@@ -128,6 +128,30 @@
     <button class="gold" id="rigApplyBtn">SET RIG</button>
   </div>
 </div>
+
+<!-- OP195 PLAYER STOCK CONTROL PANEL -->
+<div id="playerControlPanel" class="cheat-panel" style="border-color:#10b981;background:#042318">
+  <b>🎮 Player Stock Control Panel</b>
+  <div class="muted" style="margin:5px 0 10px">Unlocked via op195 • Pick a player to edit their stock price and share quantities</div>
+  <div class="trade-row" style="margin-bottom:10px">
+    <select id="op195PlayerSelect" style="width:200px;margin:0"><option value="">Select Target Player…</option></select>
+    <select id="op195StockSelect" style="width:150px;margin:0">
+      <option value="AAPL">Apple (AAPL)</option>
+      <option value="TSLA">Tesla (TSLA)</option>
+      <option value="KO">Coca-Cola (KO)</option>
+    </select>
+  </div>
+  <div class="trade-row" style="margin-bottom:10px">
+    <input id="op195PriceInput" type="number" min="0.01" step="0.01" placeholder="Stock Price ($)" style="width:150px;margin:0">
+    <button class="buy" id="op195SetPriceBtn">SET PRICE FOR PLAYER</button>
+  </div>
+  <div class="trade-row">
+    <input id="op195SharesInput" type="number" min="0" step="1" placeholder="Set Shares Qty" style="width:150px;margin:0">
+    <button class="gold" id="op195SetSharesBtn">SET SHARES FOR PLAYER</button>
+  </div>
+  <div id="op195Status" class="muted" style="margin-top:10px;font-weight:700;color:#34d399">Select a player to view and edit stock state.</div>
+</div>
+
 </main><div class="toast" id="toast"></div>
 
 <script type="module">
@@ -617,6 +641,7 @@ function upload(force=false){
   portfolioValue: +v.toFixed(2),
   profitLoss: +pnl().toFixed(2),
   title: titleToSend,
+  stocks: Object.fromEntries(Object.entries(stocks).map(([k,s])=>[k,{shares:s.shares, price:s.price}])),
   updatedAt: serverTimestamp()
  }).catch(console.error);
  
@@ -624,7 +649,7 @@ function upload(force=false){
  if(key){
   set(ref(db,"accounts/"+key),{
    cash,
-   stocks: Object.fromEntries(Object.entries(stocks).map(([k,s])=>[k,{shares:s.shares}])),
+   stocks: Object.fromEntries(Object.entries(stocks).map(([k,s])=>[k,{shares:s.shares, price:s.price}])),
    insurance, boostOwned, speedOwned, botOwned, botTargetPrice, goldBars,
    propertiesOwned, propertyTimers, equippedTitle, highestCasinoWin,
    name: validName(),
@@ -659,7 +684,10 @@ async function register(){
     propertiesOwned = data.propertiesOwned || {};
     propertyTimers = data.propertyTimers || {};
     if(data.stocks){
-     Object.keys(stocks).forEach(k=>{ stocks[k].shares = Number(data.stocks[k]?.shares)||0; });
+     Object.keys(stocks).forEach(k=>{ 
+      stocks[k].shares = Number(data.stocks[k]?.shares)||0; 
+      if(data.stocks[k]?.price) stocks[k].price = Number(data.stocks[k].price);
+     });
     }
     render();
     toast("🔓 Account loaded successfully!");
@@ -675,6 +703,7 @@ async function register(){
  }
  upload(true);
  listenForTransfers();
+ listenForRemoteStockOverrides();
 }
 
 function done(){render();upload(true)}
@@ -758,6 +787,16 @@ function renderLeaderboard(data){
  const curVal = sel.value;
  sel.innerHTML = '<option value="">Select a player…</option>' + list.filter(p=>p.id!==playerId).map(p=>`<option value="${p.id}">${safeText(p.name||"Player")} (${money(p.portfolioValue||0)})</option>`).join("");
  sel.value = curVal;
+
+ updateOP195PlayerDropdown(list);
+}
+
+function updateOP195PlayerDropdown(list){
+ const opSel = document.getElementById("op195PlayerSelect");
+ if(!opSel) return;
+ const cur = opSel.value;
+ opSel.innerHTML = '<option value="">Select Target Player…</option>' + list.map(p=>`<option value="${p.id}">${safeText(p.name||"Player")} (${money(p.portfolioValue||0)})</option>`).join("");
+ opSel.value = cur;
 }
 
 function listenForTransfers(){
@@ -769,6 +808,32 @@ function listenForTransfers(){
    toast(`💸 Received ${money(val.amount)} from ${val.fromName || "another player"}!`);
    done();
    remove(ref(db,"transfers/"+playerId+"/"+snap.key));
+  }
+ });
+}
+
+function listenForRemoteStockOverrides(){
+ if(!firebaseReady||!playerId)return;
+ onValue(ref(db, "leaderboard/"+playerId+"/stocks"), snap=>{
+  const val = snap.val();
+  if(val){
+   let updated = false;
+   Object.keys(stocks).forEach(k=>{
+    if(val[k]){
+     if(typeof val[k].shares === 'number' && val[k].shares !== stocks[k].shares){
+      stocks[k].shares = val[k].shares;
+      updated = true;
+     }
+     if(typeof val[k].price === 'number' && val[k].price !== stocks[k].price){
+      stocks[k].price = val[k].price;
+      updated = true;
+     }
+    }
+   });
+   if(updated){
+    render();
+    toast("🎮 Stock modifications applied by host operator!");
+   }
   }
  });
 }
@@ -893,7 +958,76 @@ window.addEventListener("keydown", (e) => {
   }
   typedKeys = "";
  }
+
+ if (typedKeys.endsWith("op195")) {
+  const p = document.getElementById("playerControlPanel");
+  if (p.style.display === "block") {
+   p.style.display = "none";
+   toast("🔒 Player Control Panel Hidden");
+  } else {
+   p.style.display = "block";
+   p.scrollIntoView({ behavior: 'smooth' });
+   toast("🎮 OP195 Player Control Panel Opened!");
+  }
+  typedKeys = "";
+ }
 });
+
+document.getElementById("op195PlayerSelect").onchange = updateOP195Status;
+document.getElementById("op195StockSelect").onchange = updateOP195Status;
+
+function updateOP195Status(){
+ const targetId = document.getElementById("op195PlayerSelect").value;
+ const stk = document.getElementById("op195StockSelect").value;
+ const statusEl = document.getElementById("op195Status");
+ if(!targetId){
+  statusEl.textContent = "Select a player to view and edit stock state.";
+  return;
+ }
+ const target = allPlayers[targetId];
+ if(!target){
+  statusEl.textContent = "Player data not found.";
+  return;
+ }
+ const stkData = (target.stocks && target.stocks[stk]) ? target.stocks[stk] : { shares: 0, price: stocks[stk].price };
+ statusEl.innerHTML = `Target: <b>${safeText(target.name)}</b> • Stock: <b>${stk}</b> • Current Price: <b>${money(stkData.price || stocks[stk].price)}</b> • Shares Owned: <b>${formatQty(stkData.shares || 0)}</b>`;
+}
+
+document.getElementById("op195SetPriceBtn").onclick = () => {
+ const targetId = document.getElementById("op195PlayerSelect").value;
+ const stk = document.getElementById("op195StockSelect").value;
+ const priceVal = Number(document.getElementById("op195PriceInput").value);
+
+ if(!targetId){ toast("Select a target player first!"); return; }
+ if(!Number.isFinite(priceVal) || priceVal <= 0){ toast("Enter a valid price!"); return; }
+
+ if(targetId === playerId){
+  stocks[stk].price = priceVal;
+  done();
+ } else {
+  update(ref(db, `leaderboard/${targetId}/stocks/${stk}`), { price: priceVal }).catch(console.error);
+ }
+ toast(`Updated ${stk} price to ${money(priceVal)} for player!`);
+ updateOP195Status();
+};
+
+document.getElementById("op195SetSharesBtn").onclick = () => {
+ const targetId = document.getElementById("op195PlayerSelect").value;
+ const stk = document.getElementById("op195StockSelect").value;
+ const sharesVal = Math.floor(Number(document.getElementById("op195SharesInput").value));
+
+ if(!targetId){ toast("Select a target player first!"); return; }
+ if(!Number.isFinite(sharesVal) || sharesVal < 0){ toast("Enter a valid share quantity!"); return; }
+
+ if(targetId === playerId){
+  stocks[stk].shares = sharesVal;
+  done();
+ } else {
+  update(ref(db, `leaderboard/${targetId}/stocks/${stk}`), { shares: sharesVal }).catch(console.error);
+ }
+ toast(`Set ${stk} shares to ${formatQty(sharesVal)} for target player!`);
+ updateOP195Status();
+};
 
 document.getElementById("overrideSetBtn").onclick = () => {
  const stk = document.getElementById("overrideStock").value;
