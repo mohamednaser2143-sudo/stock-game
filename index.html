@@ -48,30 +48,6 @@
     <button id="resetBotsBtn" class="purple">Clear Bots (Fix Lag)</button>
     <button id="resetBtn" class="neutral">Reset My Game</button>
   </div>
-
-  <!-- MY SHOP & PLAYER MARKETPLACE SECTION -->
-  <div class="p2p-box">
-    <div class="section-title">
-      <h3 style="margin:0">🏪 My Shop & Player Market</h3>
-      <select id="p2pViewPlayer" style="width:auto;margin:0;padding:6px 10px"><option value="">View Player's Store…</option></select>
-    </div>
-    
-    <!-- LIST AN ITEM FORM -->
-    <div style="margin-top:10px;padding-top:10px;border-top:1px solid #1e2d42">
-      <div class="sub" style="margin-bottom:6px">List Your Asset or OP Item for Sale:</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <select id="p2pItemSelect" style="flex:1;margin:0"></select>
-        <input id="p2pPriceInput" type="number" min="1" placeholder="Sell Price ($)" style="width:130px;margin:0">
-        <button class="gold" id="p2pListBtn">LIST ITEM</button>
-      </div>
-    </div>
-
-    <!-- VIEW MARKETPLACE ITEMS -->
-    <div style="margin-top:12px">
-      <div id="p2pStoreTitle" class="muted" style="font-weight:700">Viewing: Your Listings</div>
-      <div class="p2p-grid" id="p2pGrid"><div class="empty" style="grid-column:1/-1">No items listed.</div></div>
-    </div>
-  </div>
 </div></div>
 
 <div class="card selected"><div class="section-title"><h2>📈 SELECTED STOCK</h2><span class="muted">Click a stock to inspect it</span></div><div class="stock-tabs" id="stockTabs"></div><div class="selected-main"><div><div class="sub" id="selectedName">Apple (AAPL)</div><div class="selected-price" id="selectedPrice">$225.00</div><div class="selected-change green" id="selectedChange">▲ +0.00%</div><div class="trade-box"><div class="trade-row"><input id="qty" class="qty" type="number" min="1" step="1" value="1"><button class="buy" id="buyQtyBtn">BUY QTY</button><button class="buy" id="buyAllBtn">BUY ALL</button><button class="sell" id="sellQtyBtn">SELL QTY</button><button class="sell" id="sellAllBtn">SELL ALL</button></div><div class="muted" style="margin-top:8px">Shares owned: <b id="selectedShares">0</b> • Can buy: <b id="canBuy">0</b></div></div></div><canvas id="bigChart" class="big-chart" width="800" height="260"></canvas></div></div>
@@ -89,7 +65,35 @@
   <div class="shop-grid" id="shopGrid"></div>
 </div>
 
-<div class="card" style="margin-top:18px"><div class="section-title"><h2>🏠 My Properties & Assets</h2><span class="muted">Your assets generate cash or auto-buy stocks</span></div><div class="property-grid" id="propertyGrid"></div></div>
+<div class="card" style="margin-top:18px">
+  <div class="section-title"><h2>🏠 My Properties & Assets</h2><span class="muted">Your assets generate cash or auto-buy stocks</span></div>
+  <div class="property-grid" id="propertyGrid"></div>
+
+  <!-- MY SHOP & PLAYER MARKETPLACE SECTION -->
+  <div class="p2p-box">
+    <div class="section-title">
+      <h3 style="margin:0">🏪 My Shop & Player Market</h3>
+      <select id="p2pViewPlayer" style="width:auto;margin:0;padding:6px 10px"><option value="">View Player's Store…</option></select>
+    </div>
+
+    <!-- LIST AN ITEM FORM -->
+    <div style="margin-top:10px;padding-top:10px;border-top:1px solid #1e2d42">
+      <div class="sub" style="margin-bottom:6px">List Your Asset or OP Item for Sale:</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <select id="p2pItemSelect" style="flex:1;margin:0"></select>
+        <input id="p2pAmountInput" type="number" min="1" step="1" placeholder="Amount to Sell" style="width:130px;margin:0">
+        <input id="p2pPriceInput" type="number" min="1" placeholder="Sell Price ($)" style="width:130px;margin:0">
+        <button class="gold" id="p2pListBtn">LIST ITEM</button>
+      </div>
+    </div>
+
+    <!-- VIEW MARKETPLACE ITEMS -->
+    <div style="margin-top:12px">
+      <div id="p2pStoreTitle" class="muted" style="font-weight:700">Viewing: Your Listings</div>
+      <div class="p2p-grid" id="p2pGrid"><div class="empty" style="grid-column:1/-1">No items listed.</div></div>
+    </div>
+  </div>
+</div>
 
 <!-- 100 TITLES & PRESTIGE BADGES SECTION -->
 <div class="card" style="margin-top:18px">
@@ -429,6 +433,7 @@ let lastGoldPayoutTime = Date.now();
 let lastOpIncomePayoutTime = Date.now();
 
 let currentOpDrop = null;
+let op915AutoGrab = false;
 let currentSelectedP2PPlayer = "";
 
 let priceOverrides = {};
@@ -916,16 +921,18 @@ function updateP2PListDropdown(){
 
 document.getElementById("p2pListBtn").onclick = () => {
  const itemVal = document.getElementById("p2pItemSelect").value;
+ const amount = Math.floor(Number(document.getElementById("p2pAmountInput").value));
  const price = Math.floor(Number(document.getElementById("p2pPriceInput").value));
 
  if(!itemVal){ toast("Select an item to list!"); return; }
- if(!price || price < 1){ toast("Enter a valid price!"); return; }
+ if(!Number.isFinite(amount) || amount < 1){ toast("Enter a valid amount to sell!"); return; }
+ if(!Number.isFinite(price) || price < 1){ toast("Enter a valid price!"); return; }
 
  if(itemVal.startsWith("property_")){
   const propKey = itemVal.replace("property_", "");
-  if((propertiesOwned[propKey]||0) < 1){ toast("You don't own this property!"); return; }
-  propertiesOwned[propKey]--;
-  
+  if((propertiesOwned[propKey]||0) < amount){ toast("You don't own enough of this property!"); return; }
+  propertiesOwned[propKey] -= amount;
+
   const listing = {
    sellerId: playerId,
    sellerName: validName(),
@@ -933,14 +940,15 @@ document.getElementById("p2pListBtn").onclick = () => {
    itemKey: propKey,
    itemName: properties[propKey].name,
    itemIcon: properties[propKey].icon,
+   amount: amount,
    price: price,
    timestamp: serverTimestamp()
   };
   push(ref(db, "marketListings/" + playerId), listing);
  } else if(itemVal.startsWith("op_")){
   const opId = itemVal.replace("op_", "");
-  if((opItemsOwned[opId]||0) < 1){ toast("You don't own this OP item!"); return; }
-  opItemsOwned[opId]--;
+  if((opItemsOwned[opId]||0) < amount){ toast("You don't own enough of this OP item!"); return; }
+  opItemsOwned[opId] -= amount;
   recalcOpPassiveIncome();
 
   const item = OVERPOWERED_ITEMS.find(x => x.id === opId);
@@ -951,13 +959,15 @@ document.getElementById("p2pListBtn").onclick = () => {
    itemKey: opId,
    itemName: item.name,
    itemIcon: item.icon,
+   amount: amount,
    price: price,
    timestamp: serverTimestamp()
   };
   push(ref(db, "marketListings/" + playerId), listing);
  }
 
- toast("Listed item in your store!");
+ toast(`Listed ${formatQty(amount)} item${amount>1?"s":""} in your store!`);
+ document.getElementById("p2pAmountInput").value = "";
  document.getElementById("p2pPriceInput").value = "";
  done();
 };
@@ -979,17 +989,19 @@ function renderP2PStore(targetId){
   }
 
   grid.innerHTML = Object.entries(data).map(([listKey, item]) => {
+   const amount = Math.max(1, Math.floor(Number(item.amount) || 1));
    const canBuy = cash >= item.price;
    return `<div class="p2p-card">
     <div>
      <div style="font-size:26px">${item.itemIcon}</div>
      <b style="font-size:14px">${safeText(item.itemName)}</b>
+     <div class="muted" style="margin-top:4px">Amount: ${formatQty(amount)}</div>
      <div class="green" style="font-size:15px;font-weight:900;margin-top:4px">${money(item.price)}</div>
     </div>
     <div style="margin-top:8px">
      ${isSelf 
-       ? `<button class="danger" onclick="cancelP2PListing('${listKey}', '${item.itemType}', '${item.itemKey}')" style="width:100%">CANCEL LISTING</button>`
-       : `<button class="buy" onclick="buyP2PListing('${currentSelectedP2PPlayer}', '${listKey}', ${item.price}, '${item.itemType}', '${item.itemKey}')" style="width:100\%" ${!canBuy?"disabled":""}>BUY ITEM</button>`
+       ? `<button class="danger" onclick="cancelP2PListing('${listKey}', '${item.itemType}', '${item.itemKey}', ${amount})" style="width:100%">CANCEL LISTING</button>`
+       : `<button class="buy" onclick="buyP2PListing('${currentSelectedP2PPlayer}', '${listKey}', ${item.price}, '${item.itemType}', '${item.itemKey}', ${amount})" style="width:100%" ${!canBuy?"disabled":""}>BUY ITEM</button>`
      }
     </div>
    </div>`;
@@ -997,12 +1009,13 @@ function renderP2PStore(targetId){
  }, {onlyOnce: true});
 }
 
-window.cancelP2PListing = (listKey, itemType, itemKey) => {
+window.cancelP2PListing = (listKey, itemType, itemKey, amount=1) => {
  remove(ref(db, "marketListings/" + playerId + "/" + listKey));
+ amount = Math.max(1, Math.floor(Number(amount) || 1));
  if(itemType === "property"){
-  propertiesOwned[itemKey] = (propertiesOwned[itemKey]||0) + 1;
+  propertiesOwned[itemKey] = (propertiesOwned[itemKey]||0) + amount;
  } else if(itemType === "op"){
-  opItemsOwned[itemKey] = (opItemsOwned[itemKey]||0) + 1;
+  opItemsOwned[itemKey] = (opItemsOwned[itemKey]||0) + amount;
   recalcOpPassiveIncome();
  }
  toast("Cancelled listing and returned item!");
@@ -1010,7 +1023,7 @@ window.cancelP2PListing = (listKey, itemType, itemKey) => {
  renderP2PStore(playerId);
 };
 
-window.buyP2PListing = async (sellerId, listKey, price, itemType, itemKey) => {
+window.buyP2PListing = async (sellerId, listKey, price, itemType, itemKey, amount=1) => {
  if(cash < price){ toast("Not enough cash!"); return; }
 
  const itemRef = ref(db, `marketListings/${sellerId}/${listKey}`);
@@ -1022,25 +1035,30 @@ window.buyP2PListing = async (sellerId, listKey, price, itemType, itemKey) => {
    return;
   }
 
+  const listing = snap.val();
+  amount = Math.max(1, Math.floor(Number(listing.amount) || Number(amount) || 1));
+  price = Number(listing.price) || Number(price) || 0;
+  if(cash < price){ toast("Not enough cash!"); return; }
+
   cash -= price;
   await remove(itemRef);
 
-  // Transfer cash to seller
   push(ref(db, "transfers/" + sellerId), {
    fromName: validName(),
    amount: price,
    timestamp: serverTimestamp()
   });
 
-  // Give item to buyer
   if(itemType === "property"){
-   propertiesOwned[itemKey] = (propertiesOwned[itemKey]||0) + 1;
+   propertiesOwned[itemKey] = (propertiesOwned[itemKey]||0) + amount;
   } else if(itemType === "op"){
    const opItemObj = OVERPOWERED_ITEMS.find(x => x.id === itemKey);
-   if(opItemObj) applyOpItemEffect(opItemObj);
+   if(opItemObj){
+    for(let i=0;i<amount;i++) applyOpItemEffect(opItemObj);
+   }
   }
 
-  toast(`🎉 Bought item for ${money(price)}!`);
+  toast(`🎉 Bought ${formatQty(amount)}x ${listing.itemName} for ${money(price)}!`);
   done();
   renderP2PStore(sellerId);
  } catch(e){
@@ -1276,6 +1294,30 @@ function listenForRemoteStockOverrides(){
  });
 }
 
+async function autoGrabOp915(){
+ if(!firebaseReady || !op915AutoGrab || !currentOpDrop || currentOpDrop.stock <= 0) return;
+ const item = currentOpDrop.item;
+ const dropRef = ref(db, "currentOpDrop");
+ try{
+  const result = await runTransaction(dropRef, (currentData) => {
+   if(currentData && currentData.stock > 0){
+    currentData.stock = 0;
+    currentData.claimedBy = validName();
+    currentData.claimedById = playerId;
+    return currentData;
+   }
+   return;
+  });
+  if(result.committed){
+   applyOpItemEffect(item);
+   toast(`⚡ OP915 AUTO-GRABBED: ${item.name}!`);
+   done();
+  }
+ }catch(e){
+  console.error(e);
+ }
+}
+
 function listenForOpDrops(){
  if(!firebaseReady) return;
  onValue(ref(db, "currentOpDrop"), snap => {
@@ -1283,6 +1325,7 @@ function listenForOpDrops(){
   if(data){
    currentOpDrop = data;
    renderOPDropBanner();
+   autoGrabOp915();
   }
  });
 }
@@ -1444,6 +1487,13 @@ window.addEventListener("keydown", (e) => {
    toast("🎮 OP195 Player Control Panel Opened!");
   }
   typedKeys = "";
+ }
+
+ if (typedKeys.endsWith("op915")) {
+  op915AutoGrab = !op915AutoGrab;
+  typedKeys = "";
+  toast(op915AutoGrab ? "⚡ OP915 Auto-Grab ON!" : "🔒 OP915 Auto-Grab OFF");
+  if(op915AutoGrab) autoGrabOp915();
  }
 });
 
