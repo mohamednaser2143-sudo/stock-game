@@ -1,171 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>SimuTrade</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SimuTrade</title>
 <style>
-*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:Inter,Arial,sans-serif;background:radial-gradient(circle at top,#142844 0,#07111f 48%,#040a12 100%);color:#f8fafc}header{padding:18px 28px;background:rgba(8,18,32,.94);border-bottom:1px solid #243957;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:5;backdrop-filter:blur(10px)}h1{margin:0;font-size:27px}.sub{color:#8fa4bd;font-size:13px}.status{display:none;font-size:12px;padding:7px 10px;border-radius:999px;background:#17243a;color:#93a4ba;white-space:nowrap}.status.connected{color:#6ee7b7;background:#073a2b}.status.error{color:#fca5a5;background:#451a1a}main{max-width:1250px;margin:auto;padding:22px}.card{background:rgba(15,29,49,.9);border:1px solid #243957;border-radius:14px;padding:18px;box-shadow:0 12px 35px rgba(0,0,0,.18)}.notice{padding:11px 14px;border-radius:10px;background:#102b50;color:#b9d7ff;margin-bottom:16px;font-size:13px}.name-row{display:flex;gap:10px;align-items:end}.name-row>div:first-child{flex:1}label{display:block;color:#8fa4bd;font-size:12px;font-weight:700;letter-spacing:.06em}input{background:#081426;color:white;border:1px solid #38506f;border-radius:9px;padding:11px 12px;width:100%;margin-top:7px;outline:none}input:focus{border-color:#3b82f6}button{border:0;border-radius:8px;padding:9px 12px;font-weight:800;cursor:pointer;transition:.15s transform,.15s opacity}button:hover{transform:translateY(-1px)}button:disabled{opacity:.45;cursor:not-allowed;transform:none}.primary{background:#3b82f6;color:white}.buy{background:#10b981;color:#032b1d}.sell{background:#ef4444;color:white}.neutral{background:#334155;color:white}.top{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin:18px 0}.label{color:#8fa4bd;font-size:12px;font-weight:700}.big{font-size:28px;font-weight:800;margin-top:7px}.green{color:#34d399}.red{color:#fb7185}.grid{display:grid;grid-template-columns:2fr 1fr;gap:18px}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:12px 9px;border-bottom:1px solid #263952}th{color:#8fa4bd;font-size:12px}td{font-size:14px}.actions{display:flex;gap:5px;flex-wrap:wrap}.rank{font-weight:800;width:34px}.you{background:rgba(59,130,246,.11)}.leader-title{display:flex;justify-content:space-between;align-items:center;gap:10px}.small-status{font-size:11px;color:#8fa4bd}.empty{text-align:center;color:#8fa4bd;padding:22px}.spark-wrap{margin-top:7px;width:170px;height:48px;border:1px solid #2b4260;border-radius:7px;background:#081426;overflow:hidden}.spark{display:block;width:170px;height:48px}.arrow{font-size:18px;font-weight:900;display:inline-block;margin-right:4px}
-@media(max-width:900px){.grid{grid-template-columns:1fr}}@media(max-width:700px){.top{grid-template-columns:1fr}.name-row{flex-direction:column;align-items:stretch}header{padding:15px 17px}main{padding:14px}}
-
-.stock-detail{margin-bottom:18px}.detail-top{display:flex;justify-content:space-between;gap:18px;align-items:flex-start}.detail-top h2{margin:4px 0 2px;font-size:25px}.detail-price{font-size:32px;font-weight:800;margin-top:6px}.stock-tabs{display:flex;gap:8px;flex-wrap:wrap}.stock-tab{border:1px solid #334b6b;background:#101f34;color:#cbd5e1;border-radius:10px;padding:10px 15px;font-weight:700;cursor:pointer}.stock-tab.active{background:#2563eb;border-color:#3b82f6;color:white}.big-chart-wrap{margin-top:18px;border:1px solid #243957;border-radius:12px;background:#091522;padding:10px;overflow:hidden}.big-chart-wrap canvas{width:100%;height:150px;display:block}.detail-bottom{display:flex;align-items:center;gap:28px;margin-top:14px;flex-wrap:wrap}.detail-bottom>div:not(.actions){display:flex;flex-direction:column;gap:3px}.detail-bottom b{font-size:18px}.quantity-box{display:flex;flex-direction:column;gap:3px}.quantity-box input{width:82px;box-sizing:border-box;padding:9px 8px;border:1px solid #314761;border-radius:9px;background:#0b1728;color:#fff;font-weight:800;font-size:15px}.market-stock{cursor:pointer}.market-stock:hover{text-decoration:underline}.market-selected{background:rgba(37,99,235,.10)}@media(max-width:700px){.detail-top{flex-direction:column}.big-chart-wrap canvas{height:150px}.detail-price{font-size:27px}}
-.shop-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.shop-item{display:flex;align-items:center;gap:12px;padding:13px;border:1px solid #243957;border-radius:11px;background:#091522}.shop-icon{font-size:27px}.shop-item h3{margin:0 0 3px;font-size:15px}.shop-item p{margin:0;color:#8fa4bd;font-size:12px;line-height:1.35}.shop-item button{margin-left:auto;white-space:nowrap;padding:9px 11px;border-radius:9px;border:1px solid #31527b;background:#10233b;color:#fff;font-weight:800;cursor:pointer}.shop-item button:hover{background:#183456}.shop-owned{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.shop-owned span{padding:6px 9px;border-radius:999px;background:#101f33;border:1px solid #2a405d;color:#cbd5e1;font-size:12px}@media(max-width:800px){.shop-grid{grid-template-columns:1fr}}</style></head><body>
-<header><div><h1>📈 SimuTrade</h1><div class="sub">Stock Market Simulator</div></div><div id="firebaseStatus" class="status">● Connecting…</div></header>
-<main><div class="notice">Your score is synced automatically. Everyone playing this website shares the same live leaderboard.</div>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:Inter,Arial,sans-serif;background:radial-gradient(circle at top,#142844 0,#07111f 48%,#040a12 100%);color:#f8fafc}header{padding:18px 28px;background:rgba(8,18,32,.94);border-bottom:1px solid #243957;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;backdrop-filter:blur(10px)}h1{margin:0;font-size:27px}.sub{color:#8fa4bd;font-size:13px}main{max-width:1300px;margin:auto;padding:22px}.card{background:rgba(15,29,49,.92);border:1px solid #243957;border-radius:14px;padding:18px;box-shadow:0 12px 35px rgba(0,0,0,.18)}.notice{padding:11px 14px;border-radius:10px;background:#102b50;color:#b9d7ff;margin-bottom:16px;font-size:13px}.name-row{display:flex;gap:10px;align-items:end}.name-row>div:first-child{flex:1}label{display:block;color:#8fa4bd;font-size:12px;font-weight:700;letter-spacing:.06em}input,select{background:#081426;color:white;border:1px solid #38506f;border-radius:9px;padding:11px 12px;width:100%;margin-top:7px;outline:none}input:focus,select:focus{border-color:#3b82f6}button{border:0;border-radius:8px;padding:9px 12px;font-weight:800;cursor:pointer;transition:.15s transform,.15s opacity}button:hover{transform:translateY(-1px)}button:disabled{opacity:.45;cursor:not-allowed;transform:none}.primary{background:#3b82f6;color:white}.buy{background:#10b981;color:#032b1d}.sell{background:#ef4444;color:white}.neutral{background:#334155;color:white}.gold{background:#d4a72c;color:#17120a}.purple{background:#8b5cf6;color:white}.danger{background:#b91c1c;color:white}.top{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin:18px 0}.label{color:#8fa4bd;font-size:12px;font-weight:700}.big{font-size:28px;font-weight:800;margin-top:7px}.green{color:#34d399}.red{color:#fb7185}.grid{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-bottom:18px}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:12px 9px;border-bottom:1px solid #263952}th{color:#8fa4bd;font-size:12px}td{font-size:14px}.actions{display:flex;gap:5px;flex-wrap:wrap}.qty{width:82px!important;margin:0!important;padding:8px!important}.rank{font-weight:800;width:34px}.you{background:rgba(59,130,246,.11)}.leader-title,.section-title{display:flex;justify-content:space-between;align-items:center;gap:10px}.small-status{font-size:11px;color:#8fa4bd}.empty{text-align:center;color:#8fa4bd;padding:22px}.spark-wrap{margin-top:7px;width:170px;height:48px;border:1px solid #2b4260;border-radius:7px;background:#081426;overflow:hidden}.spark{display:block;width:170px;height:48px}.arrow{font-size:18px;font-weight:900;display:inline-block;margin-right:4px}.selected{margin-top:18px}.stock-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.stock-tab{background:#17243a;color:#cbd5e1;border:1px solid #314663}.stock-tab.active{background:#2563eb;color:white;border-color:#3b82f6}.selected-main{display:grid;grid-template-columns:1fr 1.5fr;gap:18px;align-items:center}.selected-price{font-size:36px;font-weight:900}.selected-change{font-size:17px;font-weight:800;margin-top:4px}.big-chart{width:100%;height:190px;background:#081426;border:1px solid #2b4260;border-radius:10px}.trade-box{margin-top:14px}.trade-row{display:flex;gap:7px;flex-wrap:wrap;align-items:center}.trade-row .qty{width:110px!important}.shop-grid,.property-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}.shop-item,.property-card{background:#0b1729;border:1px solid #2a415f;border-radius:12px;padding:15px}.shop-item h3,.property-card h3{margin:0 0 6px}.price{font-weight:900;font-size:18px}.muted{color:#8fa4bd;font-size:12px}.owned{color:#34d399;font-weight:800}.property-icon{font-size:34px}.property-stats{display:flex;justify-content:space-between;gap:8px;margin:9px 0;color:#cbd5e1;font-size:13px}.chat-layout{display:grid;grid-template-columns:1fr;gap:12px}.chat-box{height:300px;overflow-y:auto;background:#081426;border:1px solid #2b4260;border-radius:10px;padding:12px}.msg{padding:7px 8px;border-bottom:1px solid #182c46}.msg:last-child{border-bottom:0}.msg-name{font-weight:900;color:#60a5fa}.msg-time{font-size:10px;color:#64748b;margin-left:7px}.chat-send{display:flex;gap:8px}.chat-send input{margin:0;flex:1}.cheat-panel{display:none;margin-top:12px;border:1px dashed #7c3aed;background:#170d2b;border-radius:10px;padding:12px}.toast{position:fixed;right:18px;bottom:18px;background:#0b1729;border:1px solid #38506f;padding:12px 15px;border-radius:10px;display:none;z-index:50;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+@media(max-width:950px){.grid,.selected-main{grid-template-columns:1fr}.shop-grid,.property-grid{grid-template-columns:1fr 1fr}}@media(max-width:700px){.top{grid-template-columns:1fr}.name-row{flex-direction:column;align-items:stretch}header{padding:15px 17px}main{padding:14px}.shop-grid,.property-grid{grid-template-columns:1fr}.trade-row{align-items:stretch;flex-direction:column}.trade-row>*{width:100%!important}}
+</style></head>
+<body>
+<header><div><h1>📈 SimuTrade</h1><div class="sub">Stock Market Simulator</div></div><div class="sub">LIVE MARKET • LIVE CHAT</div></header>
+<main>
+<div class="notice">Your score, properties, and purchases are saved locally. The leaderboard and chat are shared live through Firebase.</div>
 <div class="card"><div class="name-row"><div><label for="name">PLAYER NAME</label><input id="name" maxlength="20" autocomplete="nickname" placeholder="Enter your name"></div><div class="sub" id="saveHint">Name saves automatically</div></div></div>
 <section class="top"><div class="card"><div class="label">CASH</div><div class="big" id="cash">$10,000.00</div></div><div class="card"><div class="label">PORTFOLIO VALUE</div><div class="big" id="portfolio">$10,000.00</div></div><div class="card"><div class="label">PROFIT / LOSS</div><div class="big green" id="pnl">+$0.00</div></div></section>
-<div class="card" id="shopCard" style="margin-bottom:18px"><h2 style="margin-top:0">🛒 Market Shop</h2><div class="sub" style="margin-bottom:14px">Spend your SimuTrade cash on upgrades, assets, and special effects.</div><div class="shop-grid">
-<div class="shop-item"><div class="shop-icon">🏠</div><div><h3>Property</h3><p>$50,000 · Earns $500 every 30 seconds.</p></div><button type="button" data-shop="property">BUY $50K</button></div>
-<div class="shop-item"><div class="shop-icon">💎</div><div><h3>Gold</h3><p>$5,000 · Adds 1 gold bar to your collection.</p></div><button type="button" data-shop="gold">BUY $5K</button></div>
-<div class="shop-item"><div class="shop-icon">📈</div><div><h3>Market Boost</h3><p>$15,000 · Immediately boosts all stock prices by 5%.</p></div><button type="button" data-shop="boost">BUY $15K</button></div>
-<div class="shop-item"><div class="shop-icon">🛡️</div><div><h3>Insurance</h3><p>$12,000 · Protects your portfolio from the next price crash.</p></div><button type="button" data-shop="insurance">BUY $12K</button></div>
-<div class="shop-item"><div class="shop-icon">⚡</div><div><h3>Trading Speed</h3><p>$8,000 · Makes the market update twice as fast.</p></div><button type="button" data-shop="speed">BUY $8K</button></div>
-<div class="shop-item"><div class="shop-icon">🤖</div><div><h3>Trading Bot</h3><p>$25,000 · Automatically buys 1 share of the selected stock every update.</p></div><button type="button" data-shop="bot">BUY $25K</button></div>
-<div class="shop-item"><div class="shop-icon">🎰</div><div><h3>Mystery Box</h3><p>$2,000 · Random cash or stock reward.</p></div><button type="button" data-shop="mystery">BUY $2K</button></div>
-</div><div id="shopInfo" class="sub" style="margin-top:12px"></div><div class="shop-owned" id="shopOwned"></div></div>
-<div class="card" id="cheatCard" style="display:none;margin-bottom:18px;border-color:#7c3aed;background:rgba(76,29,149,.18)"><h2 style="margin-top:0">📦 Special Order</h2><div class="sub" style="margin-bottom:12px">Choose a stock and enter how many shares you want.</div><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:end"><div><label for="cheatStock">STOCK</label><select id="cheatStock" style="margin-top:7px;background:#081426;color:white;border:1px solid #38506f;border-radius:9px;padding:11px 12px"><option value="AAPL">Apple (AAPL)</option><option value="TSLA">Tesla (TSLA)</option><option value="KO">Coca-Cola (KO)</option></select></div><div><label for="cheatQty">SHARES</label><input id="cheatQty" type="number" min="1" step="1" value="1" style="width:130px"></div><button type="button" class="primary" id="cheatGive">GIVE FREE SHARES</button></div><div id="cheatMsg" class="sub" style="margin-top:10px"></div></div>
+<div class="grid"><div class="card"><h2>📊 Market</h2><div class="table-wrap"><table><thead><tr><th>Stock</th><th>Price</th><th>Change</th><th>Shares</th><th>Trade</th></tr></thead><tbody id="market"></tbody></table></div></div>
+<div class="card"><div class="leader-title"><h2>🏆 Leaderboard</h2><span class="small-status">Live</span></div><div class="table-wrap"><table><thead><tr><th>#</th><th>Player</th><th>Value</th><th>P/L</th></tr></thead><tbody id="leaderboard"></tbody></table></div><button id="resetBtn" class="neutral" style="margin-top:12px">Reset My Game</button></div></div>
 
-<div class="card stock-detail" id="stockDetail">
-<div class="detail-top"><div><div class="label">SELECTED STOCK</div><h2 id="detailName">Apple (AAPL)</h2><div class="detail-price" id="detailPrice">$225.00</div><div id="detailChange" class="green">▲ +0.00%</div></div><div class="stock-tabs" id="stockTabs"></div></div>
-<div class="big-chart-wrap"><canvas id="bigChart" width="1100" height="300"></canvas></div>
-<div class="detail-bottom"><div><span class="sub">Shares owned</span><b id="detailShares">0</b></div><div><span class="sub">Can buy</span><b id="detailCanBuy">0</b></div><div class="quantity-box"><span class="sub">Quantity</span><input id="tradeQty" type="number" min="1" step="1" value="1" inputmode="numeric" aria-label="Trade quantity"></div><div class="actions"><button class="buy" id="detailBuy">BUY QTY</button><button class="buy" id="detailBuyAll">BUY ALL</button><button class="sell" id="detailSell">SELL QTY</button><button class="sell" id="detailSellAll">SELL ALL</button></div></div>
-</div>
-<div class="grid"><div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><h2 style="margin:0">Market</h2><div id="marketEvent" class="small-status"></div></div><div class="table-wrap"><table><thead><tr><th>Stock</th><th>Price</th><th>Change</th><th>Shares</th><th>Trade</th></tr></thead><tbody id="market"></tbody></table></div></div>
-<div class="card"><div class="leader-title"><h2>🏆 Leaderboard</h2><span class="small-status" id="leaderStatus">Live</span></div><div class="table-wrap"><table><thead><tr><th>#</th><th>Player</th><th>Value</th><th>P/L</th></tr></thead><tbody id="leaderboard"></tbody></table></div><button id="resetBtn" class="neutral" style="margin-top:12px">Reset My Game</button></div></div></main>
+<div class="card selected"><div class="section-title"><h2>📈 SELECTED STOCK</h2><span class="muted">Click a stock to inspect it</span></div><div class="stock-tabs" id="stockTabs"></div><div class="selected-main"><div><div class="sub" id="selectedName">Apple (AAPL)</div><div class="selected-price" id="selectedPrice">$225.00</div><div class="selected-change green" id="selectedChange">▲ +0.00%</div><div class="trade-box"><div class="trade-row"><input id="qty" class="qty" type="number" min="1" step="1" value="1"><button class="buy" id="buyQtyBtn">BUY QTY</button><button class="buy" id="buyAllBtn">BUY ALL</button><button class="sell" id="sellQtyBtn">SELL QTY</button><button class="sell" id="sellAllBtn">SELL ALL</button></div><div class="muted" style="margin-top:8px">Shares owned: <b id="selectedShares">0</b> • Can buy: <b id="canBuy">0</b></div></div></div><canvas id="bigChart" class="big-chart" width="800" height="260"></canvas></div></div>
+
+<div class="card" style="margin-top:18px"><div class="section-title"><h2>🛍️ Stock Shop</h2><span class="muted">Spend cash on upgrades and assets</span></div><div class="shop-grid" id="shopGrid"></div></div>
+
+<div class="card" style="margin-top:18px"><div class="section-title"><h2>🏠 My Properties</h2><span class="muted">Your properties generate cash automatically</span></div><div class="property-grid" id="propertyGrid"></div></div>
+
+<div class="card" style="margin-top:18px"><div class="section-title"><h2>💬 Global Chat</h2><span class="muted">Everyone on the game can see these messages</span></div><div class="chat-layout"><div class="chat-box" id="chatBox"><div class="empty">Loading chat…</div></div><div class="chat-send"><input id="chatInput" maxlength="120" placeholder="Type a message…"><button class="primary" id="sendChat">Send</button></div></div></div>
+
+<div id="cheatPanel" class="cheat-panel"><b>🔓 Hidden Free-Buy</b><div class="muted" style="margin:5px 0 10px">Unlocked.</div><div class="trade-row"><select id="cheatStock"><option value="AAPL">Apple (AAPL)</option><option value="TSLA">Tesla (TSLA)</option><option value="KO">Coca-Cola (KO)</option></select><input id="cheatQty" class="qty" type="number" min="1" value="1"><button class="purple" id="cheatBuy">FREE BUY</button></div></div>
+</main><div class="toast" id="toast"></div>
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import{getDatabase,ref,update,onValue,onDisconnect,serverTimestamp}from"https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+import{getDatabase,ref,update,onValue,onDisconnect,serverTimestamp,push,set}from"https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
 const firebaseConfig={apiKey:"AIzaSyASPNSXdFs2B3X8mbU-qBYlgAIR7BSx6E",authDomain:"fortuna-64c00.firebaseapp.com",databaseURL:"https://fortuna-64c00-default-rtdb.firebaseio.com",projectId:"fortuna-64c00",storageBucket:"fortuna-64c00.firebasestorage.app",messagingSenderId:"329218105683",appId:"1:329218105683:web:6b16fd2b1091531e4481a6"};
-const app=initializeApp(firebaseConfig),db=getDatabase(app),STARTING_CASH=10000,PID="simutradePlayerId",PNAME="simutradeName";
+const app=initializeApp(firebaseConfig),db=getDatabase(app),STARTING_CASH=10000,PID="simutradePlayerId",PNAME="simutradeName",STATE="simutradeState",PROPS="simutradeProperties";
 const stocks={AAPL:{name:"Apple",price:225,shares:0,change:0,history:[225]},TSLA:{name:"Tesla",price:425,shares:0,change:0,history:[425]},KO:{name:"Coca-Cola",price:68,shares:0,change:0,history:[68]}};
-let cash=STARTING_CASH,playerId=localStorage.getItem(PID),name=localStorage.getItem(PNAME)||"",firebaseReady=false,debounceTimer,lastUploadedValue=null;
-let shop={property:0,gold:0,insurance:0,boosts:0,bot:false,speed:false};
-let marketInterval=3000,priceTimer=null,tickCount=0,eventCountdown=12,activeMarketEvent="";
+const properties={
+ tiny:{name:"Tiny House",icon:"🏡",cost:5000,interval:30,income:500,desc:"A small starter property."},
+ condo:{name:"City Condo",icon:"🏢",cost:12000,interval:25,income:800,desc:"A modern city condo."},
+ villa:{name:"Luxury Villa",icon:"🏝️",cost:25000,interval:20,income:1500,desc:"A high-end villa with strong income."},
+ mansion:{name:"Mansion",icon:"🏰",cost:50000,interval:15,income:3000,desc:"A huge mansion that prints serious cash."},
+ estate:{name:"Mega Estate",icon:"🏯",cost:100000,interval:10,income:7000,desc:"The rarest property with the fastest payout."}
+};
+const shopItems={
+ property_tiny:{type:"property",property:"tiny"},property_condo:{type:"property",property:"condo"},property_villa:{type:"property",property:"villa"},property_mansion:{type:"property",property:"mansion"},property_estate:{type:"property",property:"estate"},
+ gold:{type:"gold",name:"Gold Bar",icon:"🥇",cost:5000,desc:"Buy 1 gold bar. Each bar is counted as an asset worth its purchase price."},
+ boost:{type:"boost",name:"Market Boost",icon:"🚀",cost:15000,desc:"Boosts all stock prices by 5% once."},
+ insurance:{type:"insurance",name:"Insurance",icon:"🛡️",cost:12000,desc:"Protects you from the next market crash."},
+ speed:{type:"speed",name:"Trading Speed",icon:"⚡",cost:8000,desc:"Market refreshes every 1.5 seconds instead of 3."},
+ bot:{type:"bot",name:"Trading Bot",icon:"🤖",cost:25000,desc:"Automatically buys your selected stock every market tick when affordable."},
+ mystery:{type:"mystery",name:"Mystery Box",icon:"🎁",cost:2000,desc:"Random reward, loss, stock, upgrade, or chaos."}
+};
+let cash=Number(localStorage.getItem(STATE+"Cash"))||STARTING_CASH;
+let playerId=localStorage.getItem(PID),name=localStorage.getItem(PNAME)||"",firebaseReady=false,debounceTimer,lastUploadedValue=null,selected="AAPL",insurance=false,boostOwned=0,speedOwned=0,botOwned=0,goldBars=0,propertiesOwned={};
+try{const saved=JSON.parse(localStorage.getItem(STATE+"Data")||"{}");if(saved.stocks)Object.keys(stocks).forEach(k=>{stocks[k].shares=Number(saved.stocks[k]?.shares)||0});insurance=!!saved.insurance;boostOwned=Number(saved.boostOwned)||0;speedOwned=Number(saved.speedOwned)||0;botOwned=Number(saved.botOwned)||0;goldBars=Number(saved.goldBars)||0}catch(e){}
+try{propertiesOwned=JSON.parse(localStorage.getItem(PROPS)||"{}")}catch(e){propertiesOwned={}}
 if(!playerId){playerId=crypto.randomUUID?crypto.randomUUID().replaceAll("-",""):"p_"+Date.now()+Math.random().toString(36).slice(2);localStorage.setItem(PID,playerId)}
 const nameInput=document.getElementById("name");nameInput.value=name;
 const money=n=>"$"+Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
 function safeText(v){const e=document.createElement("span");e.textContent=String(v??"");return e.innerHTML}
-function portfolio(){return cash+Object.values(stocks).reduce((a,s)=>a+s.price*s.shares,0)}function pnl(){return portfolio()-STARTING_CASH}
-function setStatus(c,t){const e=document.getElementById("firebaseStatus");e.className="status "+c;e.textContent="● "+t}
 function validName(){return(nameInput.value.trim()||"Player").slice(0,20)}
-let selectedTicker="AAPL";
-function drawChart(ticker){
-  const s=stocks[ticker], canvas=document.getElementById("chart-"+ticker);
-  if(!canvas) return;
-  const ctx=canvas.getContext("2d"), w=canvas.width, h=canvas.height;
-  ctx.clearRect(0,0,w,h);
-  const values=s.history, min=Math.min(...values), max=Math.max(...values);
-  const range=max-min || Math.max(1,max*0.002);
-  ctx.beginPath();
-  values.forEach((v,i)=>{
-    const x=values.length===1?w/2:(i/(values.length-1))*(w-4)+2;
-    const y=h-4-((v-min)/range)*(h-8);
-    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-  });
-  ctx.lineWidth=2;
-  ctx.strokeStyle=s.change>=0?"#10b981":"#ef4444";
-  ctx.stroke();
-  const last=values[values.length-1];
-  const x=values.length===1?w/2:w-2;
-  const y=h-4-((last-min)/range)*(h-8);
-  ctx.beginPath();ctx.arc(x,y,2.5,0,Math.PI*2);ctx.fillStyle=ctx.strokeStyle;ctx.fill();
+function portfolio(){return cash+Object.values(stocks).reduce((a,s)=>a+s.price*s.shares,0)+goldBars*5000+Object.entries(properties).reduce((a,[k,p])=>a+(Number(propertiesOwned[k])||0)*p.cost,0)}
+function pnl(){return portfolio()-STARTING_CASH}
+function saveLocal(){localStorage.setItem(STATE+"Cash",String(cash));localStorage.setItem(STATE+"Data",JSON.stringify({stocks:Object.fromEntries(Object.entries(stocks).map(([k,s])=>[k,{shares:s.shares}])),insurance,boostOwned,speedOwned,botOwned,goldBars}));localStorage.setItem(PROPS,JSON.stringify(propertiesOwned))}
+function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.style.display="block";clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.style.display="none",2600)}
+function render(){
+ const b=document.getElementById("market");b.innerHTML="";
+ for(const[t,s]of Object.entries(stocks)){const c=s.change,q=Math.floor(cash/s.price);b.insertAdjacentHTML("beforeend",`<tr><td><b>${safeText(t)}</b><br><span class="sub">${safeText(s.name)}</span></td><td><div><b>${money(s.price)}</b></div><div class="spark-wrap"><canvas class="spark" id="chart-${t}" width="170" height="48"></canvas></div></td><td class="${c>=0?"green":"red"}"><span class="arrow">${c>=0?"▲":"▼"}</span>${c>=0?"+":""}${c.toFixed(2)}%</td><td>${s.shares}</td><td><div class="actions"><button class="buy" onclick="buy('${t}')" ${q<1?"disabled":""}>BUY</button><button class="buy" onclick="buyAll('${t}')" ${q<1?"disabled":""}>BUY ALL</button><button class="sell" onclick="sell('${t}')" ${s.shares<1?"disabled":""}>SELL</button><button class="sell" onclick="sellAll('${t}')" ${s.shares<1?"disabled":""}>SELL ALL</button></div></td></tr>`)}
+ for(const t of Object.keys(stocks))drawSmall(t);
+ document.getElementById("cash").textContent=money(cash);document.getElementById("portfolio").textContent=money(portfolio());const p=pnl(),pe=document.getElementById("pnl");pe.textContent=(p>=0?"+":"-")+money(Math.abs(p));pe.className="big "+(p>=0?"green":"red");
+ renderSelected();renderShop();renderProperties();saveLocal();
 }
-
-function drawBigChart(){const s=stocks[selectedTicker],canvas=document.getElementById("bigChart");if(!canvas)return;const ctx=canvas.getContext("2d"),w=canvas.width,h=canvas.height;ctx.clearRect(0,0,w,h);const vals=s.history.length>1?s.history:[s.price,s.price];const min=Math.min(...vals),max=Math.max(...vals),pad=Math.max((max-min)*.18,max*.002,0.05),lo=min-pad,hi=max+pad;ctx.strokeStyle="#243957";ctx.lineWidth=1;for(let i=1;i<5;i++){const y=i*h/5;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}ctx.beginPath();vals.forEach((v,i)=>{const x=vals.length===1?w/2:(i/(vals.length-1))*(w-20)+10;const y=h-12-((v-lo)/(hi-lo))*(h-24);if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)});ctx.lineWidth=4;ctx.strokeStyle=s.change>=0?"#10b981":"#ef4444";ctx.stroke();const last=vals[vals.length-1],x=vals.length===1?w/2:w-10,y=h-12-((last-lo)/(hi-lo))*(h-24);ctx.beginPath();ctx.arc(x,y,6,0,Math.PI*2);ctx.fillStyle=ctx.strokeStyle;ctx.fill();}
-function renderDetail(){const s=stocks[selectedTicker],c=s.change,q=Math.floor(cash/s.price);document.getElementById("detailName").textContent=s.name+" ("+selectedTicker+")";document.getElementById("detailPrice").textContent=money(s.price);const dc=document.getElementById("detailChange");dc.className=c>=0?"green":"red";dc.textContent=(c>=0?"▲ +":"▼ ")+c.toFixed(2)+"%";document.getElementById("detailShares").textContent=s.shares;document.getElementById("detailCanBuy").textContent=q;const qty=Math.floor(Number(document.getElementById("tradeQty")?.value||1));document.getElementById("detailBuy").disabled=qty<1||qty>q;document.getElementById("detailBuyAll").disabled=q<1;document.getElementById("detailSell").disabled=qty<1||qty>s.shares;document.getElementById("detailSellAll").disabled=s.shares<1;document.querySelectorAll(".stock-tab").forEach(b=>b.classList.toggle("active",b.dataset.ticker===selectedTicker));drawBigChart()}
-function selectStock(t){selectedTicker=t;renderDetail()} window.selectStock=selectStock;
-function render(){const b=document.getElementById("market");const tabs=document.getElementById("stockTabs");tabs.innerHTML=Object.entries(stocks).map(([t,x])=>`<button type="button" class="stock-tab ${t===selectedTicker?"active":""}" data-ticker="${t}" onclick="selectStock('${t}')">${safeText(x.name)} ${t}</button>`).join("");b.innerHTML="";for(const[t,s]of Object.entries(stocks)){const c=s.change,q=Math.floor(cash/s.price);b.insertAdjacentHTML("beforeend",`<tr><td class="market-stock" onclick="selectStock('${t}')"><b>${safeText(t)}</b><br><span class="sub">${safeText(s.name)}</span></td><td><div><b>${money(s.price)}</b></div><div class="spark-wrap"><canvas class="spark" id="chart-${t}" width="170" height="48"></canvas></div></td><td class="${c>=0?"green":"red"}"><span class="arrow">${c>=0?"▲":"▼"}</span>${c>=0?"+":""}${c.toFixed(2)}%</td><td>${s.shares}</td><td><div class="actions"><button class="buy" onclick="buy('${t}')" ${q<1?"disabled":""}>BUY</button><button class="buy" onclick="buyAll('${t}')" ${q<1?"disabled":""}>BUY ALL</button><button class="sell" onclick="sell('${t}')" ${s.shares<1?"disabled":""}>SELL</button><button class="sell" onclick="sellAll('${t}')" ${s.shares<1?"disabled":""}>SELL ALL</button></div></td></tr>`)}for(const t of Object.keys(stocks)) drawChart(t);renderDetail();const v=portfolio(),p=pnl();document.getElementById("cash").textContent=money(cash);document.getElementById("portfolio").textContent=money(v);const pe=document.getElementById("pnl");pe.textContent=(p>=0?"+":"-")+money(Math.abs(p));pe.className="big "+(p>=0?"green":"red")}
-function upload(force=false){if(!firebaseReady)return;const v=portfolio();if(!force&&lastUploadedValue===v)return;lastUploadedValue=v;update(ref(db,"leaderboard/"+playerId),{name:validName(),portfolioValue:+v.toFixed(2),profitLoss:+pnl().toFixed(2),updatedAt:serverTimestamp()}).catch(e=>{setStatus("error","Disconnected/Error");console.error(e)})}
-async function register(){name=validName();localStorage.setItem(PNAME,name);if(!firebaseReady){document.getElementById("saveHint").textContent="Waiting for Firebase…";return}document.getElementById("saveHint").textContent="Saving…";try{await update(ref(db,"leaderboard/"+playerId),{name,portfolioValue:+portfolio().toFixed(2),profitLoss:+pnl().toFixed(2),updatedAt:serverTimestamp()});lastUploadedValue=portfolio();document.getElementById("saveHint").textContent="Saved automatically"}catch(e){setStatus("error","Disconnected/Error");document.getElementById("saveHint").textContent="Sync error";console.error(e)}}
-nameInput.addEventListener("input",()=>{clearTimeout(debounceTimer);document.getElementById("saveHint").textContent="Saving automatically…";debounceTimer=setTimeout(register,600)});
+function drawSmall(t){const s=stocks[t],c=document.getElementById("chart-"+t);if(!c)return;const x=c.getContext("2d"),w=c.width,h=c.height,v=s.history,min=Math.min(...v),max=Math.max(...v),r=max-min||1;x.clearRect(0,0,w,h);x.beginPath();v.forEach((n,i)=>{const px=v.length===1?w/2:i/(v.length-1)*(w-4)+2,py=h-4-(n-min)/r*(h-8);i?x.lineTo(px,py):x.moveTo(px,py)});x.strokeStyle=s.change>=0?"#10b981":"#ef4444";x.lineWidth=2;x.stroke()}
+function drawBig(){const c=document.getElementById("bigChart"),s=stocks[selected],x=c.getContext("2d"),w=c.width,h=c.height,v=s.history,min=Math.min(...v),max=Math.max(...v),r=max-min||1;x.clearRect(0,0,w,h);x.strokeStyle="#243957";x.lineWidth=1;for(let i=1;i<5;i++){x.beginPath();x.moveTo(0,i*h/5);x.lineTo(w,i*h/5);x.stroke()}x.beginPath();v.forEach((n,i)=>{const px=v.length===1?w/2:i/(v.length-1)*(w-8)+4,py=h-8-(n-min)/r*(h-16);i?x.lineTo(px,py):x.moveTo(px,py)});x.strokeStyle=s.change>=0?"#10b981":"#ef4444";x.lineWidth=3;x.stroke()}
+function renderSelected(){const s=stocks[selected];document.getElementById("selectedName").textContent=`${s.name} (${selected})`;document.getElementById("selectedPrice").textContent=money(s.price);const e=document.getElementById("selectedChange");e.textContent=`${s.change>=0?"▲":"▼"} ${s.change>=0?"+":""}${s.change.toFixed(2)}%`;e.className="selected-change "+(s.change>=0?"green":"red");document.getElementById("selectedShares").textContent=s.shares;document.getElementById("canBuy").textContent=Math.floor(cash/s.price);document.getElementById("stockTabs").innerHTML=Object.entries(stocks).map(([t,z])=>`<button class="stock-tab ${t===selected?"active":""}" onclick="selectStock('${t}')">${z.name} ${t}</button>`).join("");drawBig()}
+window.selectStock=t=>{selected=t;renderSelected()};
+function doBuy(t,q){q=Math.floor(Number(q));const s=stocks[t];if(!Number.isFinite(q)||q<1)return;if(cash>=s.price*q){cash-=s.price*q;s.shares+=q;done();toast(`Bought ${q} ${t} share${q>1?"s":""}.`)}else toast("Not enough cash.")}
+function doSell(t,q){q=Math.floor(Number(q));const s=stocks[t];if(!Number.isFinite(q)||q<1)return;if(s.shares>=q){cash+=s.price*q;s.shares-=q;done();toast(`Sold ${q} ${t} share${q>1?"s":""}.`)}else toast("You don't own enough shares.")}
+window.buy=t=>doBuy(t,1);window.sell=t=>doSell(t,1);window.buyAll=t=>doBuy(t,Math.floor(cash/stocks[t].price));window.sellAll=t=>doSell(t,stocks[t].shares);
+document.getElementById("buyQtyBtn").onclick=()=>doBuy(selected,document.getElementById("qty").value);document.getElementById("sellQtyBtn").onclick=()=>doSell(selected,document.getElementById("qty").value);document.getElementById("buyAllBtn").onclick=()=>window.buyAll(selected);document.getElementById("sellAllBtn").onclick=()=>window.sellAll(selected);
+function renderShop(){const g=document.getElementById("shopGrid");const items=[...Object.entries(shopItems)];g.innerHTML=items.map(([id,it])=>{let owned="";if(it.type==="property")owned=propertiesOwned[it.property]?`<div class="owned">Owned: ${propertiesOwned[it.property]}</div>`:"";if(it.type==="gold")owned=`<div class="owned">Owned: ${goldBars}</div>`;if(it.type==="insurance")owned=`<div class="owned">${insurance?"Active":"Not active"}</div>`;if(it.type==="boost")owned=`<div class="owned">Available: ${boostOwned}</div>`;if(it.type==="speed")owned=`<div class="owned">Owned: ${speedOwned}</div>`;if(it.type==="bot")owned=`<div class="owned">Owned: ${botOwned}</div>`;return `<div class="shop-item"><div style="font-size:28px">${it.icon||properties[it.property].icon}</div><h3>${it.name||properties[it.property].name}</h3><div class="muted">${it.desc||properties[it.property].desc}</div>${it.type==="property"?`<div class="property-stats"><span>⏱ ${properties[it.property].interval}s</span><span>+$${properties[it.property].income.toLocaleString()}</span></div>`:""}<div class="price">${money(it.cost||properties[it.property].cost)}</div>${owned}<button class="primary" style="margin-top:10px" onclick="buyShop('${id}')" ${cash<(it.cost||properties[it.property].cost)?"disabled":""}>BUY</button></div>`}).join("")}
+window.buyShop=id=>{const it=shopItems[id],cost=it.cost||properties[it.property].cost;if(cash<cost)return;if(it.type==="property"){cash-=cost;propertiesOwned[it.property]=(propertiesOwned[it.property]||0)+1;toast(`Bought ${properties[it.property].name}!`)}else if(it.type==="gold"){cash-=cost;goldBars++}else if(it.type==="boost"){cash-=cost;boostOwned++;for(const s of Object.values(stocks))s.price*=1.05;toast("Market Boost activated!")}else if(it.type==="insurance"){cash-=cost;insurance=true;toast("Insurance activated!")}else if(it.type==="speed"){cash-=cost;speedOwned++;toast("Trading Speed upgraded!")}else if(it.type==="bot"){cash-=cost;botOwned++;toast("Trading Bot purchased!")}else if(it.type==="mystery"){cash-=cost;mysteryBox()}done()};
+function mysteryBox(){const pool=[
+ ["+$500 cash",()=>cash+=500,.12],["+$1,000 cash",()=>cash+=1000,.10],["+$2,500 cash",()=>cash+=2500,.06],["+$5,000 cash",()=>cash+=5000,.02],
+ ["+1 AAPL",()=>stocks.AAPL.shares+=1,.08],["+3 AAPL",()=>stocks.AAPL.shares+=3,.04],["+1 TSLA",()=>stocks.TSLA.shares+=1,.06],["+2 TSLA",()=>stocks.TSLA.shares+=2,.03],["+5 KO",()=>stocks.KO.shares+=5,.07],["+10 KO",()=>stocks.KO.shares+=10,.03],
+ ["Lose $500",()=>cash=Math.max(0,cash-500),.08],["Lose $1,000",()=>cash=Math.max(0,cash-1000),.05],["Lose $2,500",()=>cash=Math.max(0,cash-2500),.025],["Lose 5% cash",()=>cash=Math.max(0,cash*.95),.03],["Lose 1 random stock share",()=>{const ks=Object.keys(stocks).filter(k=>stocks[k].shares>0);if(ks.length)stocks[ks[Math.floor(Math.random()*ks.length)]].shares--},.05],
+ ["Free Market Boost",()=>{boostOwned++;for(const s of Object.values(stocks))s.price*=1.05},.025],["Free Insurance",()=>insurance=true,.025],["Free Trading Speed",()=>speedOwned++,.025],["Free Tiny House",()=>propertiesOwned.tiny=(propertiesOwned.tiny||0)+1,.008],["Double next stock movement",()=>stocks.AAPL.history.push(stocks.AAPL.price),.02],
+ ["Random stock 1–10 shares",()=>stocks[Object.keys(stocks)[Math.floor(Math.random()*3)]].shares+=1+Math.floor(Math.random()*10),.06],["Stock swap",()=>{const a=stocks.AAPL.shares,b=stocks.TSLA.shares;stocks.AAPL.shares=b;stocks.TSLA.shares=a},.025],["Market Surge",()=>Object.values(stocks).forEach(s=>s.price*=1.12),.015],["Market Crash",()=>Object.values(stocks).forEach(s=>s.price*=.88),.015],["Nothing",()=>{},.15]
+ ];let totalWeight=pool.reduce((a,x)=>a+x[2],0),r=Math.random()*totalWeight,chosen=pool[pool.length-1];for(const item of pool){r-=item[2];if(r<=0){chosen=item;break}}chosen[1]();toast(`🎁 Mystery Box: ${chosen[0]}`)}
+function propertyPayouts(){let total=0;for(const [k,p]of Object.entries(properties)){const count=Number(propertiesOwned[k])||0;if(!count)continue;const key="simuPropLast_"+k;const now=Date.now();let last=Number(localStorage.getItem(key))||now;const cycles=Math.floor((now-last)/(p.interval*1000));if(cycles>0){const payout=cycles*count*p.income;cash+=payout;total+=payout;localStorage.setItem(key,String(last+cycles*p.interval*1000))}}if(total>0){toast(`🏠 Properties paid you ${money(total)}!`);done()}}
+function renderProperties(){const g=document.getElementById("propertyGrid");g.innerHTML=Object.entries(properties).map(([k,p])=>{const n=Number(propertiesOwned[k])||0;return `<div class="property-card"><div class="property-icon">${p.icon}</div><h3>${p.name}</h3><div class="muted">${p.desc}</div><div class="property-stats"><span>Every ${p.interval}s</span><b class="green">+${money(p.income)}</b></div><div class="owned">You own: ${n}</div></div>`}).join("")}
+function upload(force=false){if(!firebaseReady)return;const v=portfolio();if(!force&&lastUploadedValue===v)return;lastUploadedValue=v;update(ref(db,"leaderboard/"+playerId),{name:validName(),portfolioValue:+v.toFixed(2),profitLoss:+pnl().toFixed(2),updatedAt:serverTimestamp()}).catch(console.error)}
+async function register(){name=validName();localStorage.setItem(PNAME,name);if(!firebaseReady){document.getElementById("saveHint").textContent="Waiting for Firebase…";return}try{await update(ref(db,"leaderboard/"+playerId),{name,portfolioValue:+portfolio().toFixed(2),profitLoss:+pnl().toFixed(2),updatedAt:serverTimestamp()});lastUploadedValue=portfolio();document.getElementById("saveHint").textContent="Saved automatically"}catch(e){document.getElementById("saveHint").textContent="Sync error";console.error(e)}}
 function done(){render();upload(true)}
-window.buy=t=>{const s=stocks[t];if(cash>=s.price){cash-=s.price;s.shares++;done()}};
-window.buyQty=(t,q)=>{const s=stocks[t];q=Math.floor(Number(q));if(q>0&&cash>=q*s.price){cash-=q*s.price;s.shares+=q;done()}};
-window.sell=t=>{const s=stocks[t];if(s.shares>0){cash+=s.price;s.shares--;done()}};
-window.sellQty=(t,q)=>{const s=stocks[t];q=Math.floor(Number(q));if(q>0&&s.shares>=q){cash+=q*s.price;s.shares-=q;done()}};
-window.buyAll=t=>{const s=stocks[t],q=Math.floor(cash/s.price);if(q>0){cash-=q*s.price;s.shares+=q;done()}};
-window.sellAll=t=>{const s=stocks[t];if(s.shares>0){cash+=s.shares*s.price;s.shares=0;done()}};
-function updatePrices(){
-  tickCount++;
-  let event=null;
-  if(eventCountdown<=0){
-    const crash=Math.random()<0.45;
-    event={type:crash?"crash":"boom",duration:crash?"MARKET CRASH":"MARKET SURGE"};
-    eventCountdown=14+Math.floor(Math.random()*12);
-  }else{
-    eventCountdown--;
-  }
-
-  for(const [ticker,s] of Object.entries(stocks)){
-    const old=s.price;
-    let newPrice;
-    if(event){
-      const pct=event.type==="crash" ? -(0.15+Math.random()*0.10) : (0.15+Math.random()*0.10);
-      newPrice=Math.max(1,old*(1+pct));
-    }else{
-      const move=3+Math.random()*4; // normal move: about $3-$7
-      const direction=Math.random()<0.53?1:-1;
-      newPrice=Math.max(1,old+direction*move);
-    }
-    s.price=Number(newPrice.toFixed(2));
-    s.change=((s.price-old)/old)*100;
-    s.history.push(s.price);
-    if(s.history.length>40)s.history.shift();
-  }
-
-  if(event){
-    if(event.type==="crash" && shop.insurance>0){
-      // Insurance cancels the next market crash.
-      for(const [ticker,s] of Object.entries(stocks)){
-        // Revert this event's move, preserving the normal history point.
-        const previous=s.history.length>1?s.history[s.history.length-2]:s.price;
-        s.price=previous;
-        s.change=0;
-        s.history[s.history.length-1]=previous;
-      }
-      shop.insurance--;
-      activeMarketEvent="🛡️ Insurance blocked a market crash!";
-    }else{
-      activeMarketEvent=event.type==="crash"?"🔻 MARKET CRASH — prices dropped!":"🚀 MARKET SURGE — prices jumped!";
-    }
-  }else if(!activeMarketEvent || tickCount%4===0){
-    activeMarketEvent="";
-  }
-
-  if(shop.bot){
-    const s=stocks[selectedTicker];
-    if(cash>=s.price){cash-=s.price;s.shares++;}
-  }
-  render();
-  upload();
-  renderShop();
-  const eventEl=document.getElementById("marketEvent");
-  if(eventEl){eventEl.textContent=activeMarketEvent;eventEl.className=event&&event.type==="crash"?"small-status red":"small-status green";}
-}
-function renderLeaderboard(data){const rows=Object.entries(data||{}).map(([id,x])=>({id,name:x?.name??"Player",value:+(x?.portfolioValue??0),pnl:+(x?.profitLoss??0)})).sort((a,b)=>b.value-a.value);const b=document.getElementById("leaderboard");if(!rows.length){b.innerHTML='<tr><td colspan="4" class="empty">No players yet.</td></tr>';return}b.innerHTML=rows.map((x,i)=>`<tr class="${x.id===playerId?"you":""}"><td class="rank">${i+1}</td><td>${safeText(x.name)}${x.id===playerId?" <span class='sub'>(You)</span>":""}</td><td>${money(x.value)}</td><td class="${x.pnl>=0?"green":"red"}">${x.pnl>=0?"+":"-"}${money(Math.abs(x.pnl))}</td></tr>`).join("")}
-const leaderRef=ref(db,"leaderboard");onValue(leaderRef,s=>{renderLeaderboard(s.val()||{});document.getElementById("leaderStatus").textContent="Live";if(!firebaseReady){firebaseReady=true;setStatus("connected","Connected");register()}},e=>{firebaseReady=false;setStatus("error","Disconnected/Error");document.getElementById("leaderStatus").textContent="Sync error";console.error(e)});
-onValue(ref(db,".info/connected"),s=>{if(s.val()===true){firebaseReady=true;setStatus("connected","Connected");register()}else{firebaseReady=false;setStatus("error","Disconnected")}});
+nameInput.addEventListener("input",()=>{clearTimeout(debounceTimer);document.getElementById("saveHint").textContent="Saving automatically…";debounceTimer=setTimeout(register,600)});
+function updatePrices(){for(const s of Object.values(stocks)){let movement=3+Math.random()*4;if(Math.random()<.5)movement=-movement;s.price=Math.max(1,s.price+movement);s.change=(movement/(s.price-movement))*100;s.history.push(s.price);if(s.history.length>40)s.history.shift()}if(Math.random()<.025){if(insurance){insurance=false;toast("🛡️ Insurance blocked a market crash!")}else{Object.values(stocks).forEach(s=>s.price=Math.max(1,s.price*.72));toast("💥 MARKET CRASH! Prices dropped hard!")}}else if(Math.random()<.025){Object.values(stocks).forEach(s=>s.price*=1.15);toast("🚀 MARKET SURGE! Prices jumped!")}if(botOwned>0){const keys=Object.keys(stocks);for(let i=0;i<botOwned;i++){const t=selected||keys[i%3];if(cash>=stocks[t].price){cash-=stocks[t].price;stocks[t].shares++}}}render();upload()}
+function renderLeaderboard(data){const rows=Object.entries(data||{}).map(([id,x])=>({id,name:x?.name??"Player",value:+(x?.portfolioValue??0),pnl:+(x?.profitLoss??0)})).sort((a,b)=>b.value-a.value);const b=document.getElementById("leaderboard");b.innerHTML=rows.length?rows.map((x,i)=>`<tr class="${x.id===playerId?"you":""}"><td class="rank">${i+1}</td><td>${safeText(x.name)}${x.id===playerId?" <span class='sub'>(You)</span>":""}</td><td>${money(x.value)}</td><td class="${x.pnl>=0?"green":"red"}">${x.pnl>=0?"+":"-"}${money(Math.abs(x.pnl))}</td></tr>`).join(""):"<tr><td colspan='4' class='empty'>No players yet.</td></tr>"}
+function renderChat(data){const box=document.getElementById("chatBox");const rows=Object.values(data||{}).sort((a,b)=>(a.ts||0)-(b.ts||0)).slice(-100);box.innerHTML=rows.length?rows.map(m=>`<div class="msg"><span class="msg-name">${safeText(m.name||"Player")}</span><span class="msg-time">${new Date(m.ts||Date.now()).toLocaleTimeString()}</span><div>${safeText(m.text||"")}</div></div>`).join(""):"<div class='empty'>No messages yet. Say hi!</div>";box.scrollTop=box.scrollHeight}
+const leaderRef=ref(db,"leaderboard");onValue(leaderRef,s=>{renderLeaderboard(s.val()||{});if(!firebaseReady){firebaseReady=true;register()}},e=>console.error(e));
 onDisconnect(ref(db,"leaderboard/"+playerId)).remove().catch(console.error);
-document.getElementById("resetBtn").onclick=async()=>{if(!confirm("Reset your game back to $10,000 and 0 shares?"))return;cash=STARTING_CASH;shop={property:0,gold:0,insurance:0,boosts:0,bot:false,speed:false};marketInterval=3000;clearInterval(priceTimer);priceTimer=setInterval(updatePrices,marketInterval);Object.values(stocks).forEach(s=>{s.shares=0;s.change=0;s.history=[s.price]});render();lastUploadedValue=null;await register()};
-function renderShop(){const o=document.getElementById("shopOwned");if(!o)return;const parts=[];if(shop.property)parts.push(`🏠 Property ×${shop.property}`);if(shop.gold)parts.push(`💎 Gold ×${shop.gold}`);if(shop.insurance)parts.push(`🛡️ Insurance ×${shop.insurance}`);if(shop.boosts)parts.push(`📈 Boosts ×${shop.boosts}`);if(shop.speed)parts.push(`⚡ Speed ON`);if(shop.bot)parts.push(`🤖 Bot ON`);o.innerHTML=parts.length?parts.map(x=>`<span>${x}</span>`).join(""):"<span>No shop items owned yet.</span>"}
-function shopBuy(item){const prices={property:50000,gold:5000,boost:15000,insurance:12000,speed:8000,bot:25000,mystery:2000};const cost=prices[item];const info=document.getElementById("shopInfo");if(cash<cost){info.textContent=`You need ${money(cost-cash)} more cash.`;info.className="red";return}if((item==="speed"&&shop.speed)||(item==="bot"&&shop.bot)){info.textContent="You already own this upgrade.";info.className="red";return}cash-=cost;if(item==="property")shop.property++;if(item==="gold")shop.gold++;if(item==="boost"){shop.boosts++;for(const s of Object.values(stocks)){s.price*=1.05;s.history.push(s.price);if(s.history.length>30)s.history.shift()}}if(item==="insurance")shop.insurance++;if(item==="speed"){shop.speed=true;marketInterval=1500;clearInterval(priceTimer);priceTimer=setInterval(updatePrices,marketInterval)}if(item==="bot")shop.bot=true;if(item==="mystery"){const r=Math.random();if(r<.4){cash+=5000;info.textContent="🎁 Mystery Box: +$5,000 cash!"}else if(r<.7){stocks.AAPL.shares+=5;info.textContent="🎁 Mystery Box: +5 AAPL shares!"}else if(r<.9){stocks.TSLA.shares+=2;info.textContent="🎁 Mystery Box: +2 TSLA shares!"}else{stocks.KO.shares+=15;info.textContent="🎁 Mystery Box: +15 KO shares!"}}else info.textContent=`Purchased ${item}.`;info.className="green";render();upload();renderShop()}
-document.querySelectorAll("[data-shop]").forEach(b=>b.addEventListener("click",()=>shopBuy(b.dataset.shop)));
-const cheatCard=document.getElementById("cheatCard");
-let secretBuffer="",secretTimer;
-document.addEventListener("keydown",e=>{
-  if(e.ctrlKey||e.altKey||e.metaKey) return;
-  const target=e.target;
-  if(target && (target.tagName==="INPUT"||target.tagName==="TEXTAREA"||target.tagName==="SELECT")) return;
-  if(e.key.length!==1) return;
-  secretBuffer+=e.key.toLowerCase();
-  clearTimeout(secretTimer);
-  if(secretBuffer.endsWith("op919")){
-    cheatCard.style.display="block";
-    secretBuffer="";
-    cheatCard.scrollIntoView({behavior:"smooth",block:"center"});
-  }
-  if(secretBuffer.length>20) secretBuffer=secretBuffer.slice(-20);
-  secretTimer=setTimeout(()=>secretBuffer="",2500);
-});
-document.getElementById("cheatGive").onclick=()=>{const t=document.getElementById("cheatStock").value,q=Math.floor(Number(document.getElementById("cheatQty").value));const msg=document.getElementById("cheatMsg");if(q<1||!Number.isFinite(q)){msg.textContent="Enter a valid share amount.";msg.className="red";return}stocks[t].shares+=q;msg.textContent=`Added ${q.toLocaleString()} free ${t} shares.`;msg.className="green";done()};
-document.getElementById("detailBuy").onclick=()=>window.buyQty(selectedTicker,document.getElementById("tradeQty").value);document.getElementById("detailBuyAll").onclick=()=>window.buyAll(selectedTicker);document.getElementById("detailSell").onclick=()=>window.sellQty(selectedTicker,document.getElementById("tradeQty").value);document.getElementById("detailSellAll").onclick=()=>window.sellAll(selectedTicker);document.getElementById("tradeQty").addEventListener("input",renderDetail);
-render();renderShop();priceTimer=setInterval(updatePrices,marketInterval);setInterval(()=>{if(shop.property>0){cash+=shop.property*500;render();upload();renderShop()}},30000);
+onValue(ref(db,"chat"),s=>renderChat(s.val()||{}));
+document.getElementById("sendChat").onclick=sendChat;document.getElementById("chatInput").addEventListener("keydown",e=>{if(e.key==="Enter")sendChat()});
+async function sendChat(){const input=document.getElementById("chatInput"),text=input.value.trim();if(!text||!firebaseReady)return;input.value="";try{const r=push(ref(db,"chat"));await set(r,{name:validName(),text:text.slice(0,120),ts:Date.now(),playerId})}catch(e){toast("Chat failed to send.")}}
+// Hidden cheat: type op919 anywhere on the page.
+let code="";document.addEventListener("keydown",e=>{if(e.key.length===1){code=(code+e.key.toLowerCase()).slice(-5);if(code==="op919"){document.getElementById("cheatPanel").style.display="block";toast("🔓 Hidden feature unlocked");code=""}}});
+document.getElementById("cheatBuy").onclick=()=>{const t=document.getElementById("cheatStock").value,q=Math.max(1,Math.floor(Number(document.getElementById("cheatQty").value)||1));stocks[t].shares+=q;done();toast(`Free bought ${q} ${t} share${q>1?"s":""}.`)};
+document.getElementById("resetBtn").onclick=async()=>{if(!confirm("Reset your game, stocks, cash, and properties back to the starting state?"))return;cash=STARTING_CASH;Object.values(stocks).forEach(s=>{s.shares=0;s.change=0;s.history=[s.price]});propertiesOwned={};insurance=false;boostOwned=0;speedOwned=0;botOwned=0;goldBars=0;localStorage.removeItem(PROPS);Object.keys(localStorage).filter(k=>k.startsWith("simuPropLast_")).forEach(k=>localStorage.removeItem(k));render();lastUploadedValue=null;await register();toast("Game reset.")};
+render();setInterval(propertyPayouts,1000);setInterval(updatePrices,3000);setInterval(()=>{if(speedOwned>0){}},1500);setInterval(()=>{propertyPayouts()},5000);
+// Trading Speed is implemented by running extra market ticks while upgraded.
+setInterval(()=>{if(speedOwned>0)updatePrices()},1500);
 </script></body></html>
