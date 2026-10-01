@@ -155,6 +155,7 @@ function doBuy(t,q){q=Math.floor(Number(q));const s=stocks[t];if(!Number.isFinit
 function doSell(t,q){q=Math.floor(Number(q));const s=stocks[t];if(!Number.isFinite(q)||q<1)return;if(s.shares>=q){cash+=s.price*q;s.shares-=q;done();toast(`Sold ${formatQty(q)} ${t} share${q>1?"s":""}.`)}else toast("You don't own enough shares.")}
 window.buy=t=>doBuy(t,1);window.sell=t=>doSell(t,1);window.buyAll=t=>doBuy(t,Math.floor(cash/stocks[t].price));window.sellAll=t=>doSell(t,stocks[t].shares);
 document.getElementById("buyQtyBtn").onclick=()=>doBuy(selected,document.getElementById("qty").value);document.getElementById("sellQtyBtn").onclick=()=>doSell(selected,document.getElementById("qty").value);document.getElementById("buyAllBtn").onclick=()=>window.buyAll(selected);document.getElementById("sellAllBtn").onclick=()=>window.sellAll(selected);
+
 function renderShop(){
  const g=document.getElementById("shopGrid");
  const items=[...Object.entries(shopItems)];
@@ -163,12 +164,15 @@ function renderShop(){
   if(it.type==="property")owned=propertiesOwned[it.property]?`<div class="owned">Owned: ${formatQty(propertiesOwned[it.property])}</div>`:"";
   if(it.type==="gold")owned=`<div class="owned">Owned: ${formatQty(goldBars)}</div>`;
   if(it.type==="insurance")owned=`<div class="owned">${insurance?"Active":"Not active"}</div>`;
-  if(it.type==="boost")owned=`<div class="owned">Available: ${formatQty(boostOwned)}</div>`;
+  if(it.type==="boost")owned=`<div class="owned">Times Boosted: ${formatQty(boostOwned)}</div>`;
   if(it.type==="speed")owned=`<div class="owned">Owned: ${formatQty(speedOwned)}</div>`;
   if(it.type==="bot")owned=`<div class="owned">Owned: ${formatQty(botOwned)}</div>`;
   
   const cost = it.cost || properties[it.property].cost;
   const canBuySingle = cash >= cost;
+  
+  // Market Boost button is single-click only to prevent performance lag
+  const isBoost = it.type === "boost";
   
   return `<div class="shop-item">
    <div style="font-size:28px">${it.icon||properties[it.property].icon}</div>
@@ -178,8 +182,8 @@ function renderShop(){
    <div class="price">${money(cost)}</div>
    ${owned}
    <div class="shop-btn-row">
-    <button class="primary" onclick="buyShop('${id}', 1)" ${!canBuySingle?"disabled":""}>BUY 1</button>
-    <button class="buy" onclick="buyShop('${id}', 'max')" ${!canBuySingle?"disabled":""}>BUY MAX</button>
+    <button class="primary" onclick="buyShop('${id}', 1)" ${!canBuySingle?"disabled":""}>${isBoost?"BUY BOOST (1x)":"BUY 1"}</button>
+    ${!isBoost?`<button class="buy" onclick="buyShop('${id}', 'max')" ${!canBuySingle?"disabled":""}>BUY MAX</button>`:""}
    </div>
   </div>`;
  }).join("");
@@ -190,7 +194,7 @@ window.buyShop=(id, qtyMode=1)=>{
  if(cash<cost) return;
  
  let qty = 1;
- if(qtyMode === "max"){
+ if(qtyMode === "max" && it.type !== "boost"){
   qty = Math.floor(cash / cost);
  }
  if(qty < 1) return;
@@ -208,16 +212,13 @@ window.buyShop=(id, qtyMode=1)=>{
   goldBars += qty;
   toast(`Bought ${formatQty(qty)}x Gold Bar!`);
  }else if(it.type==="boost"){
-  cash -= cost * qty;
-  boostOwned += qty;
-  
-  // Instant O(1) exponential math to eliminate lag completely
-  const multiplier = Math.pow(1.05, qty);
+  // Single manual click boost to eliminate lag
+  cash -= cost;
+  boostOwned += 1;
   for(const s of Object.values(stocks)){
-   s.price *= multiplier;
+   s.price *= 1.05;
   }
-  
-  toast(`Activated ${formatQty(qty)}x Market Boost!`);
+  toast("Activated 1x Market Boost!");
  }else if(it.type==="insurance"){
   cash -= cost;
   insurance = true;
@@ -231,7 +232,6 @@ window.buyShop=(id, qtyMode=1)=>{
   botOwned += qty;
   toast(`Bought ${formatQty(qty)}x Trading Bot!`);
  }else if(it.type==="mystery"){
-  // Cap mystery boxes to prevent frozen browser tab
   const actualQty = Math.min(qty, 10000);
   for(let i=0; i<actualQty; i++){
    if(cash >= cost){
