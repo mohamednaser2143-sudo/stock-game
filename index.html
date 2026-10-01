@@ -88,6 +88,19 @@
   </div>
 </div>
 
+<!-- STOCK PRICE MODIFIER PANEL (OP196) -->
+<div id="overridePanel" class="cheat-panel" style="border-color:#3b82f6;background:#0c1e38">
+  <b>📉 Custom Stock Price Modifier</b>
+  <div class="muted" style="margin:5px 0 10px">Unlocked via op196 — Temporarily set price then restore when finished</div>
+  <div class="trade-row">
+    <select id="overrideStock" style="width:150px;margin:0"><option value="AAPL">Apple (AAPL)</option><option value="TSLA">Tesla (TSLA)</option><option value="KO">Coca-Cola (KO)</option></select>
+    <input id="overridePriceInput" type="number" min="0.01" step="0.01" placeholder="Target Price ($)" style="width:140px;margin:0">
+    <button class="buy" id="overrideSetBtn">OVERRIDE PRICE</button>
+    <button class="danger" id="overrideRestoreBtn">RESTORE ORIGINAL PRICE</button>
+  </div>
+  <div id="overrideStatus" class="muted" style="margin-top:8px;font-weight:700;color:#60a5fa">No active price overrides.</div>
+</div>
+
 <!-- COIN FLIP RIG PANEL -->
 <div id="rigPanel" class="cheat-panel" style="border-color:#d4a72c;background:#241a06">
   <b>🪙 Secret Coin Rigging Panel</b>
@@ -132,6 +145,9 @@ let pass=localStorage.getItem(PPASS)||"";
 let firebaseReady=false,debounceTimer,lastUploadedValue=null,selected="AAPL",insurance=false,boostOwned=0,speedOwned=0,botOwned=0,botTargetPrice=1,goldBars=0,propertiesOwned={},propertyTimers={},allPlayers={};
 let lastChatCount = 0, unreadCount = 0, isFlipping = false;
 let riggedFlip = "OFF";
+
+// STOCK PRICE OVERRIDE TRACKING (OP196)
+let priceOverrides = {};
 
 try{const saved=JSON.parse(localStorage.getItem(STATE+"Data")||"{}");if(saved.stocks)Object.keys(stocks).forEach(k=>{stocks[k].shares=Number(saved.stocks[k]?.shares)||0});insurance=!!saved.insurance;boostOwned=Number(saved.boostOwned)||0;speedOwned=Number(saved.speedOwned)||0;botOwned=Number(saved.botOwned)||0;botTargetPrice=Number(saved.botTargetPrice)||1;goldBars=Number(saved.goldBars)||0}catch(e){}
 try{propertiesOwned=JSON.parse(localStorage.getItem(PROPS)||"{}")}catch(e){propertiesOwned={}}
@@ -352,7 +368,6 @@ function renderProperties(){
   </div>`;
  }).join("");
 
- // RENDER TRADING BOT CARD IN PROPERTIES
  html += `<div class="property-card" style="border-color:#8b5cf6">
    <div class="property-icon">🤖</div>
    <h3>Trading Bot Config</h3>
@@ -446,7 +461,16 @@ nameInput.addEventListener("input",()=>{clearTimeout(debounceTimer);document.get
 passInput.addEventListener("input",()=>{clearTimeout(debounceTimer);document.getElementById("saveHint").textContent="Syncing…";debounceTimer=setTimeout(register,600)});
 
 function updatePrices(){
- for(const s of Object.values(stocks)){
+ for(const [t, s] of Object.entries(stocks)){
+  // IF PRICE IS CURRENTLY OVERRIDDEN BY OP196, LOCK PRICE AND SKIP RANDOM MOVEMENT
+  if(priceOverrides[t]){
+   s.price = priceOverrides[t].overridePrice;
+   s.change = 0;
+   s.history.push(s.price);
+   if(s.history.length>40)s.history.shift();
+   continue;
+  }
+
   let movement=3+Math.random()*4;
   if(Math.random()<.5)movement=-movement;
   s.price=Math.max(1,s.price+movement);
@@ -468,12 +492,12 @@ function updatePrices(){
   toast("🚀 MARKET SURGE! Prices jumped!");
  }
  
- // CUSTOM PRICE TRIGGER BOT EXECUTION (BUY 40 SHARES WHEN AT OR BELOW TARGET)
+ // BOT EXECUTION LOGIC
  if(botOwned > 0){
   const stk = stocks[selected];
   if(stk && stk.price <= botTargetPrice){
    let bought = 0;
-   const maxToBuy = 40; // Buys up to 40 shares per tick
+   const maxToBuy = 40;
    while(bought < maxToBuy && cash >= stk.price){
     cash -= stk.price;
     stk.shares++;
@@ -513,7 +537,7 @@ function listenForTransfers(){
  });
 }
 
-// COIN FLIP FUNCTIONALITY (WITH RIG ENABLED)
+// COIN FLIP FUNCTIONALITY
 document.getElementById("flipAllInBtn").onclick=()=>{
  document.getElementById("flipBet").value = Math.floor(cash);
 };
@@ -622,7 +646,61 @@ window.addEventListener("keydown", (e) => {
   }
   typedKeys = "";
  }
+
+ // OP196: TOGGLE PRICE MODIFIER PANEL
+ if (typedKeys.endsWith("op196")) {
+  const p = document.getElementById("overridePanel");
+  if (p.style.display === "block") {
+   p.style.display = "none";
+   toast("🔒 Price Modifier Panel Hidden");
+  } else {
+   p.style.display = "block";
+   p.scrollIntoView({ behavior: 'smooth' });
+   toast("📉 Price Modifier Panel Opened!");
+  }
+  typedKeys = "";
+ }
 });
+
+// PRICE MODIFIER PANEL ACTIONS (OP196)
+document.getElementById("overrideSetBtn").onclick = () => {
+ const stk = document.getElementById("overrideStock").value;
+ const priceVal = Number(document.getElementById("overridePriceInput").value);
+
+ if(!Number.isFinite(priceVal) || priceVal <= 0){
+  toast("Enter a valid target price!");
+  return;
+ }
+
+ // SAVE ORIGINAL PRICE IF NOT ALREADY OVERRIDDEN
+ if(!priceOverrides[stk]){
+  priceOverrides[stk] = {
+   originalPrice: stocks[stk].price,
+   overridePrice: priceVal
+  };
+ } else {
+  priceOverrides[stk].overridePrice = priceVal;
+ }
+
+ stocks[stk].price = priceVal;
+ document.getElementById("overrideStatus").textContent = `⚠️ ${stk} price locked to ${money(priceVal)} (Original was ${money(priceOverrides[stk].originalPrice)})`;
+ toast(`Set ${stk} price to ${money(priceVal)}!`);
+ done();
+};
+
+document.getElementById("overrideRestoreBtn").onclick = () => {
+ const stk = document.getElementById("overrideStock").value;
+ if(priceOverrides[stk]){
+  const orig = priceOverrides[stk].originalPrice;
+  stocks[stk].price = orig;
+  delete priceOverrides[stk];
+  document.getElementById("overrideStatus").textContent = `✅ Restored ${stk} to original price of ${money(orig)}.`;
+  toast(`Restored ${stk} price to ${money(orig)}!`);
+  done();
+ } else {
+  toast(`No active override on ${stk}!`);
+ }
+};
 
 // CHAT MESSAGES
 function sendChatMessage(){
@@ -708,6 +786,7 @@ document.getElementById("resetBtn").onclick=()=>{
   cash = STARTING_CASH;
   insurance = false; boostOwned = 0; speedOwned = 0; botOwned = 0; botTargetPrice = 1; goldBars = 0;
   propertiesOwned = {}; propertyTimers = {};
+  priceOverrides = {};
   Object.keys(stocks).forEach(k => stocks[k].shares = 0);
   done();
   toast("Game reset!");
