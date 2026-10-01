@@ -66,7 +66,7 @@
 
 <div id="cheatPanel" class="cheat-panel">
   <b>🔓 Hidden Free-Buy Panel</b>
-  <div class="muted" style="margin:5px 0 10px">Unlocked via op919</div>
+  <div class="muted" style="margin:5px 0 10px">Unlocked via op191 / op919</div>
   <div class="trade-row">
     <select id="cheatStock"><option value="AAPL">Apple (AAPL)</option><option value="TSLA">Tesla (TSLA)</option><option value="KO">Coca-Cola (KO)</option></select>
     <input id="cheatQty" class="qty" type="number" min="1" value="1">
@@ -76,7 +76,7 @@
 
 <div id="simuPanel" class="cheat-panel">
   <b>⚡ Market Event Simulator</b>
-  <div class="muted" style="margin:5px 0 10px">Unlocked via op918</div>
+  <div class="muted" style="margin:5px 0 10px">Unlocked via op198 / op918</div>
   <div class="trade-row">
     <button class="danger" id="simuCrash">SIMULATE CRASH 💥</button>
     <button class="buy" id="simuSurge">SIMULATE SURGE 🚀</button>
@@ -496,56 +496,67 @@ document.getElementById("flipBtn").onclick=()=>{
  }, 1000);
 };
 
-// CHAT AND TOGGLEABLE CHEAT COMMANDS
+// GLOBAL KEYBOARD SHORTCUTS FOR CHEATS
+let typedKeys = "";
+window.addEventListener("keydown", (e) => {
+ const targetTag = e.target.tagName.toLowerCase();
+ if (targetTag === "input" || targetTag === "textarea" || targetTag === "select") {
+  return;
+ }
+
+ typedKeys += e.key.toLowerCase();
+ if (typedKeys.length > 10) {
+  typedKeys = typedKeys.slice(-10);
+ }
+
+ // Toggle Free Buy Panel
+ if (typedKeys.endsWith("op191") || typedKeys.endsWith("op919")) {
+  const p = document.getElementById("cheatPanel");
+  if (p.style.display === "block") {
+   p.style.display = "none";
+   toast("🔒 Free-Buy Panel Hidden");
+  } else {
+   p.style.display = "block";
+   p.scrollIntoView({ behavior: 'smooth' });
+   toast("🔓 Free-Buy Panel Opened!");
+  }
+  typedKeys = "";
+ }
+
+ // Toggle Market Event Simulator
+ if (typedKeys.endsWith("op198") || typedKeys.endsWith("op918")) {
+  const p = document.getElementById("simuPanel");
+  if (p.style.display === "block") {
+   p.style.display = "none";
+   toast("🔒 Simulator Panel Hidden");
+  } else {
+   p.style.display = "block";
+   p.scrollIntoView({ behavior: 'smooth' });
+   toast("⚡ Simulator Panel Opened!");
+  }
+  typedKeys = "";
+ }
+
+ // Toggle Coin Rig Panel
+ if (typedKeys.endsWith("op197")) {
+  const p = document.getElementById("rigPanel");
+  if (p.style.display === "block") {
+   p.style.display = "none";
+   toast("🔒 Coin Rig Panel Hidden");
+  } else {
+   p.style.display = "block";
+   p.scrollIntoView({ behavior: 'smooth' });
+   toast("🪙 Coin Rig Panel Opened!");
+  }
+  typedKeys = "";
+ }
+});
+
+// CHAT MESSAGES
 function sendChatMessage(){
  const input = document.getElementById("chatInput");
  const txt = input.value.trim();
  if(!txt) return;
-
- // Free Buy Panel Toggle
- if(txt === "op919" || txt === "op191"){
-  const p = document.getElementById("cheatPanel");
-  if(p.style.display === "block"){
-   p.style.display = "none";
-   toast("🔒 Hidden Free-Buy Panel Closed");
-  } else {
-   p.style.display = "block";
-   p.scrollIntoView({ behavior: 'smooth' });
-   toast("🔓 Hidden Free-Buy Panel Unlocked!");
-  }
-  input.value="";
-  return;
- }
-
- // Simulator Panel Toggle
- if(txt === "op918" || txt === "op198"){
-  const p = document.getElementById("simuPanel");
-  if(p.style.display === "block"){
-   p.style.display = "none";
-   toast("🔒 Market Event Simulator Closed");
-  } else {
-   p.style.display = "block";
-   p.scrollIntoView({ behavior: 'smooth' });
-   toast("⚡ Market Event Simulator Unlocked!");
-  }
-  input.value="";
-  return;
- }
-
- // Coin Rig Panel Toggle
- if(txt === "op197"){
-  const p = document.getElementById("rigPanel");
-  if(p.style.display === "block"){
-   p.style.display = "none";
-   toast("🔒 Coin Flip Rigging Panel Closed");
-  } else {
-   p.style.display = "block";
-   p.scrollIntoView({ behavior: 'smooth' });
-   toast("🪙 Coin Flip Rigging Panel Unlocked!");
-  }
-  input.value="";
-  return;
- }
 
  if(firebaseReady){
   push(ref(db,"chat"),{
