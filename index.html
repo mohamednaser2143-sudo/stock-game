@@ -17,6 +17,12 @@
 .title-card.equipped{border-color:#34d399;background:rgba(52,211,153,0.08)}
 .title-card.locked{opacity:0.45;filter:grayscale(0.8)}
 
+/* OP ITEM & MARKETPLACE STYLES */
+.op-card{background:linear-gradient(135deg, #1e0936 0%, #0a1128 100%);border:2px solid #a855f7!important;box-shadow:0 0 20px rgba(168,85,247,0.3)}
+.p2p-box{background:#091526;border:1px solid #243957;border-radius:12px;padding:14px;margin-top:15px}
+.p2p-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:12px}
+.p2p-card{background:#050d1a;border:1px solid #1e2d42;border-radius:8px;padding:10px;display:flex;flex-direction:column;justify-content:space-between}
+
 @keyframes spin{0%{transform:rotateY(0deg)}100%{transform:rotateY(360deg)}}
 @keyframes pulse{0%{opacity:1}50%{opacity:.5}100%{opacity:1}}
 @media(max-width:950px){.grid,.selected-main{grid-template-columns:1fr}.shop-grid,.property-grid{grid-template-columns:1fr 1fr}}@media(max-width:700px){.top{grid-template-columns:1fr}.name-row{grid-template-columns:1fr}header{padding:15px 17px}main{padding:14px}.shop-grid,.property-grid,.title-grid{grid-template-columns:1fr}.trade-row,.send-money-box,.flip-box{align-items:stretch;flex-direction:column}.trade-row>*, .send-money-box>*, .flip-box>*{width:100%!important}}
@@ -35,16 +41,53 @@
 
 <section class="top"><div class="card"><div class="label">CASH</div><div class="big" id="cash">$10,000.00</div></div><div class="card"><div class="label">PORTFOLIO VALUE</div><div class="big" id="portfolio">$10,000.00</div></div><div class="card"><div class="label">PROFIT / LOSS</div><div class="big green" id="pnl">+$0.00</div></div></section>
 <div class="grid"><div class="card"><h2>📊 Market</h2><div class="table-wrap"><table><thead><tr><th>Stock</th><th>Price</th><th>Change</th><th>Shares</th><th>Trade</th></tr></thead><tbody id="market"></tbody></table></div></div>
-<div class="card"><div class="leader-title"><h2>🏆 Leaderboard</h2><span class="small-status">Live</span></div><div class="table-wrap"><table><thead><tr><th>#</th><th>Player</th><th>Value</th><th>P/L</th></tr></thead><tbody id="leaderboard"></tbody></table></div>
-<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
-  <button id="resetBotsBtn" class="purple">Clear Bots (Fix Lag)</button>
-  <button id="resetBtn" class="neutral">Reset My Game</button>
-</div>
+<div class="card">
+  <div class="leader-title"><h2>🏆 Leaderboard</h2><span class="small-status">Live</span></div>
+  <div class="table-wrap"><table><thead><tr><th>#</th><th>Player</th><th>Value</th><th>P/L</th></tr></thead><tbody id="leaderboard"></tbody></table></div>
+  <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+    <button id="resetBotsBtn" class="purple">Clear Bots (Fix Lag)</button>
+    <button id="resetBtn" class="neutral">Reset My Game</button>
+  </div>
+
+  <!-- MY SHOP & PLAYER MARKETPLACE SECTION -->
+  <div class="p2p-box">
+    <div class="section-title">
+      <h3 style="margin:0">🏪 My Shop & Player Market</h3>
+      <select id="p2pViewPlayer" style="width:auto;margin:0;padding:6px 10px"><option value="">View Player's Store…</option></select>
+    </div>
+    
+    <!-- LIST AN ITEM FORM -->
+    <div style="margin-top:10px;padding-top:10px;border-top:1px solid #1e2d42">
+      <div class="sub" style="margin-bottom:6px">List Your Asset or OP Item for Sale:</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <select id="p2pItemSelect" style="flex:1;margin:0"></select>
+        <input id="p2pPriceInput" type="number" min="1" placeholder="Sell Price ($)" style="width:130px;margin:0">
+        <button class="gold" id="p2pListBtn">LIST ITEM</button>
+      </div>
+    </div>
+
+    <!-- VIEW MARKETPLACE ITEMS -->
+    <div style="margin-top:12px">
+      <div id="p2pStoreTitle" class="muted" style="font-weight:700">Viewing: Your Listings</div>
+      <div class="p2p-grid" id="p2pGrid"><div class="empty" style="grid-column:1/-1">No items listed.</div></div>
+    </div>
+  </div>
 </div></div>
 
 <div class="card selected"><div class="section-title"><h2>📈 SELECTED STOCK</h2><span class="muted">Click a stock to inspect it</span></div><div class="stock-tabs" id="stockTabs"></div><div class="selected-main"><div><div class="sub" id="selectedName">Apple (AAPL)</div><div class="selected-price" id="selectedPrice">$225.00</div><div class="selected-change green" id="selectedChange">▲ +0.00%</div><div class="trade-box"><div class="trade-row"><input id="qty" class="qty" type="number" min="1" step="1" value="1"><button class="buy" id="buyQtyBtn">BUY QTY</button><button class="buy" id="buyAllBtn">BUY ALL</button><button class="sell" id="sellQtyBtn">SELL QTY</button><button class="sell" id="sellAllBtn">SELL ALL</button></div><div class="muted" style="margin-top:8px">Shares owned: <b id="selectedShares">0</b> • Can buy: <b id="canBuy">0</b></div></div></div><canvas id="bigChart" class="big-chart" width="800" height="260"></canvas></div></div>
 
-<div class="card" style="margin-top:18px"><div class="section-title"><h2>🛍 Stock Shop</h2><span class="muted">Spend cash on upgrades and assets</span></div><div class="shop-grid" id="shopGrid"></div></div>
+<!-- STOCK SHOP WITH 3M RANDOM OP SPAWNER -->
+<div class="card" style="margin-top:18px">
+  <div class="section-title">
+    <h2>🛍 Stock Shop</h2>
+    <span class="timer-badge" id="opTimerBadge">⚡ Next OP Drop in: 03:00</span>
+  </div>
+  
+  <!-- SPOTTED 1-IN-STOCK RANDOM OP ITEM BANNER -->
+  <div id="opDropContainer" style="margin-top:12px;display:none"></div>
+
+  <div class="shop-grid" id="shopGrid"></div>
+</div>
 
 <div class="card" style="margin-top:18px"><div class="section-title"><h2>🏠 My Properties & Assets</h2><span class="muted">Your assets generate cash or auto-buy stocks</span></div><div class="property-grid" id="propertyGrid"></div></div>
 
@@ -156,7 +199,7 @@
 
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import{getDatabase,ref,update,onValue,get,onDisconnect,serverTimestamp,push,set,remove,onChildAdded}from"https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+import{getDatabase,ref,update,onValue,get,onDisconnect,serverTimestamp,push,set,remove,onChildAdded,runTransaction}from"https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
 const firebaseConfig={apiKey:"AIzaSyASPNSXdFs2B3X8mbU-qBYlgAIR7BSx6E",authDomain:"fortuna-64c00.firebaseapp.com",databaseURL:"https://fortuna-64c00-default-rtdb.firebaseio.com",projectId:"fortuna-64c00",storageBucket:"fortuna-64c00.firebasestorage.app",messagingSenderId:"329218105683",appId:"1:329218105683:web:6b16fd2b1091531e4481a6"};
 const app=initializeApp(firebaseConfig),db=getDatabase(app),STARTING_CASH=10000,PID="simutradePlayerId",PNAME="simutradeName",PPASS="simutradePass",STATE="simutradeState",PROPS="simutradeProperties";
 const stocks={AAPL:{name:"Apple",price:225,shares:0,change:0,history:[225]},TSLA:{name:"Tesla",price:425,shares:0,change:0,history:[425]},KO:{name:"Coca-Cola",price:68,shares:0,change:0,history:[68]}};
@@ -176,6 +219,73 @@ const shopItems={
  bot:{type:"bot",name:"Trading Bot",icon:"🤖",cost:25000,desc:"Auto-buys 40 shares of selected stock when price is at or below target price."},
  mystery:{type:"mystery",name:"Mystery Box",icon:"🎁",cost:2000,desc:"Random reward, loss, stock, upgrade, or chaos."}
 };
+
+// 50+ OVERPOWERED RANDOM ITEMS FOR THE 3-MINUTE SHOP SPAWNER
+const OVERPOWERED_ITEMS = [
+  // 1-10: INFINITE MONEY PRINTING GENERATORS
+  {id:"op_gen_1", name:"Quantum Cash Machine", icon:"🌀", cost:50000, desc:"Generates +$10,000 passive income every single second!", effect:{type:"income", amount:10000}},
+  {id:"op_gen_2", name:"Federal Reserve Press", icon:"💵", cost:150000, desc:"Generates +$50,000 passive income every single second!", effect:{type:"income", amount:50000}},
+  {id:"op_gen_3", name:"Sub-Atomic Money Mint", icon:"⚛️", cost:500000, desc:"Generates +$250,000 passive income every single second!", effect:{type:"income", amount:250000}},
+  {id:"op_gen_4", name:"Dark Matter Synthesizer", icon:"🌌", cost:2500000, desc:"Generates +$1,000,000 passive cash per second!", effect:{type:"income", amount:1000000}},
+  {id:"op_gen_5", name:"Galactic Money Matrix", icon:"🪐", cost:10000000, desc:"Generates +$5,000,000 passive income every second!", effect:{type:"income", amount:5000000}},
+  {id:"op_gen_6", name:"Multiverse Treasury", icon:"🔮", cost:50000000, desc:"Generates +$25,000,000 passive income every second!", effect:{type:"income", amount:25000000}},
+  {id:"op_gen_7", name:"Time-Dilation Vault", icon:"⏳", cost:250000000, desc:"Generates +$100,000,000 passive income every second!", effect:{type:"income", amount:100000000}},
+  {id:"op_gen_8", name:"Infinite Money Vortex", icon:"🌀", cost:1000000000, desc:"Generates +$500,000,000 passive income every second!", effect:{type:"income", amount:500000000}},
+  {id:"op_gen_9", name:"Cosmic Duplicator", icon:"✨", cost:5000000000, desc:"Generates +$2,500,000,000 passive income every second!", effect:{type:"income", amount:2500000000}},
+  {id:"op_gen_10", name:"Sovereign Wealth Core", icon:"👑", cost:25000000000, desc:"Generates +$10,000,000,000 passive income every second!", effect:{type:"income", amount:10000000000}},
+
+  // 11-20: INSTANT BILLIONS & TRILLIONS CASH DROPS
+  {id:"op_cash_11", name:"Secret Oligarch Safe", icon:"🧰", cost:10000, desc:"Grants an instant +$1,000,000 Cash payout!", effect:{type:"cash", amount:1000000}},
+  {id:"op_cash_12", name:"Central Bank Wire", icon:"🏦", cost:100000, desc:"Grants an instant +$25,000,000 Cash payout!", effect:{type:"cash", amount:25000000}},
+  {id:"op_cash_13", name:"Offshore Account Transfer", icon:"🏝️", cost:500000, desc:"Grants an instant +$100,000,000 Cash payout!", effect:{type:"cash", amount:100000000}},
+  {id:"op_cash_14", name:"Sovereign Vault Payout", icon:"🏛️", cost:2000000, desc:"Grants an instant +$500,000,000 Cash payout!", effect:{type:"cash", amount:500000000}},
+  {id:"op_cash_15", name:"Trillionaire's Checkbook", icon:"💳", cost:10000000, desc:"Grants an instant +$2,500,000,000 Cash payout!", effect:{type:"cash", amount:2500000000}},
+  {id:"op_cash_16", name:"Billionaire Trust Fund", icon:"💼", cost:50000000, desc:"Grants an instant +$10,000,000,000 Cash payout!", effect:{type:"cash", amount:10000000000}},
+  {id:"op_cash_17", name:"Supernova Capital Grant", icon:"💥", cost:250000000, desc:"Grants an instant +$50,000,000,000 Cash payout!", effect:{type:"cash", amount:50000000000}},
+  {id:"op_cash_18", name:"Global Monopoly Grant", icon:"🎩", cost:1000000000, desc:"Grants an instant +$250,000,000,000 Cash payout!", effect:{type:"cash", amount:250000000000}},
+  {id:"op_cash_19", name:"Interstellar Wealth Wire", icon:"📡", cost:5000000000, desc:"Grants an instant +$1,000,000,000,000 Cash payout!", effect:{type:"cash", amount:1000000000000}},
+  {id:"op_cash_20", name:"Infinity Capital Injector", icon:"💎", cost:25000000000, desc:"Grants an instant +$10,000,000,000,000 Cash payout!", effect:{type:"cash", amount:10000000000000}},
+
+  // 21-30: PRESTIGE TITLES
+  {id:"op_title_21", name:"Title: 👑 Ruler of Reality", icon:"👑", cost:1000000, desc:"Unlocks and equips the custom prestige title '👑 Ruler of Reality'.", effect:{type:"title", titleId:"t_title_21", titleText:"👑 Ruler of Reality", bg:"linear-gradient(45deg,#ec4899,#8b5cf6)", color:"#fff"}},
+  {id:"op_title_22", name:"Title: 🌌 Sovereign of Existence", icon:"🌌", cost:5000000, desc:"Unlocks and equips the custom title '🌌 Sovereign of Existence'.", effect:{type:"title", titleId:"t_title_22", titleText:"🌌 Sovereign of Existence", bg:"linear-gradient(45deg,#3b82f6,#10b981)", color:"#fff"}},
+  {id:"op_title_23", name:"Title: ⚡ Stock Market Architect", icon:"⚡", cost:25000000, desc:"Unlocks and equips the custom title '⚡ Stock Market Architect'.", effect:{type:"title", titleId:"t_title_23", titleText:"⚡ Stock Market Architect", bg:"linear-gradient(45deg,#f59e0b,#ef4444)", color:"#fff"}},
+  {id:"op_title_24", name:"Title: 🔮 Infinite Wealth God", icon:"🔮", cost:100000000, desc:"Unlocks and equips the custom title '🔮 Infinite Wealth God'.", effect:{type:"title", titleId:"t_title_24", titleText:"🔮 Infinite Wealth God", bg:"linear-gradient(45deg,#8b5cf6,#d97706)", color:"#fff"}},
+  {id:"op_title_25", name:"Title: 🪐 Cosmic Monopoly Master", icon:"🪐", cost:500000000, desc:"Unlocks and equips the custom title '🪐 Cosmic Monopoly Master'.", effect:{type:"title", titleId:"t_title_25", titleText:"🪐 Cosmic Monopoly Master", bg:"linear-gradient(45deg,#06b6d4,#3b82f6)", color:"#fff"}},
+  {id:"op_title_26", name:"Title: 💎 Diamond Hands Emperor", icon:"💎", cost:2500000000, desc:"Unlocks and equips the custom title '💎 Diamond Hands Emperor'.", effect:{type:"title", titleId:"t_title_26", titleText:"💎 Diamond Hands Emperor", bg:"linear-gradient(45deg,#38bdf8,#818cf8)", color:"#fff"}},
+  {id:"op_title_27", name:"Title: 🔥 Transcendent Tycoon", icon:"🔥", cost:10000000000, desc:"Unlocks and equips the custom title '🔥 Transcendent Tycoon'.", effect:{type:"title", titleId:"t_title_27", titleText:"🔥 Transcendent Tycoon", bg:"linear-gradient(45deg,#f97316,#dc2626)", color:"#fff"}},
+  {id:"op_title_28", name:"Title: 👁️ Omnipotent Market Lord", icon:"👁️️", cost:50000000000, desc:"Unlocks and equips the custom title '👁️️ Omnipotent Market Lord'.", effect:{type:"title", titleId:"t_title_28", titleText:"👁️ Omnipotent Market Lord", bg:"linear-gradient(45deg,#10b981,#059669)", color:"#fff"}},
+  {id:"op_title_29", name:"Title: 🌀 Void Wealth Titan", icon:"🌀", cost:250000000000, desc:"Unlocks and equips the custom title '🌀 Void Wealth Titan'.", effect:{type:"title", titleId:"t_title_29", titleText:"🌀 Void Wealth Titan", bg:"linear-gradient(45deg,#6366f1,#4f46e5)", color:"#fff"}},
+  {id:"op_title_30", name:"Title: ♾️ Eternal Market Deity", icon:"♾️", cost:1000000000000, desc:"Unlocks and equips the ultimate title '♾️ Eternal Market Deity'.", effect:{type:"title", titleId:"t_title_30", titleText:"♾️ Eternal Market Deity", bg:"linear-gradient(45deg,#f59e0b,#eab308)", color:"#000"}},
+
+  // 31-40: STOCK SHARE MULTIPLIER PACKETS
+  {id:"op_stock_31", name:"Apple Stock Takeover (10,000 AAPL)", icon:"🍏", cost:100000, desc:"Instantly adds +10,000 AAPL shares directly to your portfolio!", effect:{type:"shares", stock:"AAPL", amount:10000}},
+  {id:"op_stock_32", name:"Tesla Fleet Control (10,000 TSLA)", icon:"⚡", cost:200000, desc:"Instantly adds +10,000 TSLA shares directly to your portfolio!", effect:{type:"shares", stock:"TSLA", amount:10000}},
+  {id:"op_stock_33", name:"Coca-Cola Monopoly (50,000 KO)", icon:"🥤", cost:150000, desc:"Instantly adds +50,000 KO shares directly to your portfolio!", effect:{type:"shares", stock:"KO", amount:50000}},
+  {id:"op_stock_34", name:"Mega Apple Vault (100,000 AAPL)", icon:"🍏", cost:1000000, desc:"Instantly adds +100,000 AAPL shares directly to your portfolio!", effect:{type:"shares", stock:"AAPL", amount:100000}},
+  {id:"op_stock_35", name:"Tesla Gigafactory Stash (100,000 TSLA)", icon:"⚡", cost:2000000, desc:"Instantly adds +100,000 TSLA shares directly to your portfolio!", effect:{type:"shares", stock:"TSLA", amount:100000}},
+  {id:"op_stock_36", name:"Coca-Cola Treasury (500,000 KO)", icon:"🥤", cost:1500000, desc:"Instantly adds +500,000 KO shares directly to your portfolio!", effect:{type:"shares", stock:"KO", amount:500000}},
+  {id:"op_stock_37", name:"Cosmic Apple Injection (1,000,000 AAPL)", icon:"🍏", cost:10000000, desc:"Instantly adds +1,000,000 AAPL shares to your portfolio!", effect:{type:"shares", stock:"AAPL", amount:1000000}},
+  {id:"op_stock_38", name:"Galactic Tesla Dominance (1,000,000 TSLA)", icon:"⚡", cost:20000000, desc:"Instantly adds +1,000,000 TSLA shares to your portfolio!", effect:{type:"shares", stock:"TSLA", amount:1000000}},
+  {id:"op_stock_39", name:"Global Coca-Cola Reserve (5,000,000 KO)", icon:"🥤", cost:15000000, desc:"Instantly adds +5,000,000 KO shares to your portfolio!", effect:{type:"shares", stock:"KO", amount:5000000}},
+  {id:"op_stock_40", name:"Omnipotent Share Packet (10,000,000 All)", icon:"📦", cost:100000000, desc:"Instantly adds +10,000,000 shares to ALL 3 stocks!", effect:{type:"all_shares", amount:10000000}},
+
+  // 41-45: OP LUCKY MYSTERY BOXES
+  {id:"op_mystery_41", name:"Cosmic OP Mystery Box", icon:"🎁", cost:25000, desc:"Contains high-tier random cash rewards or huge stock packs!", effect:{type:"op_mystery", tier:1}},
+  {id:"op_mystery_42", name:"Infinity Loot Chest", icon:"🧰", cost:250000, desc:"Guarantees at least +$10,000,000 cash or rare property drops!", effect:{type:"op_mystery", tier:2}},
+  {id:"op_mystery_43", name:"Omni-God Mystery Vault", icon:"💎", cost:2500000, desc:"Contains up to +$100,000,000 cash, 50,000 Gold Bars, or 100 Bots!", effect:{type:"op_mystery", tier:3}},
+  {id:"op_mystery_44", name:"Multiverse Secret Box", icon:"🔮", cost:25000000, desc:"Unlocks massive trillion-dollar rewards or cosmic passive items!", effect:{type:"op_mystery", tier:4}},
+  {id:"op_mystery_45", name:"Ultimate Reality Crate", icon:"🌌", cost:250000000, desc:"The most overpowered crate in existence!", effect:{type:"op_mystery", tier:5}},
+
+  // 46-52: SUPERCHARGED BOT & SPEED FLEETS
+  {id:"op_bot_46", name:"Wall Street AI Supercomputer", icon:"🖥️", cost:50000, desc:"Instantly grants +100 Trading Bots!", effect:{type:"bots", amount:100}},
+  {id:"op_bot_47", name:"High-Frequency Bot Swarm", icon:"🤖", cost:500000, desc:"Instantly grants +1,000 Trading Bots!", effect:{type:"bots", amount:1000}},
+  {id:"op_bot_48", name:"Quantum Trading Matrix", icon:"⚡", cost:5000000, desc:"Instantly grants +10,000 Trading Bots!", effect:{type:"bots", amount:10000}},
+  {id:"op_bot_49", name:"Omni-Trader Fleet", icon:"🚀", cost:50000000, desc:"Instantly grants +100,000 Trading Bots!", effect:{type:"bots", amount:100000}},
+  {id:"op_gold_50", name:"Fort Knox Reserve", icon:"🧱", cost:100000, desc:"Instantly grants +1,000 Gold Bars (+ $50,000/min cash dividend)!", effect:{type:"gold", amount:1000}},
+  {id:"op_gold_51", name:"Central Gold Stash", icon:"🥇", cost:1000000, desc:"Instantly grants +10,000 Gold Bars (+ $500,000/min cash dividend)!", effect:{type:"gold", amount:10000}},
+  {id:"op_gold_52", name:"Cosmic Gold Vault", icon:"🌟", cost:10000000, desc:"Instantly grants +100,000 Gold Bars (+ $5,000,000/min dividend)!", effect:{type:"gold", amount:100000}}
+];
 
 // HELPER TO CONVERT EXPONENT POWERS TO BIGINT COMPARISONS
 function big(val){
@@ -308,21 +418,38 @@ let cash=Number(localStorage.getItem(STATE+"Cash"))||STARTING_CASH;
 let playerId=localStorage.getItem(PID),name=localStorage.getItem(PNAME)||"";
 let pass=localStorage.getItem(PPASS)||"";
 let firebaseReady=false,debounceTimer,lastUploadedValue=null,selected="AAPL",insurance=false,boostOwned=0,speedOwned=0,botOwned=0,botTargetPrice=1,goldBars=0,propertiesOwned={},propertyTimers={},allPlayers={};
+let opItemsOwned = {};
+let opPassiveIncome = 0;
 let lastChatCount = 0, unreadCount = 0, isFlipping = false;
 let riggedFlip = "OFF";
 let equippedTitle = localStorage.getItem("simuEquippedTitle")||"";
+let customTitlesUnlocked = {};
 let highestCasinoWin = Number(localStorage.getItem("simuHighCasinoWin"))||0;
 let lastGoldPayoutTime = Date.now();
+let lastOpIncomePayoutTime = Date.now();
+
+let currentOpDrop = null;
+let currentSelectedP2PPlayer = "";
 
 let priceOverrides = {};
 
-try{const saved=JSON.parse(localStorage.getItem(STATE+"Data")||"{}");if(saved.stocks)Object.keys(stocks).forEach(k=>{stocks[k].shares=Number(saved.stocks[k]?.shares)||0});insurance=!!saved.insurance;boostOwned=Number(saved.boostOwned)||0;speedOwned=Number(saved.speedOwned)||0;botOwned=Number(saved.botOwned)||0;botTargetPrice=Number(saved.botTargetPrice)||1;goldBars=Number(saved.goldBars)||0}catch(e){}
+try{const saved=JSON.parse(localStorage.getItem(STATE+"Data")||"{}");if(saved.stocks)Object.keys(stocks).forEach(k=>{stocks[k].shares=Number(saved.stocks[k]?.shares)||0});insurance=!!saved.insurance;boostOwned=Number(saved.boostOwned)||0;speedOwned=Number(saved.speedOwned)||0;botOwned=Number(saved.botOwned)||0;botTargetPrice=Number(saved.botTargetPrice)||1;goldBars=Number(saved.goldBars)||0;opItemsOwned=saved.opItemsOwned||{};customTitlesUnlocked=saved.customTitlesUnlocked||{};recalcOpPassiveIncome();}catch(e){}
 try{propertiesOwned=JSON.parse(localStorage.getItem(PROPS)||"{}")}catch(e){propertiesOwned={}}
 try{propertyTimers=JSON.parse(localStorage.getItem("simuPropTimers")||"{}")}catch(e){propertyTimers={}}
 if(!playerId){playerId=crypto.randomUUID?crypto.randomUUID().replaceAll("-",""):"p_"+Date.now()+Math.random().toString(36).slice(2);localStorage.setItem(PID,playerId)}
 
 const nameInput=document.getElementById("name");nameInput.value=name;
 const passInput=document.getElementById("pass");passInput.value=pass;
+
+function recalcOpPassiveIncome(){
+ opPassiveIncome = 0;
+ for(const [opId, count] of Object.entries(opItemsOwned)){
+  const item = OVERPOWERED_ITEMS.find(x => x.id === opId);
+  if(item && item.effect && item.effect.type === "income"){
+   opPassiveIncome += (item.effect.amount * count);
+  }
+ }
+}
 
 function accountKey(){
  const n=validName().toLowerCase().replace(/[^a-z0-9]/g,"");
@@ -364,7 +491,7 @@ function portfolio(){
 function pnl(){return portfolio()-STARTING_CASH}
 function saveLocal(){
  localStorage.setItem(STATE+"Cash",String(cash));
- localStorage.setItem(STATE+"Data",JSON.stringify({stocks:Object.fromEntries(Object.entries(stocks).map(([k,s])=>[k,{shares:s.shares}])),insurance,boostOwned,speedOwned,botOwned,botTargetPrice,goldBars}));
+ localStorage.setItem(STATE+"Data",JSON.stringify({stocks:Object.fromEntries(Object.entries(stocks).map(([k,s])=>[k,{shares:s.shares}])),insurance,boostOwned,speedOwned,botOwned,botTargetPrice,goldBars,opItemsOwned,customTitlesUnlocked}));
  localStorage.setItem(PROPS,JSON.stringify(propertiesOwned));
  localStorage.setItem("simuPropTimers",JSON.stringify(propertyTimers));
  localStorage.setItem("simuEquippedTitle",equippedTitle);
@@ -377,7 +504,7 @@ function render(){
  for(const[t,s]of Object.entries(stocks)){const c=s.change,q=Math.floor(cash/s.price);b.insertAdjacentHTML("beforeend",`<tr><td><b>${safeText(t)}</b><br><span class="sub">${safeText(s.name)}</span></td><td><div><b>${money(s.price)}</b></div><div class="spark-wrap"><canvas class="spark" id="chart-${t}" width="170" height="48"></canvas></div></td><td class="${c>=0?"green":"red"}"><span class="arrow">${c>=0?"▲":"▼"}</span>${c>=0?"+":""}${c.toFixed(2)}%</td><td>${formatQty(s.shares)}</td><td><div class="actions"><button class="buy" onclick="buy('${t}')" ${q<1?"disabled":""}>BUY</button><button class="buy" onclick="buyAll('${t}')" ${q<1?"disabled":""}>BUY ALL</button><button class="sell" onclick="sell('${t}')" ${s.shares<1?"disabled":""}>SELL</button><button class="sell" onclick="sellAll('${t}')" ${s.shares<1?"disabled":""}>SELL ALL</button></div></td></tr>`)}
  for(const t of Object.keys(stocks))drawSmall(t);
  document.getElementById("cash").textContent=money(cash);document.getElementById("portfolio").textContent=money(portfolio());const p=pnl(),pe=document.getElementById("pnl");pe.textContent=(p>=0?"+":"-")+money(Math.abs(p));pe.className="big "+(p>=0?"green":"red");
- renderSelected();renderShop();renderProperties();renderTitles();saveLocal();
+ renderSelected();renderShop();renderProperties();renderTitles();updateP2PListDropdown();saveLocal();
 }
 function drawSmall(t){const s=stocks[t],c=document.getElementById("chart-"+t);if(!c)return;const x=c.getContext("2d"),w=c.width,h=c.height,v=s.history,min=Math.min(...v),max=Math.max(...v),r=max-min||1;x.clearRect(0,0,w,h);x.beginPath();v.forEach((n,i)=>{const px=v.length===1?w/2:i/(v.length-1)*(w-4)+2,py=h-4-(n-min)/r*(h-8);i?x.lineTo(px,py):x.moveTo(px,py)});x.strokeStyle=s.change>=0?"#10b981":"#ef4444";x.lineWidth=2;x.stroke()}
 function drawBig(){const c=document.getElementById("bigChart"),s=stocks[selected],x=c.getContext("2d"),w=c.width,h=c.height,v=s.history,min=Math.min(...v),max=Math.max(...v),r=max-min||1;x.clearRect(0,0,w,h);x.strokeStyle="#243957";x.lineWidth=1;for(let i=1;i<5;i++){x.beginPath();x.moveTo(0,i*h/5);x.lineTo(w,i*h/5);x.stroke()}x.beginPath();v.forEach((n,i)=>{const px=v.length===1?w/2:i/(v.length-1)*(w-8)+4,py=h-8-(n-min)/r*(h-16);i?x.lineTo(px,py):x.moveTo(px,py)});x.strokeStyle=s.change>=0?"#10b981":"#ef4444";x.lineWidth=3;x.stroke()}
@@ -417,6 +544,110 @@ function renderShop(){
    </div>
   </div>`;
  }).join("");
+
+ renderOPDropBanner();
+}
+
+function renderOPDropBanner(){
+ const container = document.getElementById("opDropContainer");
+ if(!currentOpDrop || currentOpDrop.stock <= 0){
+  container.style.display = "none";
+  return;
+ }
+
+ const item = currentOpDrop.item;
+ const canAfford = cash >= item.cost;
+
+ container.style.display = "block";
+ container.innerHTML = `<div class="shop-item op-card">
+  <div style="display:flex;justify-content:space-between;align-items:center">
+   <span class="title-badge" style="background:#a855f7;color:#fff;font-size:12px">⚡ RARE 3-MIN OP DROP (1 IN STOCK)</span>
+   <span class="red" style="font-weight:800;font-size:12px">🔥 STOCK: ${currentOpDrop.stock}/1</span>
+  </div>
+  <div style="display:flex;gap:12px;margin-top:10px;align-items:center">
+   <div style="font-size:42px">${item.icon}</div>
+   <div>
+    <h2 style="margin:0;color:#f472b6">${safeText(item.name)}</h2>
+    <div class="muted">${safeText(item.desc)}</div>
+    <div class="price green" style="margin-top:4px">${money(item.cost)}</div>
+   </div>
+  </div>
+  <button class="gold" onclick="claimOpDrop()" style="width:100%;margin-top:10px;padding:12px;font-size:15px;box-shadow:0 0 15px rgba(234,179,8,0.4)" ${!canAfford?"disabled":""}>
+   BUY OP ITEM NOW (${money(item.cost)})
+  </button>
+ </div>`;
+}
+
+window.claimOpDrop = async () => {
+ if(!firebaseReady || !currentOpDrop || currentOpDrop.stock <= 0) return;
+ const item = currentOpDrop.item;
+ if(cash < item.cost){
+  toast("Not enough cash!");
+  return;
+ }
+
+ const dropRef = ref(db, "currentOpDrop");
+ try {
+  const result = await runTransaction(dropRef, (currentData) => {
+   if (currentData && currentData.stock > 0) {
+    currentData.stock = 0;
+    currentData.claimedBy = validName();
+    return currentData;
+   } else {
+    return; // Abort transaction if already claimed
+   }
+  });
+
+  if (result.committed) {
+   cash -= item.cost;
+   applyOpItemEffect(item);
+   toast(`🎉 YOU BOUGHT THE OP ITEM: ${item.name}!`);
+   done();
+  } else {
+   toast("❌ Someone else bought it first!");
+  }
+ } catch (e) {
+  console.error(e);
+  toast("Transaction failed, try again!");
+ }
+};
+
+function applyOpItemEffect(item){
+ opItemsOwned[item.id] = (opItemsOwned[item.id] || 0) + 1;
+ const eff = item.effect;
+ if(!eff) return;
+
+ if(eff.type === "cash"){
+  cash += eff.amount;
+  toast(`💰 Received +${money(eff.amount)} Cash!`);
+ } else if(eff.type === "income"){
+  recalcOpPassiveIncome();
+  toast(`⚡ Passive Income increased by +${money(eff.amount)}/sec!`);
+ } else if(eff.type === "shares"){
+  if(stocks[eff.stock]) stocks[eff.stock].shares += eff.amount;
+  toast(`📈 Added +${formatQty(eff.amount)} ${eff.stock} shares!`);
+ } else if(eff.type === "all_shares"){
+  Object.values(stocks).forEach(s => s.shares += eff.amount);
+  toast(`📦 Added +${formatQty(eff.amount)} shares to ALL stocks!`);
+ } else if(eff.type === "title"){
+  customTitlesUnlocked[eff.titleId] = eff;
+  equippedTitle = eff.titleId;
+  toast(`🏆 Unlocked & Equipped title: ${eff.titleText}!`);
+ } else if(eff.type === "bots"){
+  botOwned += eff.amount;
+  toast(`🤖 Received +${formatQty(eff.amount)} Trading Bots!`);
+ } else if(eff.type === "gold"){
+  goldBars += eff.amount;
+  toast(`🥇 Received +${formatQty(eff.amount)} Gold Bars!`);
+ } else if(eff.type === "op_mystery"){
+  triggerOpMysteryBox(eff.tier);
+ }
+}
+
+function triggerOpMysteryBox(tier){
+ const bonus = Math.pow(10, tier) * 100000;
+ cash += bonus;
+ toast(`🎁 OP Mystery Box Tier ${tier} granted +${money(bonus)}!`);
 }
 
 window.buyShop=(id, qtyMode=1)=>{
@@ -506,14 +737,27 @@ function propertyPayouts(){
 }
 
 function goldPayouts(){
- if(goldBars <= 0) return;
  const now = Date.now();
- const elapsedSec = (now - lastGoldPayoutTime) / 1000;
- if(elapsedSec >= 5){
-  const goldPayout = Math.floor((50 / 60) * elapsedSec * goldBars);
-  if(goldPayout > 0){
-   cash += goldPayout;
-   lastGoldPayoutTime = now;
+ 
+ // Gold Dividends
+ if(goldBars > 0){
+  const elapsedSec = (now - lastGoldPayoutTime) / 1000;
+  if(elapsedSec >= 5){
+   const goldPayout = Math.floor((50 / 60) * elapsedSec * goldBars);
+   if(goldPayout > 0){
+    cash += goldPayout;
+    lastGoldPayoutTime = now;
+    done();
+   }
+  }
+ }
+
+ // OP Passive Income Generators
+ if(opPassiveIncome > 0){
+  const elapsedSecOp = (now - lastOpIncomePayoutTime) / 1000;
+  if(elapsedSecOp >= 1){
+   cash += Math.floor(opPassiveIncome * elapsedSecOp);
+   lastOpIncomePayoutTime = now;
    done();
   }
  }
@@ -547,9 +791,22 @@ function renderProperties(){
    <div class="muted">${p.desc}</div>
    <div class="property-stats"><span>Payout: Every ${p.interval}s</span><b class="green">+${money(p.income)}</b></div>
    <div class="owned">You own: ${formatQty(n)}</div>
-   <div class="timer-badge" id="timer-"+k}">⏱ Next payout in --s</div>
+   <div class="timer-badge" id="timer-${k}">⏱ Next payout in --s</div>
   </div>`;
  }).join("");
+
+ // RENDER OWNED OP ITEMS
+ for(const [opId, count] of Object.entries(opItemsOwned)){
+  if(count <= 0) continue;
+  const item = OVERPOWERED_ITEMS.find(x => x.id === opId);
+  if(!item) continue;
+  html += `<div class="property-card" style="border-color:#a855f7">
+   <div class="property-icon">${item.icon}</div>
+   <h3 style="color:#c084fc">${safeText(item.name)}</h3>
+   <div class="muted">${safeText(item.desc)}</div>
+   <div class="owned" style="margin-top:6px;color:#a855f7">Owned OP Count: ${formatQty(count)}</div>
+  </div>`;
+ }
 
  html += `<div class="property-card" style="border-color:#8b5cf6">
    <div class="property-icon">🤖</div>
@@ -579,14 +836,22 @@ function renderProperties(){
 
 function renderTitles(){
  const g = document.getElementById("titleGrid");
- const currentTitleObj = ALL_TITLES.find(t => t.id === equippedTitle);
+ const currentTitleObj = ALL_TITLES.find(t => t.id === equippedTitle) || customTitlesUnlocked[equippedTitle];
  document.getElementById("equippedTitleText").innerHTML = currentTitleObj 
-  ? `Active Title: <span class="title-badge" style="background:${currentTitleObj.bg};color:${currentTitleObj.color}">${currentTitleObj.text}</span>`
+  ? `Active Title: <span class="title-badge" style="background:${currentTitleObj.bg};color:${currentTitleObj.color}">${currentTitleObj.text || currentTitleObj.titleText}</span>`
   : "Active Title: None";
 
- g.innerHTML = ALL_TITLES.map(t => {
+ // Combine base titles + custom unlocked OP titles
+ let displayList = [...ALL_TITLES];
+ for(const [tId, tObj] of Object.entries(customTitlesUnlocked)){
+  displayList.unshift({id: tId, text: tObj.titleText, bg: tObj.bg, color: tObj.color, desc: "Unlocked via OP Shop Drop!", req:()=>true});
+ }
+
+ g.innerHTML = displayList.map(t => {
   let isUnlocked = false;
-  if(t.dynamic && t.id === "richest"){
+  if(customTitlesUnlocked[t.id]){
+   isUnlocked = true;
+  } else if(t.dynamic && t.id === "richest"){
    isUnlocked = isRichestPlayer();
   } else if(t.req) {
    isUnlocked = t.req();
@@ -625,6 +890,169 @@ function isRichestPlayer(){
  return sorted.length > 0 && sorted[0].id === playerId;
 }
 
+function updateP2PListDropdown(){
+ const sel = document.getElementById("p2pItemSelect");
+ if(!sel) return;
+ let opts = '<option value="">Select an item to list…</option>';
+
+ for(const [k, p] of Object.entries(properties)){
+  const count = Number(propertiesOwned[k]) || 0;
+  if(count > 0){
+   opts += `<option value="property_${k}">Property: ${p.name} (Owned: ${count})</option>`;
+  }
+ }
+
+ for(const [opId, count] of Object.entries(opItemsOwned)){
+  if(count > 0){
+   const item = OVERPOWERED_ITEMS.find(x => x.id === opId);
+   if(item){
+    opts += `<option value="op_${opId}">OP Item: ${item.name} (Owned: ${count})</option>`;
+   }
+  }
+ }
+
+ sel.innerHTML = opts;
+}
+
+document.getElementById("p2pListBtn").onclick = () => {
+ const itemVal = document.getElementById("p2pItemSelect").value;
+ const price = Math.floor(Number(document.getElementById("p2pPriceInput").value));
+
+ if(!itemVal){ toast("Select an item to list!"); return; }
+ if(!price || price < 1){ toast("Enter a valid price!"); return; }
+
+ if(itemVal.startsWith("property_")){
+  const propKey = itemVal.replace("property_", "");
+  if((propertiesOwned[propKey]||0) < 1){ toast("You don't own this property!"); return; }
+  propertiesOwned[propKey]--;
+  
+  const listing = {
+   sellerId: playerId,
+   sellerName: validName(),
+   itemType: "property",
+   itemKey: propKey,
+   itemName: properties[propKey].name,
+   itemIcon: properties[propKey].icon,
+   price: price,
+   timestamp: serverTimestamp()
+  };
+  push(ref(db, "marketListings/" + playerId), listing);
+ } else if(itemVal.startsWith("op_")){
+  const opId = itemVal.replace("op_", "");
+  if((opItemsOwned[opId]||0) < 1){ toast("You don't own this OP item!"); return; }
+  opItemsOwned[opId]--;
+  recalcOpPassiveIncome();
+
+  const item = OVERPOWERED_ITEMS.find(x => x.id === opId);
+  const listing = {
+   sellerId: playerId,
+   sellerName: validName(),
+   itemType: "op",
+   itemKey: opId,
+   itemName: item.name,
+   itemIcon: item.icon,
+   price: price,
+   timestamp: serverTimestamp()
+  };
+  push(ref(db, "marketListings/" + playerId), listing);
+ }
+
+ toast("Listed item in your store!");
+ document.getElementById("p2pPriceInput").value = "";
+ done();
+};
+
+function renderP2PStore(targetId){
+ currentSelectedP2PPlayer = targetId || playerId;
+ const isSelf = currentSelectedP2PPlayer === playerId;
+ const storeTitle = document.getElementById("p2pStoreTitle");
+ const grid = document.getElementById("p2pGrid");
+
+ const targetPlayerObj = allPlayers[currentSelectedP2PPlayer];
+ storeTitle.textContent = isSelf ? "Viewing: Your Listings" : `Viewing Store of: ${targetPlayerObj ? targetPlayerObj.name : "Player"}`;
+
+ onValue(ref(db, "marketListings/" + currentSelectedP2PPlayer), snap => {
+  const data = snap.val();
+  if(!data){
+   grid.innerHTML = '<div class="empty" style="grid-column:1/-1">No items listed in this store.</div>';
+   return;
+  }
+
+  grid.innerHTML = Object.entries(data).map(([listKey, item]) => {
+   const canBuy = cash >= item.price;
+   return `<div class="p2p-card">
+    <div>
+     <div style="font-size:26px">${item.itemIcon}</div>
+     <b style="font-size:14px">${safeText(item.itemName)}</b>
+     <div class="green" style="font-size:15px;font-weight:900;margin-top:4px">${money(item.price)}</div>
+    </div>
+    <div style="margin-top:8px">
+     ${isSelf 
+       ? `<button class="danger" onclick="cancelP2PListing('${listKey}', '${item.itemType}', '${item.itemKey}')" style="width:100%">CANCEL LISTING</button>`
+       : `<button class="buy" onclick="buyP2PListing('${currentSelectedP2PPlayer}', '${listKey}', ${item.price}, '${item.itemType}', '${item.itemKey}')" style="width:100\%" ${!canBuy?"disabled":""}>BUY ITEM</button>`
+     }
+    </div>
+   </div>`;
+  }).join("");
+ }, {onlyOnce: true});
+}
+
+window.cancelP2PListing = (listKey, itemType, itemKey) => {
+ remove(ref(db, "marketListings/" + playerId + "/" + listKey));
+ if(itemType === "property"){
+  propertiesOwned[itemKey] = (propertiesOwned[itemKey]||0) + 1;
+ } else if(itemType === "op"){
+  opItemsOwned[itemKey] = (opItemsOwned[itemKey]||0) + 1;
+  recalcOpPassiveIncome();
+ }
+ toast("Cancelled listing and returned item!");
+ done();
+ renderP2PStore(playerId);
+};
+
+window.buyP2PListing = async (sellerId, listKey, price, itemType, itemKey) => {
+ if(cash < price){ toast("Not enough cash!"); return; }
+
+ const itemRef = ref(db, `marketListings/${sellerId}/${listKey}`);
+ try {
+  const snap = await get(itemRef);
+  if(!snap.exists()){
+   toast("Item was already sold or removed!");
+   renderP2PStore(sellerId);
+   return;
+  }
+
+  cash -= price;
+  await remove(itemRef);
+
+  // Transfer cash to seller
+  push(ref(db, "transfers/" + sellerId), {
+   fromName: validName(),
+   amount: price,
+   timestamp: serverTimestamp()
+  });
+
+  // Give item to buyer
+  if(itemType === "property"){
+   propertiesOwned[itemKey] = (propertiesOwned[itemKey]||0) + 1;
+  } else if(itemType === "op"){
+   const opItemObj = OVERPOWERED_ITEMS.find(x => x.id === itemKey);
+   if(opItemObj) applyOpItemEffect(opItemObj);
+  }
+
+  toast(`🎉 Bought item for ${money(price)}!`);
+  done();
+  renderP2PStore(sellerId);
+ } catch(e){
+  console.error(e);
+ }
+};
+
+document.getElementById("p2pViewPlayer").onchange = (e) => {
+ const val = e.target.value;
+ renderP2PStore(val || playerId);
+};
+
 function upload(force=false){
  if(!firebaseReady)return;
  const v=portfolio();
@@ -651,7 +1079,7 @@ function upload(force=false){
    cash,
    stocks: Object.fromEntries(Object.entries(stocks).map(([k,s])=>[k,{shares:s.shares, price:s.price}])),
    insurance, boostOwned, speedOwned, botOwned, botTargetPrice, goldBars,
-   propertiesOwned, propertyTimers, equippedTitle, highestCasinoWin,
+   propertiesOwned, propertyTimers, equippedTitle, highestCasinoWin, opItemsOwned, customTitlesUnlocked,
    name: validName(),
    updatedAt: serverTimestamp()
   }).catch(console.error);
@@ -679,6 +1107,9 @@ async function register(){
     botOwned = Number(data.botOwned)||0;
     botTargetPrice = Number(data.botTargetPrice)||1;
     goldBars = Number(data.goldBars)||0;
+    opItemsOwned = data.opItemsOwned || {};
+    customTitlesUnlocked = data.customTitlesUnlocked || {};
+    recalcOpPassiveIncome();
     equippedTitle = data.equippedTitle || "";
     highestCasinoWin = Number(data.highestCasinoWin)||0;
     propertiesOwned = data.propertiesOwned || {};
@@ -704,6 +1135,7 @@ async function register(){
  upload(true);
  listenForTransfers();
  listenForRemoteStockOverrides();
+ listenForOpDrops();
 }
 
 function done(){render();upload(true)}
@@ -770,9 +1202,9 @@ function renderLeaderboard(data){
   let activeTitleId = p.title;
   if(i === 0) activeTitleId = "richest";
 
-  const tObj = ALL_TITLES.find(t => t.id === activeTitleId);
+  const tObj = ALL_TITLES.find(t => t.id === activeTitleId) || customTitlesUnlocked[activeTitleId];
   if(tObj){
-   titleBadgeHtml = `<span class="title-badge" style="background:${tObj.bg};color:${tObj.color}">${tObj.text}</span>`;
+   titleBadgeHtml = `<span class="title-badge" style="background:${tObj.bg};color:${tObj.color}">${tObj.text || tObj.titleText}</span>`;
   }
 
   return `<tr class="${p.id===playerId?"you":""}">
@@ -787,6 +1219,12 @@ function renderLeaderboard(data){
  const curVal = sel.value;
  sel.innerHTML = '<option value="">Select a player…</option>' + list.filter(p=>p.id!==playerId).map(p=>`<option value="${p.id}">${safeText(p.name||"Player")} (${money(p.portfolioValue||0)})</option>`).join("");
  sel.value = curVal;
+
+ // UPDATE P2P STORE SELECTOR
+ const p2pSel = document.getElementById("p2pViewPlayer");
+ const curP2P = p2pSel.value;
+ p2pSel.innerHTML = '<option value="">View Player\'s Store…</option>' + list.map(p=>`<option value="${p.id}">${safeText(p.name||"Player")} (${money(p.portfolioValue||0)})</option>`).join("");
+ p2pSel.value = curP2P;
 
  updateOP195PlayerDropdown(list);
 }
@@ -836,6 +1274,42 @@ function listenForRemoteStockOverrides(){
    }
   }
  });
+}
+
+function listenForOpDrops(){
+ if(!firebaseReady) return;
+ onValue(ref(db, "currentOpDrop"), snap => {
+  const data = snap.val();
+  if(data){
+   currentOpDrop = data;
+   renderOPDropBanner();
+  }
+ });
+}
+
+function handle3MinuteOpSpawner(){
+ if(!firebaseReady) return;
+ const now = Date.now();
+ const dropIntervalMs = 3 * 60 * 1000;
+ const currentCycle = Math.floor(now / dropIntervalMs);
+ const nextDropTime = (currentCycle + 1) * dropIntervalMs;
+ const remainingSec = Math.max(0, Math.ceil((nextDropTime - now) / 1000));
+
+ const mins = String(Math.floor(remainingSec / 60)).padStart(2, '0');
+ const secs = String(remainingSec % 60).padStart(2, '0');
+ document.getElementById("opTimerBadge").textContent = `⚡ Next OP Drop in: ${mins}:${secs}`;
+
+ // Trigger drop sync every 3 minutes
+ if(remainingSec === 180 || !currentOpDrop || currentOpDrop.cycle !== currentCycle){
+  const randomOpItem = OVERPOWERED_ITEMS[Math.floor(Math.random() * OVERPOWERED_ITEMS.length)];
+  const newDrop = {
+   cycle: currentCycle,
+   item: randomOpItem,
+   stock: 1,
+   timestamp: serverTimestamp()
+  };
+  set(ref(db, "currentOpDrop"), newDrop).catch(console.error);
+ }
 }
 
 document.getElementById("flipAllInBtn").onclick=()=>{
@@ -1144,6 +1618,7 @@ document.getElementById("resetBtn").onclick=()=>{
  if(confirm("Are you sure you want to reset your local progress?")){
   cash = STARTING_CASH;
   insurance = false; boostOwned = 0; speedOwned = 0; botOwned = 0; botTargetPrice = 1; goldBars = 0;
+  opItemsOwned = {}; customTitlesUnlocked = {}; opPassiveIncome = 0;
   equippedTitle = ""; highestCasinoWin = 0;
   propertiesOwned = {}; propertyTimers = {};
   priceOverrides = {};
@@ -1192,10 +1667,12 @@ document.getElementById("chatBadge").onclick=()=>{
 firebaseReady = true;
 register();
 render();
+renderP2PStore(playerId);
 
 setInterval(updatePrices, 3000);
 setInterval(propertyPayouts, 1000);
 setInterval(goldPayouts, 1000);
+setInterval(handle3MinuteOpSpawner, 1000);
 </script>
 </body>
 </html>
