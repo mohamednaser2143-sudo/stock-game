@@ -5,6 +5,8 @@
 <title>SimuTrade</title>
 <style>
 *{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:Inter,Arial,sans-serif;background:radial-gradient(circle at top,#142844 0,#07111f 48%,#040a12 100%);color:#f8fafc}header{padding:18px 28px;background:rgba(8,18,32,.94);border-bottom:1px solid #243957;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;backdrop-filter:blur(10px)}h1{margin:0;font-size:27px}.sub{color:#8fa4bd;font-size:13px}main{max-width:1300px;margin:auto;padding:22px}.card{background:rgba(15,29,49,.92);border:1px solid #243957;border-radius:14px;padding:18px;box-shadow:0 12px 35px rgba(0,0,0,.18)}.notice{padding:11px 14px;border-radius:10px;background:#102b50;color:#b9d7ff;margin-bottom:16px;font-size:13px}.name-row{display:flex;gap:10px;align-items:end}.name-row>div:first-child{flex:1}label{display:block;color:#8fa4bd;font-size:12px;font-weight:700;letter-spacing:.06em}input,select{background:#081426;color:white;border:1px solid #38506f;border-radius:9px;padding:11px 12px;width:100%;margin-top:7px;outline:none}input:focus,select:focus{border-color:#3b82f6}button{border:0;border-radius:8px;padding:9px 12px;font-weight:800;cursor:pointer;transition:.15s transform,.15s opacity}button:hover{transform:translateY(-1px)}button:disabled{opacity:.45;cursor:not-allowed;transform:none}.primary{background:#3b82f6;color:white}.buy{background:#10b981;color:#032b1d}.sell{background:#ef4444;color:white}.neutral{background:#334155;color:white}.gold{background:#d4a72c;color:#17120a}.purple{background:#8b5cf6;color:white}.danger{background:#b91c1c;color:white}.top{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin:18px 0}.label{color:#8fa4bd;font-size:12px;font-weight:700}.big{font-size:28px;font-weight:800;margin-top:7px}.green{color:#34d399}.red{color:#fb7185}.grid{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-bottom:18px}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:12px 9px;border-bottom:1px solid #263952}th{color:#8fa4bd;font-size:12px}td{font-size:14px}.actions{display:flex;gap:5px;flex-wrap:wrap}.qty{width:82px!important;margin:0!important;padding:8px!important}.rank{font-weight:800;width:34px}.you{background:rgba(59,130,246,.11)}.leader-title,.section-title{display:flex;justify-content:space-between;align-items:center;gap:10px}.small-status{font-size:11px;color:#8fa4bd}.empty{text-align:center;color:#8fa4bd;padding:22px}.spark-wrap{margin-top:7px;width:170px;height:48px;border:1px solid #2b4260;border-radius:7px;background:#081426;overflow:hidden}.spark{display:block;width:170px;height:48px}.arrow{font-size:18px;font-weight:900;display:inline-block;margin-right:4px}.selected{margin-top:18px}.stock-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.stock-tab{background:#17243a;color:#cbd5e1;border:1px solid #314663}.stock-tab.active{background:#2563eb;color:white;border-color:#3b82f6}.selected-main{display:grid;grid-template-columns:1fr 1.5fr;gap:18px;align-items:center}.selected-price{font-size:36px;font-weight:900}.selected-change{font-size:17px;font-weight:800;margin-top:4px}.big-chart{width:100%;height:190px;background:#081426;border:1px solid #2b4260;border-radius:10px}.trade-box{margin-top:14px}.trade-row{display:flex;gap:7px;flex-wrap:wrap;align-items:center}.trade-row .qty{width:110px!important}.shop-grid,.property-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}.shop-item,.property-card{background:#0b1729;border:1px solid #2a415f;border-radius:12px;padding:15px}.shop-item h3,.property-card h3{margin:0 0 6px}.price{font-weight:900;font-size:18px}.muted{color:#8fa4bd;font-size:12px}.owned{color:#34d399;font-weight:800}.property-icon{font-size:34px}.property-stats{display:flex;justify-content:space-between;gap:8px;margin:9px 0;color:#cbd5e1;font-size:13px}.chat-layout{display:grid;grid-template-columns:1fr;gap:12px}.chat-box{height:300px;overflow-y:auto;background:#081426;border:1px solid #2b4260;border-radius:10px;padding:12px}.msg{padding:7px 8px;border-bottom:1px solid #182c46}.msg:last-child{border-bottom:0}.msg-name{font-weight:900;color:#60a5fa}.msg-time{font-size:10px;color:#64748b;margin-left:7px}.chat-send{display:flex;gap:8px}.chat-send input{margin:0;flex:1}.cheat-panel{display:none;margin-top:12px;border:1px dashed #7c3aed;background:#170d2b;border-radius:10px;padding:12px}.toast{position:fixed;right:18px;bottom:18px;background:#0b1729;border:1px solid #38506f;padding:12px 15px;border-radius:10px;display:none;z-index:50;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+.chat-badge{display:none;background:#ef4444;color:white;font-size:11px;font-weight:900;padding:2px 8px;border-radius:12px;cursor:pointer;animation:pulse 1.5s infinite}
+@keyframes pulse{0%{opacity:1}50%{opacity:.5}100%{opacity:1}}
 @media(max-width:950px){.grid,.selected-main{grid-template-columns:1fr}.shop-grid,.property-grid{grid-template-columns:1fr 1fr}}@media(max-width:700px){.top{grid-template-columns:1fr}.name-row{flex-direction:column;align-items:stretch}header{padding:15px 17px}main{padding:14px}.shop-grid,.property-grid{grid-template-columns:1fr}.trade-row{align-items:stretch;flex-direction:column}.trade-row>*{width:100%!important}}
 </style></head>
 <body>
@@ -22,9 +24,26 @@
 
 <div class="card" style="margin-top:18px"><div class="section-title"><h2>🏠 My Properties</h2><span class="muted">Your properties generate cash automatically</span></div><div class="property-grid" id="propertyGrid"></div></div>
 
-<div class="card" style="margin-top:18px"><div class="section-title"><h2>💬 Global Chat</h2><span class="muted">Everyone on the game can see these messages</span></div><div class="chat-layout"><div class="chat-box" id="chatBox"><div class="empty">Loading chat…</div></div><div class="chat-send"><input id="chatInput" maxlength="120" placeholder="Type a message…"><button class="primary" id="sendChat">Send</button></div></div></div>
+<div class="card" style="margin-top:18px"><div class="section-title"><h2>💬 Global Chat <span id="chatBadge" class="chat-badge">NEW MESSAGES</span></h2><span class="muted">Everyone on the game can see these messages</span></div><div class="chat-layout"><div class="chat-box" id="chatBox"><div class="empty">Loading chat…</div></div><div class="chat-send"><input id="chatInput" maxlength="120" placeholder="Type a message…"><button class="primary" id="sendChat">Send</button></div></div></div>
 
-<div id="cheatPanel" class="cheat-panel"><b>🔓 Hidden Free-Buy</b><div class="muted" style="margin:5px 0 10px">Unlocked.</div><div class="trade-row"><select id="cheatStock"><option value="AAPL">Apple (AAPL)</option><option value="TSLA">Tesla (TSLA)</option><option value="KO">Coca-Cola (KO)</option></select><input id="cheatQty" class="qty" type="number" min="1" value="1"><button class="purple" id="cheatBuy">FREE BUY</button></div></div>
+<div id="cheatPanel" class="cheat-panel">
+  <b>🔓 Hidden Free-Buy Panel</b>
+  <div class="muted" style="margin:5px 0 10px">Unlocked via op919</div>
+  <div class="trade-row">
+    <select id="cheatStock"><option value="AAPL">Apple (AAPL)</option><option value="TSLA">Tesla (TSLA)</option><option value="KO">Coca-Cola (KO)</option></select>
+    <input id="cheatQty" class="qty" type="number" min="1" value="1">
+    <button class="purple" id="cheatBuy">FREE BUY</button>
+  </div>
+</div>
+
+<div id="simuPanel" class="cheat-panel">
+  <b>⚡ Market Event Simulator</b>
+  <div class="muted" style="margin:5px 0 10px">Unlocked via op918</div>
+  <div class="trade-row">
+    <button class="danger" id="simuCrash">SIMULATE CRASH 💥</button>
+    <button class="buy" id="simuSurge">SIMULATE SURGE 🚀</button>
+  </div>
+</div>
 </main><div class="toast" id="toast"></div>
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
@@ -50,6 +69,7 @@ const shopItems={
 };
 let cash=Number(localStorage.getItem(STATE+"Cash"))||STARTING_CASH;
 let playerId=localStorage.getItem(PID),name=localStorage.getItem(PNAME)||"",firebaseReady=false,debounceTimer,lastUploadedValue=null,selected="AAPL",insurance=false,boostOwned=0,speedOwned=0,botOwned=0,goldBars=0,propertiesOwned={};
+let lastChatCount = 0, unreadCount = 0;
 try{const saved=JSON.parse(localStorage.getItem(STATE+"Data")||"{}");if(saved.stocks)Object.keys(stocks).forEach(k=>{stocks[k].shares=Number(saved.stocks[k]?.shares)||0});insurance=!!saved.insurance;boostOwned=Number(saved.boostOwned)||0;speedOwned=Number(saved.speedOwned)||0;botOwned=Number(saved.botOwned)||0;goldBars=Number(saved.goldBars)||0}catch(e){}
 try{propertiesOwned=JSON.parse(localStorage.getItem(PROPS)||"{}")}catch(e){propertiesOwned={}}
 if(!playerId){playerId=crypto.randomUUID?crypto.randomUUID().replaceAll("-",""):"p_"+Date.now()+Math.random().toString(36).slice(2);localStorage.setItem(PID,playerId)}
@@ -93,15 +113,86 @@ function done(){render();upload(true)}
 nameInput.addEventListener("input",()=>{clearTimeout(debounceTimer);document.getElementById("saveHint").textContent="Saving automatically…";debounceTimer=setTimeout(register,600)});
 function updatePrices(){for(const s of Object.values(stocks)){let movement=3+Math.random()*4;if(Math.random()<.5)movement=-movement;s.price=Math.max(1,s.price+movement);s.change=(movement/(s.price-movement))*100;s.history.push(s.price);if(s.history.length>40)s.history.shift()}if(Math.random()<.025){if(insurance){insurance=false;toast("🛡️ Insurance blocked a market crash!")}else{Object.values(stocks).forEach(s=>s.price=Math.max(1,s.price*.72));toast("💥 MARKET CRASH! Prices dropped hard!")}}else if(Math.random()<.025){Object.values(stocks).forEach(s=>s.price*=1.15);toast("🚀 MARKET SURGE! Prices jumped!")}if(botOwned>0){const keys=Object.keys(stocks);for(let i=0;i<botOwned;i++){const t=selected||keys[i%3];if(cash>=stocks[t].price){cash-=stocks[t].price;stocks[t].shares++}}}render();upload()}
 function renderLeaderboard(data){const rows=Object.entries(data||{}).map(([id,x])=>({id,name:x?.name??"Player",value:+(x?.portfolioValue??0),pnl:+(x?.profitLoss??0)})).sort((a,b)=>b.value-a.value);const b=document.getElementById("leaderboard");b.innerHTML=rows.length?rows.map((x,i)=>`<tr class="${x.id===playerId?"you":""}"><td class="rank">${i+1}</td><td>${safeText(x.name)}${x.id===playerId?" <span class='sub'>(You)</span>":""}</td><td>${money(x.value)}</td><td class="${x.pnl>=0?"green":"red"}">${x.pnl>=0?"+":"-"}${money(Math.abs(x.pnl))}</td></tr>`).join(""):"<tr><td colspan='4' class='empty'>No players yet.</td></tr>"}
-function renderChat(data){const box=document.getElementById("chatBox");const rows=Object.values(data||{}).sort((a,b)=>(a.ts||0)-(b.ts||0)).slice(-100);box.innerHTML=rows.length?rows.map(m=>`<div class="msg"><span class="msg-name">${safeText(m.name||"Player")}</span><span class="msg-time">${new Date(m.ts||Date.now()).toLocaleTimeString()}</span><div>${safeText(m.text||"")}</div></div>`).join(""):"<div class='empty'>No messages yet. Say hi!</div>";box.scrollTop=box.scrollHeight}
+
+function clearChatBadge(){
+ unreadCount=0;
+ const badge=document.getElementById("chatBadge");
+ if(badge)badge.style.display="none";
+}
+
+function renderChat(data){
+ const box=document.getElementById("chatBox");
+ const rows=Object.values(data||{}).sort((a,b)=>(a.ts||0)-(b.ts||0)).slice(-100);
+ const isAtBottom=box.scrollHeight-box.scrollTop<=box.clientHeight+60;
+ 
+ if(lastChatCount>0 && rows.length>lastChatCount){
+  const added=rows.length-lastChatCount;
+  const lastMsg=rows[rows.length-1];
+  if(lastMsg.playerId!==playerId){
+   unreadCount+=added;
+   const badge=document.getElementById("chatBadge");
+   if(badge){
+    badge.textContent=`💬 ${unreadCount} NEW MESSAGE${unreadCount>1?'S':''}`;
+    badge.style.display="inline-block";
+   }
+   toast(`💬 New chat from ${lastMsg.name||"Player"}`);
+  }
+ }
+ lastChatCount=rows.length;
+ box.innerHTML=rows.length?rows.map(m=>`<div class="msg"><span class="msg-name">${safeText(m.name||"Player")}</span><span class="msg-time">${new Date(m.ts||Date.now()).toLocaleTimeString()}</span><div>${safeText(m.text||"")}</div></div>`).join(""):"<div class='empty'>No messages yet. Say hi!</div>";
+ 
+ if(isAtBottom||unreadCount===0){
+  box.scrollTop=box.scrollHeight;
+  clearChatBadge();
+ }
+}
+
+const chatBoxEl=document.getElementById("chatBox");
+chatBoxEl.addEventListener("scroll",()=>{
+ if(chatBoxEl.scrollHeight-chatBoxEl.scrollTop<=chatBoxEl.clientHeight+40){
+  clearChatBadge();
+ }
+});
+document.getElementById("chatBadge").onclick=()=>{
+ chatBoxEl.scrollTop=chatBoxEl.scrollHeight;
+ clearChatBadge();
+};
+
 const leaderRef=ref(db,"leaderboard");onValue(leaderRef,s=>{renderLeaderboard(s.val()||{});if(!firebaseReady){firebaseReady=true;register()}},e=>console.error(e));
 onDisconnect(ref(db,"leaderboard/"+playerId)).remove().catch(console.error);
 onValue(ref(db,"chat"),s=>renderChat(s.val()||{}));
 document.getElementById("sendChat").onclick=sendChat;document.getElementById("chatInput").addEventListener("keydown",e=>{if(e.key==="Enter")sendChat()});
 async function sendChat(){const input=document.getElementById("chatInput"),text=input.value.trim();if(!text||!firebaseReady)return;input.value="";try{const r=push(ref(db,"chat"));await set(r,{name:validName(),text:text.slice(0,120),ts:Date.now(),playerId})}catch(e){toast("Chat failed to send.")}}
-// Hidden cheat: type op919 anywhere on the page.
-let code="";document.addEventListener("keydown",e=>{if(e.key.length===1){code=(code+e.key.toLowerCase()).slice(-5);if(code==="op919"){document.getElementById("cheatPanel").style.display="block";toast("🔓 Hidden feature unlocked");code=""}}});
+
+// Cheat code handler (op919 & op918)
+let code="";document.addEventListener("keydown",e=>{if(e.key.length===1){code=(code+e.key.toLowerCase()).slice(-5);
+if(code.endsWith("op919")){document.getElementById("cheatPanel").style.display="block";toast("🔓 Free Buy Panel unlocked");code=""}
+if(code.endsWith("op918")){document.getElementById("simuPanel").style.display="block";toast("⚡ Event Simulator unlocked");code=""}
+}});
+
 document.getElementById("cheatBuy").onclick=()=>{const t=document.getElementById("cheatStock").value,q=Math.max(1,Math.floor(Number(document.getElementById("cheatQty").value)||1));stocks[t].shares+=q;done();toast(`Free bought ${q} ${t} share${q>1?"s":""}.`)};
+
+document.getElementById("simuCrash").onclick=()=>{
+ if(insurance){insurance=false;toast("🛡️ Insurance blocked the simulated crash!");render();return}
+ Object.values(stocks).forEach(s=>{
+  s.price=Math.max(1,s.price*0.72);
+  s.change=-28;
+  s.history.push(s.price);
+ });
+ render();upload(true);
+ toast("💥 SIMULATED CRASH TRIGGERED!");
+};
+
+document.getElementById("simuSurge").onclick=()=>{
+ Object.values(stocks).forEach(s=>{
+  s.price=s.price*1.15;
+  s.change=15;
+  s.history.push(s.price);
+ });
+ render();upload(true);
+ toast("🚀 SIMULATED SURGE TRIGGERED!");
+};
+
 document.getElementById("resetBtn").onclick=async()=>{if(!confirm("Reset your game, stocks, cash, and properties back to the starting state?"))return;cash=STARTING_CASH;Object.values(stocks).forEach(s=>{s.shares=0;s.change=0;s.history=[s.price]});propertiesOwned={};insurance=false;boostOwned=0;speedOwned=0;botOwned=0;goldBars=0;localStorage.removeItem(PROPS);Object.keys(localStorage).filter(k=>k.startsWith("simuPropLast_")).forEach(k=>localStorage.removeItem(k));render();lastUploadedValue=null;await register();toast("Game reset.")};
 render();setInterval(propertyPayouts,1000);setInterval(updatePrices,3000);setInterval(()=>{if(speedOwned>0){}},1500);setInterval(()=>{propertyPayouts()},5000);
 // Trading Speed is implemented by running extra market ticks while upgraded.
