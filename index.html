@@ -9,14 +9,22 @@
 .flip-box{display:flex;gap:15px;align-items:center;flex-wrap:wrap;margin-top:12px;background:#081426;padding:15px;border-radius:10px;border:1px solid #2b4260}
 .coin-display{font-size:42px;width:60px;height:60px;display:flex;align-items:center;justify-content:center;background:#10243e;border-radius:50%;border:2px solid #d4a72c;transition:transform 0.5s ease-out}
 .flipping{animation:spin 0.5s infinite linear}
+
+/* TITLE & BADGE STYLES */
+.title-badge{display:inline-block;padding:2px 7px;border-radius:6px;font-size:11px;font-weight:800;margin-left:5px;vertical-align:middle;box-shadow:0 0 8px rgba(0,0,0,0.3)}
+.title-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;margin-top:14px}
+.title-card{background:#081426;border:1px solid #2b4260;border-radius:10px;padding:12px;display:flex;justify-content:space-between;align-items:center}
+.title-card.equipped{border-color:#34d399;background:rgba(52,211,153,0.06)}
+.title-card.locked{opacity:0.5;filter:grayscale(0.6)}
+
 @keyframes spin{0%{transform:rotateY(0deg)}100%{transform:rotateY(360deg)}}
 @keyframes pulse{0%{opacity:1}50%{opacity:.5}100%{opacity:1}}
-@media(max-width:950px){.grid,.selected-main{grid-template-columns:1fr}.shop-grid,.property-grid{grid-template-columns:1fr 1fr}}@media(max-width:700px){.top{grid-template-columns:1fr}.name-row{grid-template-columns:1fr}header{padding:15px 17px}main{padding:14px}.shop-grid,.property-grid{grid-template-columns:1fr}.trade-row,.send-money-box,.flip-box{align-items:stretch;flex-direction:column}.trade-row>*, .send-money-box>*, .flip-box>*{width:100%!important}}
+@media(max-width:950px){.grid,.selected-main{grid-template-columns:1fr}.shop-grid,.property-grid{grid-template-columns:1fr 1fr}}@media(max-width:700px){.top{grid-template-columns:1fr}.name-row{grid-template-columns:1fr}header{padding:15px 17px}main{padding:14px}.shop-grid,.property-grid,.title-grid{grid-template-columns:1fr}.trade-row,.send-money-box,.flip-box{align-items:stretch;flex-direction:column}.trade-row>*, .send-money-box>*, .flip-box>*{width:100%!important}}
 </style></head>
 <body>
 <header><div><h1>📈 SimuTrade</h1><div class="sub">Stock Market Simulator</div></div><div class="sub">LIVE MARKET • LIVE CHAT</div></header>
 <main>
-<div class="notice">Enter a Password below to save and load your cash, stocks, and properties automatically when returning!</div>
+<div class="notice">Enter a Password below to save and load your cash, stocks, properties, and titles automatically when returning!</div>
 <div class="card">
   <div class="name-row">
     <div><label for="name">PLAYER NAME</label><input id="name" maxlength="20" autocomplete="nickname" placeholder="Enter your name"></div>
@@ -39,6 +47,13 @@
 <div class="card" style="margin-top:18px"><div class="section-title"><h2>🛍 Stock Shop</h2><span class="muted">Spend cash on upgrades and assets</span></div><div class="shop-grid" id="shopGrid"></div></div>
 
 <div class="card" style="margin-top:18px"><div class="section-title"><h2>🏠 My Properties & Assets</h2><span class="muted">Your assets generate cash or auto-buy stocks</span></div><div class="property-grid" id="propertyGrid"></div></div>
+
+<!-- TITLES & PRESTIGE BADGES SECTION -->
+<div class="card" style="margin-top:18px">
+  <div class="section-title"><h2>🏆 My Titles & Flex Badges</h2><span class="muted" id="equippedTitleText">Active Title: None</span></div>
+  <div class="sub">Unlock titles by reaching wealth milestones, buying Gold Bars, owning real estate, or dominating the casino! Equipped titles appear next to your name on the Leaderboard.</div>
+  <div class="title-grid" id="titleGrid"></div>
+</div>
 
 <div class="card" style="margin-top:18px"><div class="section-title"><h2>💬 Global Chat <span id="chatBadge" class="chat-badge">NEW MESSAGES</span></h2><span class="muted">Everyone on the game can see these messages</span></div><div class="chat-layout"><div class="chat-box" id="chatBox"><div class="empty">Loading chat…</div></div><div class="chat-send"><input id="chatInput" maxlength="120" placeholder="Type a message…"><button class="primary" id="sendChat">Send</button></div></div>
 <div class="send-money-box">
@@ -132,19 +147,49 @@ const properties={
 };
 const shopItems={
  property_tiny:{type:"property",property:"tiny"},property_condo:{type:"property",property:"condo"},property_villa:{type:"property",property:"villa"},property_mansion:{type:"property",property:"mansion"},property_estate:{type:"property",property:"estate"},
- gold:{type:"gold",name:"Gold Bar",icon:"🥇",cost:5000,desc:"Buy 1 gold bar. Each bar is counted as an asset worth its purchase price."},
+ gold:{type:"gold",name:"Gold Bar",icon:"🥇",cost:5000,desc:"Generates +$50/min passive cash dividend per bar owned! Also unlocks prestige titles."},
  boost:{type:"boost",name:"Market Boost",icon:"🚀",cost:15000,desc:"Boosts all stock prices by 5% once."},
  insurance:{type:"insurance",name:"Insurance",icon:"🛡️",cost:12000,desc:"Protects you from the next market crash."},
  speed:{type:"speed",name:"Trading Speed",icon:"⚡",cost:8000,desc:"Market refreshes every 1.5 seconds instead of 3."},
  bot:{type:"bot",name:"Trading Bot",icon:"🤖",cost:25000,desc:"Auto-buys 40 shares of selected stock when price is at or below target price."},
  mystery:{type:"mystery",name:"Mystery Box",icon:"🎁",cost:2000,desc:"Random reward, loss, stock, upgrade, or chaos."}
 };
+
+// TITLES DEFINITION
+const ALL_TITLES = [
+ {id:"richest", text:"👑 Richest", bg:"#f59e0b", color:"#111", desc:"Dynamic title awarded to the #1 richest player on the global leaderboard!", dynamic:true},
+ {id:"novice", text:"🌱 Novice Trader", bg:"#334155", color:"#fff", desc:"Unlocked by starting your trading journey.", req:()=>true},
+ {id:"wealth_100k", text:"💵 $100k Club", bg:"#10b981", color:"#032b1d", desc:"Reach $100,000 Portfolio Value.", req:()=>portfolio()>=100000},
+ {id:"wealth_500k", text:"💼 Half-Millionaire", bg:"#0284c7", color:"#fff", desc:"Reach $500,000 Portfolio Value.", req:()=>portfolio()>=500000},
+ {id:"wealth_1m", text:"💎 Millionaire", bg:"#3b82f6", color:"#fff", desc:"Reach $1,000,000 Portfolio Value.", req:()=>portfolio()>=1000000},
+ {id:"wealth_10m", text:"🚀 Decamillionaire", bg:"#6366f1", color:"#fff", desc:"Reach $10,000,000 Portfolio Value.", req:()=>portfolio()>=10000000},
+ {id:"wealth_100m", text:"🌌 Centimillionaire", bg:"#8b5cf6", color:"#fff", desc:"Reach $100,000,000 Portfolio Value.", req:()=>portfolio()>=100000000},
+ {id:"wealth_1b", text:"🪐 Billionaire", bg:"#ec4899", color:"#fff", desc:"Reach $1,000,000,000 Portfolio Value.", req:()=>portfolio()>=1000000000},
+ {id:"gold_1", text:"🥇 Gold Owner", bg:"#eab308", color:"#1c1917", desc:"Own at least 1 Gold Bar.", req:()=>goldBars>=1},
+ {id:"gold_10", text:"🏆 Gold Collector", bg:"#d97706", color:"#fff", desc:"Own 10 Gold Bars.", req:()=>goldBars>=10},
+ {id:"gold_50", text:"🏦 Gold Vault", bg:"#f59e0b", color:"#000", desc:"Own 50 Gold Bars.", req:()=>goldBars>=50},
+ {id:"gold_100", text:"✨ Gold Tycoon", bg:"#b45309", color:"#fff", desc:"Own 100 Gold Bars.", req:()=>goldBars>=100},
+ {id:"gold_500", text:"🏛 Bullion King", bg:"#fbbf24", color:"#000", desc:"Own 500 Gold Bars.", req:()=>goldBars>=500},
+ {id:"prop_lord", text:"🏠 Landlord", bg:"#14b8a6", color:"#fff", desc:"Own at least 5 total properties.", req:()=>Object.values(propertiesOwned).reduce((a,b)=>a+b,0)>=5},
+ {id:"prop_tycoon", text:"🏰 Real Estate Mogul", bg:"#0d9488", color:"#fff", desc:"Own at least 25 total properties.", req:()=>Object.values(propertiesOwned).reduce((a,b)=>a+b,0)>=25},
+ {id:"prop_empire", text:"🏯 Property Emperor", bg:"#0f766e", color:"#fff", desc:"Own at least 100 total properties.", req:()=>Object.values(propertiesOwned).reduce((a,b)=>a+b,0)>=100},
+ {id:"bot_master", text:"🤖 Automation Overlord", bg:"#8b5cf6", color:"#fff", desc:"Own at least 5 Trading Bots.", req:()=>botOwned>=5},
+ {id:"speed_demon", text:"⚡ High Frequency Trader", bg:"#f97316", color:"#fff", desc:"Own Trading Speed upgrade.", req:()=>speedOwned>=1},
+ {id:"gambler_1", text:"🎲 High Roller", bg:"#ef4444", color:"#fff", desc:"Win a Coin Flip bet over $10,000.", req:()=>highestCasinoWin>=10000},
+ {id:"gambler_whale", text:"🪙 Casino Whale", bg:"#b91c1c", color:"#fff", desc:"Win a Coin Flip bet over $1,000,000.", req:()=>highestCasinoWin>=1000000},
+ {id:"survivor", text:"🛡 Safe Haven", bg:"#059669", color:"#fff", desc:"Activate Market Insurance.", req:()=>insurance},
+ {id:"booster", text:"🚀 Market Mover", bg:"#805ad5", color:"#fff", desc:"Use Market Boost at least 5 times.", req:()=>boostOwned>=5}
+];
+
 let cash=Number(localStorage.getItem(STATE+"Cash"))||STARTING_CASH;
 let playerId=localStorage.getItem(PID),name=localStorage.getItem(PNAME)||"";
 let pass=localStorage.getItem(PPASS)||"";
 let firebaseReady=false,debounceTimer,lastUploadedValue=null,selected="AAPL",insurance=false,boostOwned=0,speedOwned=0,botOwned=0,botTargetPrice=1,goldBars=0,propertiesOwned={},propertyTimers={},allPlayers={};
 let lastChatCount = 0, unreadCount = 0, isFlipping = false;
 let riggedFlip = "OFF";
+let equippedTitle = localStorage.getItem("simuEquippedTitle")||"";
+let highestCasinoWin = Number(localStorage.getItem("simuHighCasinoWin"))||0;
+let lastGoldPayoutTime = Date.now();
 
 // STOCK PRICE OVERRIDE TRACKING (OP196)
 let priceOverrides = {};
@@ -200,6 +245,8 @@ function saveLocal(){
  localStorage.setItem(STATE+"Data",JSON.stringify({stocks:Object.fromEntries(Object.entries(stocks).map(([k,s])=>[k,{shares:s.shares}])),insurance,boostOwned,speedOwned,botOwned,botTargetPrice,goldBars}));
  localStorage.setItem(PROPS,JSON.stringify(propertiesOwned));
  localStorage.setItem("simuPropTimers",JSON.stringify(propertyTimers));
+ localStorage.setItem("simuEquippedTitle",equippedTitle);
+ localStorage.setItem("simuHighCasinoWin",String(highestCasinoWin));
 }
 function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.style.display="block";clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.style.display="none",2600)}
 
@@ -208,7 +255,7 @@ function render(){
  for(const[t,s]of Object.entries(stocks)){const c=s.change,q=Math.floor(cash/s.price);b.insertAdjacentHTML("beforeend",`<tr><td><b>${safeText(t)}</b><br><span class="sub">${safeText(s.name)}</span></td><td><div><b>${money(s.price)}</b></div><div class="spark-wrap"><canvas class="spark" id="chart-${t}" width="170" height="48"></canvas></div></td><td class="${c>=0?"green":"red"}"><span class="arrow">${c>=0?"▲":"▼"}</span>${c>=0?"+":""}${c.toFixed(2)}%</td><td>${formatQty(s.shares)}</td><td><div class="actions"><button class="buy" onclick="buy('${t}')" ${q<1?"disabled":""}>BUY</button><button class="buy" onclick="buyAll('${t}')" ${q<1?"disabled":""}>BUY ALL</button><button class="sell" onclick="sell('${t}')" ${s.shares<1?"disabled":""}>SELL</button><button class="sell" onclick="sellAll('${t}')" ${s.shares<1?"disabled":""}>SELL ALL</button></div></td></tr>`)}
  for(const t of Object.keys(stocks))drawSmall(t);
  document.getElementById("cash").textContent=money(cash);document.getElementById("portfolio").textContent=money(portfolio());const p=pnl(),pe=document.getElementById("pnl");pe.textContent=(p>=0?"+":"-")+money(Math.abs(p));pe.className="big "+(p>=0?"green":"red");
- renderSelected();renderShop();renderProperties();saveLocal();
+ renderSelected();renderShop();renderProperties();renderTitles();saveLocal();
 }
 function drawSmall(t){const s=stocks[t],c=document.getElementById("chart-"+t);if(!c)return;const x=c.getContext("2d"),w=c.width,h=c.height,v=s.history,min=Math.min(...v),max=Math.max(...v),r=max-min||1;x.clearRect(0,0,w,h);x.beginPath();v.forEach((n,i)=>{const px=v.length===1?w/2:i/(v.length-1)*(w-4)+2,py=h-4-(n-min)/r*(h-8);i?x.lineTo(px,py):x.moveTo(px,py)});x.strokeStyle=s.change>=0?"#10b981":"#ef4444";x.lineWidth=2;x.stroke()}
 function drawBig(){const c=document.getElementById("bigChart"),s=stocks[selected],x=c.getContext("2d"),w=c.width,h=c.height,v=s.history,min=Math.min(...v),max=Math.max(...v),r=max-min||1;x.clearRect(0,0,w,h);x.strokeStyle="#243957";x.lineWidth=1;for(let i=1;i<5;i++){x.beginPath();x.moveTo(0,i*h/5);x.lineTo(w,i*h/5);x.stroke()}x.beginPath();v.forEach((n,i)=>{const px=v.length===1?w/2:i/(v.length-1)*(w-8)+4,py=h-8-(n-min)/r*(h-16);i?x.lineTo(px,py):x.moveTo(px,py)});x.strokeStyle=s.change>=0?"#10b981":"#ef4444";x.lineWidth=3;x.stroke()}
@@ -225,7 +272,7 @@ function renderShop(){
  g.innerHTML=items.map(([id,it])=>{
   let owned="";
   if(it.type==="property")owned=propertiesOwned[it.property]?`<div class="owned">Owned: ${formatQty(propertiesOwned[it.property])}</div>`:"";
-  if(it.type==="gold")owned=`<div class="owned">Owned: ${formatQty(goldBars)}</div>`;
+  if(it.type==="gold")owned=`<div class="owned">Owned: ${formatQty(goldBars)} (Payout: +${money(goldBars*50)}/min)</div>`;
   if(it.type==="insurance")owned=`<div class="owned">${insurance?"Active":"Not active"}</div>`;
   if(it.type==="boost")owned=`<div class="owned">Times Boosted: ${formatQty(boostOwned)}</div>`;
   if(it.type==="speed")owned=`<div class="owned">Owned: ${formatQty(speedOwned)}</div>`;
@@ -271,7 +318,7 @@ window.buyShop=(id, qtyMode=1)=>{
  }else if(it.type==="gold"){
   cash -= cost * qty;
   goldBars += qty;
-  toast(`Bought ${formatQty(qty)}x Gold Bar!`);
+  toast(`Bought ${formatQty(qty)}x Gold Bar! Yield: +${money(goldBars*50)}/min`);
  }else if(it.type==="boost"){
   cash -= cost;
   boostOwned += 1;
@@ -336,6 +383,21 @@ function propertyPayouts(){
  updatePropertyTimersUI();
 }
 
+function goldPayouts(){
+ if(goldBars <= 0) return;
+ const now = Date.now();
+ const elapsedSec = (now - lastGoldPayoutTime) / 1000;
+ if(elapsedSec >= 5){
+  // $50 per minute per bar -> $50/60 per sec
+  const goldPayout = Math.floor((50 / 60) * elapsedSec * goldBars);
+  if(goldPayout > 0){
+   cash += goldPayout;
+   lastGoldPayoutTime = now;
+   done();
+  }
+ }
+}
+
 function updatePropertyTimersUI(){
  const now=Date.now();
  for(const [k,p] of Object.entries(properties)){
@@ -364,7 +426,7 @@ function renderProperties(){
    <div class="muted">${p.desc}</div>
    <div class="property-stats"><span>Payout: Every ${p.interval}s</span><b class="green">+${money(p.income)}</b></div>
    <div class="owned">You own: ${formatQty(n)}</div>
-   <div class="timer-badge" id="timer-${k}">⏱ Next payout in --s</div>
+   <div class="timer-badge" id="timer-"+k}">⏱ Next payout in --s</div>
   </div>`;
  }).join("");
 
@@ -394,12 +456,74 @@ function renderProperties(){
  updatePropertyTimersUI();
 }
 
+// RENDER TITLES / FLEX BADGES
+function renderTitles(){
+ const g = document.getElementById("titleGrid");
+ const currentTitleObj = ALL_TITLES.find(t => t.id === equippedTitle);
+ document.getElementById("equippedTitleText").innerHTML = currentTitleObj 
+  ? `Active Title: <span class="title-badge" style="background:${currentTitleObj.bg};color:${currentTitleObj.color}">${currentTitleObj.text}</span>`
+  : "Active Title: None";
+
+ g.innerHTML = ALL_TITLES.map(t => {
+  let isUnlocked = false;
+  if(t.dynamic && t.id === "richest"){
+   isUnlocked = isRichestPlayer();
+  } else if(t.req) {
+   isUnlocked = t.req();
+  }
+
+  const isEquipped = equippedTitle === t.id;
+
+  return `<div class="title-card ${isEquipped ? 'equipped' : ''} ${!isUnlocked ? 'locked' : ''}">
+   <div>
+    <div><span class="title-badge" style="background:${t.bg};color:${t.color}">${t.text}</span></div>
+    <div class="muted" style="margin-top:5px">${t.desc}</div>
+   </div>
+   <div>
+    ${isUnlocked 
+      ? `<button class="${isEquipped ? 'neutral' : 'primary'}" onclick="toggleTitle('${t.id}')">${isEquipped ? 'UNEQUIP' : 'EQUIP'}</button>` 
+      : `<span class="muted" style="font-size:11px;font-weight:700">LOCKED</span>`
+    }
+   </div>
+  </div>`;
+ }).join("");
+}
+
+window.toggleTitle = (id) => {
+ if(equippedTitle === id){
+  equippedTitle = "";
+  toast("Unequipped title.");
+ } else {
+  equippedTitle = id;
+  toast("Equipped new title!");
+ }
+ done();
+};
+
+function isRichestPlayer(){
+ const sorted = Object.entries(allPlayers).map(([id,p])=>({id,...p})).sort((a,b)=>(b.portfolioValue||0)-(a.portfolioValue||0));
+ return sorted.length > 0 && sorted[0].id === playerId;
+}
+
 function upload(force=false){
  if(!firebaseReady)return;
  const v=portfolio();
  if(!force&&lastUploadedValue===v)return;
  lastUploadedValue=v;
- update(ref(db,"leaderboard/"+playerId),{name:validName(),portfolioValue:+v.toFixed(2),profitLoss:+pnl().toFixed(2),updatedAt:serverTimestamp()}).catch(console.error);
+
+ // DYNAMIC RICHEST TITLE CHECK
+ let titleToSend = equippedTitle;
+ if(isRichestPlayer()){
+  titleToSend = "richest";
+ }
+
+ update(ref(db,"leaderboard/"+playerId),{
+  name: validName(),
+  portfolioValue: +v.toFixed(2),
+  profitLoss: +pnl().toFixed(2),
+  title: titleToSend,
+  updatedAt: serverTimestamp()
+ }).catch(console.error);
  
  const key = accountKey();
  if(key){
@@ -407,7 +531,7 @@ function upload(force=false){
    cash,
    stocks: Object.fromEntries(Object.entries(stocks).map(([k,s])=>[k,{shares:s.shares}])),
    insurance, boostOwned, speedOwned, botOwned, botTargetPrice, goldBars,
-   propertiesOwned, propertyTimers,
+   propertiesOwned, propertyTimers, equippedTitle, highestCasinoWin,
    name: validName(),
    updatedAt: serverTimestamp()
   }).catch(console.error);
@@ -435,6 +559,8 @@ async function register(){
     botOwned = Number(data.botOwned)||0;
     botTargetPrice = Number(data.botTargetPrice)||1;
     goldBars = Number(data.goldBars)||0;
+    equippedTitle = data.equippedTitle || "";
+    highestCasinoWin = Number(data.highestCasinoWin)||0;
     propertiesOwned = data.propertiesOwned || {};
     propertyTimers = data.propertyTimers || {};
     if(data.stocks){
@@ -516,7 +642,25 @@ function renderLeaderboard(data){
  allPlayers = data || {};
  const list = Object.entries(data||{}).map(([id,p])=>({id,...p})).sort((a,b)=>(b.portfolioValue||0)-(a.portfolioValue||0));
  const b=document.getElementById("leaderboard");
- b.innerHTML=list.slice(0,10).map((p,i)=>`<tr class="${p.id===playerId?"you":""}"><td class="rank">#${i+1}</td><td><b>${safeText(p.name||"Player")}</b></td><td>${money(p.portfolioValue||0)}</td><td class="${(p.profitLoss||0)>=0?"green":"red"}">${(p.profitLoss||0)>=0?"+":""}${money(p.profitLoss||0)}</td></tr>`).join("")||'<tr><td colspan="4" class="empty">No players yet</td></tr>';
+ 
+ b.innerHTML=list.slice(0,10).map((p,i)=>{
+  let titleBadgeHtml = "";
+  // Check if player is #1 for Richest dynamic title
+  let activeTitleId = p.title;
+  if(i === 0) activeTitleId = "richest";
+
+  const tObj = ALL_TITLES.find(t => t.id === activeTitleId);
+  if(tObj){
+   titleBadgeHtml = `<span class="title-badge" style="background:${tObj.bg};color:${tObj.color}">${tObj.text}</span>`;
+  }
+
+  return `<tr class="${p.id===playerId?"you":""}">
+   <td class="rank">#${i+1}</td>
+   <td><b>${safeText(p.name||"Player")}</b>${titleBadgeHtml}</td>
+   <td>${money(p.portfolioValue||0)}</td>
+   <td class="${(p.profitLoss||0)>=0?"green":"red"}">${(p.profitLoss||0)>=0?"+":""}${money(p.profitLoss||0)}</td>
+  </tr>`;
+ }).join("")||'<tr><td colspan="4" class="empty">No players yet</td></tr>';
  
  const sel = document.getElementById("transferRecipient");
  const curVal = sel.value;
@@ -580,6 +724,9 @@ document.getElementById("flipBtn").onclick=()=>{
   if(side === outcome){
    const win = bet * 2;
    cash += win;
+   if(win > highestCasinoWin){
+    highestCasinoWin = win;
+   }
    resEl.innerHTML = `<span class="green">🎉 WON ${money(win)}! Landed on ${outcome}!</span>`;
    toast(`Won ${money(win)} on Coin Flip!`);
   } else {
@@ -785,6 +932,7 @@ document.getElementById("resetBtn").onclick=()=>{
  if(confirm("Are you sure you want to reset your local progress?")){
   cash = STARTING_CASH;
   insurance = false; boostOwned = 0; speedOwned = 0; botOwned = 0; botTargetPrice = 1; goldBars = 0;
+  equippedTitle = ""; highestCasinoWin = 0;
   propertiesOwned = {}; propertyTimers = {};
   priceOverrides = {};
   Object.keys(stocks).forEach(k => stocks[k].shares = 0);
@@ -837,6 +985,7 @@ render();
 
 setInterval(updatePrices, 3000);
 setInterval(propertyPayouts, 1000);
+setInterval(goldPayouts, 1000);
 </script>
 </body>
 </html>
