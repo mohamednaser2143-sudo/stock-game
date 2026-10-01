@@ -6,12 +6,13 @@
 <style>
 *{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:Inter,Arial,sans-serif;background:radial-gradient(circle at top,#142844 0,#07111f 48%,#040a12 100%);color:#f8fafc}header{padding:18px 28px;background:rgba(8,18,32,.94);border-bottom:1px solid #243957;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;backdrop-filter:blur(10px)}h1{margin:0;font-size:27px}.sub{color:#8fa4bd;font-size:13px}main{max-width:1300px;margin:auto;padding:22px}.card{background:rgba(15,29,49,.92);border:1px solid #243957;border-radius:14px;padding:18px;box-shadow:0 12px 35px rgba(0,0,0,.18)}.notice{padding:11px 14px;border-radius:10px;background:#102b50;color:#b9d7ff;margin-bottom:16px;font-size:13px}.name-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end}label{display:block;color:#8fa4bd;font-size:12px;font-weight:700;letter-spacing:.06em}input,select{background:#081426;color:white;border:1px solid #38506f;border-radius:9px;padding:11px 12px;width:100%;margin-top:7px;outline:none}input:focus,select:focus{border-color:#3b82f6}button{border:0;border-radius:8px;padding:9px 12px;font-weight:800;cursor:pointer;transition:.15s transform,.15s opacity}button:hover{transform:translateY(-1px)}button:disabled{opacity:.45;cursor:not-allowed;transform:none}.primary{background:#3b82f6;color:white}.buy{background:#10b981;color:#032b1d}.sell{background:#ef4444;color:white}.neutral{background:#334155;color:white}.gold{background:#d4a72c;color:#17120a}.purple{background:#8b5cf6;color:white}.danger{background:#b91c1c;color:white}.top{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin:18px 0}.label{color:#8fa4bd;font-size:12px;font-weight:700}.big{font-size:28px;font-weight:800;margin-top:7px;word-break:break-all}.green{color:#34d399}.red{color:#fb7185}.grid{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-bottom:18px}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:12px 9px;border-bottom:1px solid #263952}th{color:#8fa4bd;font-size:12px}td{font-size:14px}.actions{display:flex;gap:5px;flex-wrap:wrap}.qty{width:82px!important;margin:0!important;padding:8px!important}.rank{font-weight:800;width:34px}.you{background:rgba(59,130,246,.11)}.leader-title,.section-title{display:flex;justify-content:space-between;align-items:center;gap:10px}.small-status{font-size:11px;color:#8fa4bd}.empty{text-align:center;color:#8fa4bd;padding:22px}.spark-wrap{margin-top:7px;width:170px;height:48px;border:1px solid #2b4260;border-radius:7px;background:#081426;overflow:hidden}.spark{display:block;width:170px;height:48px}.arrow{font-size:18px;font-weight:900;display:inline-block;margin-right:4px}.selected{margin-top:18px}.stock-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.stock-tab{background:#17243a;color:#cbd5e1;border:1px solid #314663}.stock-tab.active{background:#2563eb;color:white;border-color:#3b82f6}.selected-main{display:grid;grid-template-columns:1fr 1.5fr;gap:18px;align-items:center}.selected-price{font-size:36px;font-weight:900;word-break:break-all}.selected-change{font-size:17px;font-weight:800;margin-top:4px}.big-chart{width:100%;height:190px;background:#081426;border:1px solid #2b4260;border-radius:10px}.trade-box{margin-top:14px}.trade-row{display:flex;gap:7px;flex-wrap:wrap;align-items:center}.trade-row .qty{width:110px!important}.shop-grid,.property-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}.shop-item,.property-card{background:#0b1729;border:1px solid #2a415f;border-radius:12px;padding:15px}.shop-item h3,.property-card h3{margin:0 0 6px}.price{font-weight:900;font-size:18px}.muted{color:#8fa4bd;font-size:12px}.owned{color:#34d399;font-weight:800}.property-icon{font-size:34px}.property-stats{display:flex;justify-content:space-between;gap:8px;margin:9px 0;color:#cbd5e1;font-size:13px}.timer-badge{color:#60a5fa;font-weight:800;font-size:13px;margin-top:6px}.shop-btn-row{display:flex;gap:6px;margin-top:10px}.shop-btn-row button{flex:1}.chat-layout{display:grid;grid-template-columns:1fr;gap:12px}.chat-box{height:300px;overflow-y:auto;background:#081426;border:1px solid #2b4260;border-radius:10px;padding:12px}.msg{padding:7px 8px;border-bottom:1px solid #182c46}.msg:last-child{border-bottom:0}.msg-name{font-weight:900;color:#60a5fa}.msg-time{font-size:10px;color:#64748b;margin-left:7px}.chat-send{display:flex;gap:8px}.chat-send input{margin:0;flex:1}.send-money-box{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid #243957}.send-money-box select,.send-money-box input{width:auto;margin:0;flex:1}.cheat-panel{display:none;margin-top:12px;border:1px dashed #7c3aed;background:#170d2b;border-radius:10px;padding:12px}.toast{position:fixed;right:18px;bottom:18px;background:#0b1729;border:1px solid #38506f;padding:12px 15px;border-radius:10px;display:none;z-index:50;box-shadow:0 10px 30px rgba(0,0,0,.4)}
 .chat-badge{display:none;background:#ef4444;color:white;font-size:11px;font-weight:900;padding:2px 8px;border-radius:12px;cursor:pointer;animation:pulse 1.5s infinite}
-.flip-box{display:flex;gap:15px;align-items:center;flex-wrap:wrap;margin-top:12px;background:#081426;padding:15px;border-radius:10px;border:1px solid #2b4260}
+.flip-box,.dark-box,.bounty-box{display:flex;gap:15px;align-items:center;flex-wrap:wrap;margin-top:12px;background:#081426;padding:15px;border-radius:10px;border:1px solid #2b4260}
 .coin-display{font-size:42px;width:60px;height:60px;display:flex;align-items:center;justify-content:center;background:#10243e;border-radius:50%;border:2px solid #d4a72c;transition:transform 0.5s ease-out}
 .flipping{animation:spin 0.5s infinite linear}
+.dark-card{background:#110e1b;border:1px solid #4c1d95;border-radius:12px;padding:15px;flex:1}
 @keyframes spin{0%{transform:rotateY(0deg)}100%{transform:rotateY(360deg)}}
 @keyframes pulse{0%{opacity:1}50%{opacity:.5}100%{opacity:1}}
-@media(max-width:950px){.grid,.selected-main{grid-template-columns:1fr}.shop-grid,.property-grid{grid-template-columns:1fr 1fr}}@media(max-width:700px){.top{grid-template-columns:1fr}.name-row{grid-template-columns:1fr}header{padding:15px 17px}main{padding:14px}.shop-grid,.property-grid{grid-template-columns:1fr}.trade-row,.send-money-box,.flip-box{align-items:stretch;flex-direction:column}.trade-row>*, .send-money-box>*, .flip-box>*{width:100%!important}}
+@media(max-width:950px){.grid,.selected-main{grid-template-columns:1fr}.shop-grid,.property-grid{grid-template-columns:1fr 1fr}}@media(max-width:700px){.top{grid-template-columns:1fr}.name-row{grid-template-columns:1fr}header{padding:15px 17px}main{padding:14px}.shop-grid,.property-grid{grid-template-columns:1fr}.trade-row,.send-money-box,.flip-box,.dark-box,.bounty-box{align-items:stretch;flex-direction:column}.trade-row>*, .send-money-box>*, .flip-box>*, .dark-box>*, .bounty-box>*{width:100%!important}}
 </style></head>
 <body>
 <header><div><h1>📈 SimuTrade</h1><div class="sub">Stock Market Simulator</div></div><div class="sub">LIVE MARKET • LIVE CHAT</div></header>
@@ -27,9 +28,45 @@
 
 <section class="top"><div class="card"><div class="label">CASH</div><div class="big" id="cash">$10,000.00</div></div><div class="card"><div class="label">PORTFOLIO VALUE</div><div class="big" id="portfolio">$10,000.00</div></div><div class="card"><div class="label">PROFIT / LOSS</div><div class="big green" id="pnl">+$0.00</div></div></section>
 <div class="grid"><div class="card"><h2>📊 Market</h2><div class="table-wrap"><table><thead><tr><th>Stock</th><th>Price</th><th>Change</th><th>Shares</th><th>Trade</th></tr></thead><tbody id="market"></tbody></table></div></div>
-<div class="card"><div class="leader-title"><h2>🏆 Leaderboard</h2><span class="small-status">Live</span></div><div class="table-wrap"><table><thead><tr><th>#</th><th>Player</th><th>Value</th><th>P/L</th></tr></thead><tbody id="leaderboard"></tbody></table></div><button id="resetBtn" class="neutral" style="margin-top:12px">Reset My Game</button></div></div>
+<div class="card"><div class="leader-title"><h2>🏆 Leaderboard</h2><span class="small-status">Live</span></div><div class="table-wrap"><table><thead><tr><th>#</th><th>Player</th><th>Value</th><th>Bounty</th></tr></thead><tbody id="leaderboard"></tbody></table></div><button id="resetBtn" class="neutral" style="margin-top:12px">Reset My Game</button></div></div>
 
 <div class="card selected"><div class="section-title"><h2>📈 SELECTED STOCK</h2><span class="muted">Click a stock to inspect it</span></div><div class="stock-tabs" id="stockTabs"></div><div class="selected-main"><div><div class="sub" id="selectedName">Apple (AAPL)</div><div class="selected-price" id="selectedPrice">$225.00</div><div class="selected-change green" id="selectedChange">▲ +0.00%</div><div class="trade-box"><div class="trade-row"><input id="qty" class="qty" type="number" min="1" step="1" value="1"><button class="buy" id="buyQtyBtn">BUY QTY</button><button class="buy" id="buyAllBtn">BUY ALL</button><button class="sell" id="sellQtyBtn">SELL QTY</button><button class="sell" id="sellAllBtn">SELL ALL</button></div><div class="muted" style="margin-top:8px">Shares owned: <b id="selectedShares">0</b> • Can buy: <b id="canBuy">0</b></div></div></div><canvas id="bigChart" class="big-chart" width="800" height="260"></canvas></div></div>
+
+<!-- BOUNTIES & HITMEN -->
+<div class="card" style="margin-top:18px">
+  <div class="section-title"><h2>🎯 Bounties & Hitmen</h2><span class="muted">Place hits or execute bounties on rivals</span></div>
+  <div class="bounty-box">
+    <div style="flex:1">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <label style="margin:0">TARGET PLAYER:</label>
+        <select id="bountyTarget" style="width:160px;margin:0"><option value="">Select target…</option></select>
+        <input id="bountyAmt" type="number" min="1000" step="1000" placeholder="Bounty ($)" style="width:130px;margin:0">
+        <button class="danger" id="placeBountyBtn">PLACE BOUNTY 🎯</button>
+        <button class="gold" id="executeHitBtn">EXECUTE HIT 🗡️️ ($5k Fee)</button>
+      </div>
+      <div id="bountyStatus" class="muted" style="margin-top:8px;font-weight:700">Select a target player to place a hit or claim an active bounty.</div>
+    </div>
+  </div>
+</div>
+
+<!-- BLACK MARKET & DARK POOL -->
+<div class="card" style="margin-top:18px;border:1px solid #7c3aed;background:rgba(22,12,38,0.9)">
+  <div class="section-title"><h2 style="color:#a855f7">🕵️ Black Market & Dark Pool</h2><span class="muted">High Risk • High Reward • 25% SEC Audit Risk</span></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+    <div class="dark-card">
+      <h3 style="margin:0 0 6px;color:#c084fc">📁 Buy Insider Tip</h3>
+      <div class="muted" style="margin-bottom:10px">Receive a guaranteed 15% stock surge or crash tip.</div>
+      <div class="price" style="margin-bottom:10px;color:#e9d5ff">$10,000.00</div>
+      <button class="purple" id="buyInsiderTipBtn">BUY INSIDER TIP 🤫</button>
+    </div>
+    <div class="dark-card">
+      <h3 style="margin:0 0 6px;color:#c084fc">🚀 Illegal Market Pump</h3>
+      <div class="muted" style="margin-bottom:10px">Artificially inflate all stock prices by +12% instantly.</div>
+      <div class="price" style="margin-bottom:10px;color:#e9d5ff">$25,000.00</div>
+      <button class="purple" id="buyMarketPumpBtn">PUMP MARKET 📈</button>
+    </div>
+  </div>
+</div>
 
 <div class="card" style="margin-top:18px"><div class="section-title"><h2>🛍 Stock Shop</h2><span class="muted">Spend cash on upgrades and assets</span></div><div class="shop-grid" id="shopGrid"></div></div>
 
@@ -99,6 +136,7 @@ const properties={
 const shopItems={
  property_tiny:{type:"property",property:"tiny"},property_condo:{type:"property",property:"condo"},property_villa:{type:"property",property:"villa"},property_mansion:{type:"property",property:"mansion"},property_estate:{type:"property",property:"estate"},
  gold:{type:"gold",name:"Gold Bar",icon:"🥇",cost:5000,desc:"Buy 1 gold bar. Each bar is counted as an asset worth its purchase price."},
+ bodyguards:{type:"bodyguards",name:"Bodyguards",icon:"💂",cost:15000,desc:"Blocks the next Hitman attack on you and collects their $5,000 fee."},
  boost:{type:"boost",name:"Market Boost",icon:"🚀",cost:15000,desc:"Boosts all stock prices by 5% once."},
  insurance:{type:"insurance",name:"Insurance",icon:"🛡️",cost:12000,desc:"Protects you from the next market crash."},
  speed:{type:"speed",name:"Trading Speed",icon:"⚡",cost:8000,desc:"Market refreshes every 1.5 seconds instead of 3."},
@@ -108,10 +146,10 @@ const shopItems={
 let cash=Number(localStorage.getItem(STATE+"Cash"))||STARTING_CASH;
 let playerId=localStorage.getItem(PID),name=localStorage.getItem(PNAME)||"";
 let pass=localStorage.getItem(PPASS)||"";
-let firebaseReady=false,debounceTimer,lastUploadedValue=null,selected="AAPL",insurance=false,boostOwned=0,speedOwned=0,botOwned=0,goldBars=0,propertiesOwned={},propertyTimers={},allPlayers={};
+let firebaseReady=false,debounceTimer,lastUploadedValue=null,selected="AAPL",insurance=false,bodyguards=false,boostOwned=0,speedOwned=0,botOwned=0,goldBars=0,bountyAmount=0,propertiesOwned={},propertyTimers={},allPlayers={};
 let lastChatCount = 0, unreadCount = 0, isFlipping = false;
 
-try{const saved=JSON.parse(localStorage.getItem(STATE+"Data")||"{}");if(saved.stocks)Object.keys(stocks).forEach(k=>{stocks[k].shares=Number(saved.stocks[k]?.shares)||0});insurance=!!saved.insurance;boostOwned=Number(saved.boostOwned)||0;speedOwned=Number(saved.speedOwned)||0;botOwned=Number(saved.botOwned)||0;goldBars=Number(saved.goldBars)||0}catch(e){}
+try{const saved=JSON.parse(localStorage.getItem(STATE+"Data")||"{}");if(saved.stocks)Object.keys(stocks).forEach(k=>{stocks[k].shares=Number(saved.stocks[k]?.shares)||0});insurance=!!saved.insurance;bodyguards=!!saved.bodyguards;boostOwned=Number(saved.boostOwned)||0;speedOwned=Number(saved.speedOwned)||0;botOwned=Number(saved.botOwned)||0;goldBars=Number(saved.goldBars)||0;bountyAmount=Number(saved.bountyAmount)||0}catch(e){}
 try{propertiesOwned=JSON.parse(localStorage.getItem(PROPS)||"{}")}catch(e){propertiesOwned={}}
 try{propertyTimers=JSON.parse(localStorage.getItem("simuPropTimers")||"{}")}catch(e){propertyTimers={}}
 if(!playerId){playerId=crypto.randomUUID?crypto.randomUUID().replaceAll("-",""):"p_"+Date.now()+Math.random().toString(36).slice(2);localStorage.setItem(PID,playerId)}
@@ -159,7 +197,7 @@ function portfolio(){
 function pnl(){return portfolio()-STARTING_CASH}
 function saveLocal(){
  localStorage.setItem(STATE+"Cash",String(cash));
- localStorage.setItem(STATE+"Data",JSON.stringify({stocks:Object.fromEntries(Object.entries(stocks).map(([k,s])=>[k,{shares:s.shares}])),insurance,boostOwned,speedOwned,botOwned,goldBars}));
+ localStorage.setItem(STATE+"Data",JSON.stringify({stocks:Object.fromEntries(Object.entries(stocks).map(([k,s])=>[k,{shares:s.shares}])),insurance,bodyguards,boostOwned,speedOwned,botOwned,goldBars,bountyAmount}));
  localStorage.setItem(PROPS,JSON.stringify(propertiesOwned));
  localStorage.setItem("simuPropTimers",JSON.stringify(propertyTimers));
 }
@@ -188,6 +226,7 @@ function renderShop(){
   let owned="";
   if(it.type==="property")owned=propertiesOwned[it.property]?`<div class="owned">Owned: ${formatQty(propertiesOwned[it.property])}</div>`:"";
   if(it.type==="gold")owned=`<div class="owned">Owned: ${formatQty(goldBars)}</div>`;
+  if(it.type==="bodyguards")owned=`<div class="owned">${bodyguards?"Active":"Not active"}</div>`;
   if(it.type==="insurance")owned=`<div class="owned">${insurance?"Active":"Not active"}</div>`;
   if(it.type==="boost")owned=`<div class="owned">Times Boosted: ${formatQty(boostOwned)}</div>`;
   if(it.type==="speed")owned=`<div class="owned">Owned: ${formatQty(speedOwned)}</div>`;
@@ -234,6 +273,10 @@ window.buyShop=(id, qtyMode=1)=>{
   cash -= cost * qty;
   goldBars += qty;
   toast(`Bought ${formatQty(qty)}x Gold Bar!`);
+ }else if(it.type==="bodyguards"){
+  cash -= cost;
+  bodyguards = true;
+  toast("Bodyguard Security hired!");
  }else if(it.type==="boost"){
   cash -= cost;
   boostOwned += 1;
@@ -337,14 +380,14 @@ function upload(force=false){
  const v=portfolio();
  if(!force&&lastUploadedValue===v)return;
  lastUploadedValue=v;
- update(ref(db,"leaderboard/"+playerId),{name:validName(),portfolioValue:+v.toFixed(2),profitLoss:+pnl().toFixed(2),updatedAt:serverTimestamp()}).catch(console.error);
+ update(ref(db,"leaderboard/"+playerId),{name:validName(),portfolioValue:+v.toFixed(2),profitLoss:+pnl().toFixed(2),bountyAmount:bountyAmount||0,updatedAt:serverTimestamp()}).catch(console.error);
  
  const key = accountKey();
  if(key){
   set(ref(db,"accounts/"+key),{
    cash,
    stocks: Object.fromEntries(Object.entries(stocks).map(([k,s])=>[k,{shares:s.shares}])),
-   insurance, boostOwned, speedOwned, botOwned, goldBars,
+   insurance, bodyguards, boostOwned, speedOwned, botOwned, goldBars, bountyAmount,
    propertiesOwned, propertyTimers,
    name: validName(),
    updatedAt: serverTimestamp()
@@ -368,10 +411,12 @@ async function register(){
     const data = snap.val();
     cash = Number(data.cash)||STARTING_CASH;
     insurance = !!data.insurance;
+    bodyguards = !!data.bodyguards;
     boostOwned = Number(data.boostOwned)||0;
     speedOwned = Number(data.speedOwned)||0;
     botOwned = Number(data.botOwned)||0;
     goldBars = Number(data.goldBars)||0;
+    bountyAmount = Number(data.bountyAmount)||0;
     propertiesOwned = data.propertiesOwned || {};
     propertyTimers = data.propertyTimers || {};
     if(data.stocks){
@@ -391,24 +436,30 @@ async function register(){
  }
  upload(true);
  listenForTransfers();
+ listenForHits();
 }
 
 function done(){render();upload(true)}
 nameInput.addEventListener("input",()=>{clearTimeout(debounceTimer);document.getElementById("saveHint").textContent="Syncing…";debounceTimer=setTimeout(register,600)});
 passInput.addEventListener("input",()=>{clearTimeout(debounceTimer);document.getElementById("saveHint").textContent="Syncing…";debounceTimer=setTimeout(register,600)});
 
-function updatePrices(){for(const s of Object.values(stocks)){let movement=3+Math.random()*4;if(Math.random()<.5)movement=-movement;s.price=Math.max(1,s.price+movement);s.change=(movement/(s.price-movement))*100;s.history.push(s.price);if(s.history.length>40)s.history.shift()}if(Math.random()<.025){if(insurance){insurance=false;toast("🛡️️ Insurance blocked a market crash!")}else{Object.values(stocks).forEach(s=>s.price=Math.max(1,s.price*.72));toast("💥 MARKET CRASH! Prices dropped hard!")}}else if(Math.random()<.025){Object.values(stocks).forEach(s=>s.price*=1.15);toast("🚀 MARKET SURGE! Prices jumped!")}if(botOwned>0){const keys=Object.keys(stocks);for(let i=0;i<botOwned;i++){const t=selected||keys[i%3];if(cash>=stocks[t].price){cash-=stocks[t].price;stocks[t].shares++}}}render();upload()}
+function updatePrices(){for(const s of Object.values(stocks)){let movement=3+Math.random()*4;if(Math.random()<.5)movement=-movement;s.price=Math.max(1,s.price+movement);s.change=(movement/(s.price-movement))*100;s.history.push(s.price);if(s.history.length>40)s.history.shift()}if(Math.random()<.025){if(insurance){insurance=false;toast("🛡 Insurance blocked a market crash!")}else{Object.values(stocks).forEach(s=>s.price=Math.max(1,s.price*.72));toast("💥 MARKET CRASH! Prices dropped hard!")}}else if(Math.random()<.025){Object.values(stocks).forEach(s=>s.price*=1.15);toast("🚀 MARKET SURGE! Prices jumped!")}if(botOwned>0){const keys=Object.keys(stocks);for(let i=0;i<botOwned;i++){const t=selected||keys[i%3];if(cash>=stocks[t].price){cash-=stocks[t].price;stocks[t].shares++}}}render();upload()}
 
 function renderLeaderboard(data){
  allPlayers = data || {};
- const rows=Object.entries(data||{}).map(([id,x])=>({id,name:x?.name??"Player",value:+(x?.portfolioValue??0),pnl:+(x?.profitLoss??0)})).sort((a,b)=>b.value-a.value);
+ const rows=Object.entries(data||{}).map(([id,x])=>({id,name:x?.name??"Player",value:+(x?.portfolioValue??0),bounty:+(x?.bountyAmount??0)})).sort((a,b)=>b.value-a.value);
  const b=document.getElementById("leaderboard");
- b.innerHTML=rows.length?rows.map((x,i)=>`<tr class="${x.id===playerId?"you":""}"><td class="rank">${i+1}</td><td>${safeText(x.name)}${x.id===playerId?" <span class='sub'>(You)</span>":""}</td><td>${money(x.value)}</td><td class="${x.pnl>=0?"green":"red"}">${x.pnl>=0?"+":"-"}${money(Math.abs(x.pnl))}</td></tr>`).join(""):"<tr><td colspan='4' class='empty'>No players yet.</td></tr>";
+ b.innerHTML=rows.length?rows.map((x,i)=>`<tr class="${x.id===playerId?"you":""}"><td class="rank">${i+1}</td><td>${safeText(x.name)}${x.id===playerId?" <span class='sub'>(You)</span>":""}</td><td>${money(x.value)}</td><td class="red">${x.bounty>0?money(x.bounty):"-"}</td></tr>`).join(""):"<tr><td colspan='4' class='empty'>No players yet.</td></tr>";
  
  const select = document.getElementById("transferRecipient");
+ const bountySelect = document.getElementById("bountyTarget");
  const curr = select.value;
- select.innerHTML = '<option value="">Select a player…</option>' + rows.filter(r=>r.id!==playerId).map(r=>`<option value="${r.id}">${safeText(r.name)}</option>`).join("");
+ const currBounty = bountySelect.value;
+ const optionsHTML = '<option value="">Select a player…</option>' + rows.filter(r=>r.id!==playerId).map(r=>`<option value="${r.id}">${safeText(r.name)} (${r.bounty>0?'🎯 '+money(r.bounty):'No Bounty'})</option>`).join("");
+ select.innerHTML = optionsHTML;
+ bountySelect.innerHTML = optionsHTML;
  select.value = curr;
+ bountySelect.value = currBounty;
 }
 
 function clearChatBadge(){
@@ -461,6 +512,7 @@ onValue(ref(db,"chat"),s=>renderChat(s.val()||{}));
 document.getElementById("sendChat").onclick=sendChat;document.getElementById("chatInput").addEventListener("keydown",e=>{if(e.key==="Enter")sendChat()});
 async function sendChat(){const input=document.getElementById("chatInput"),text=input.value.trim();if(!text||!firebaseReady)return;input.value="";try{const r=push(ref(db,"chat"));await set(r,{name:validName(),text:text.slice(0,120),ts:Date.now(),playerId})}catch(e){toast("Chat failed to send.")}}
 
+// MONEY TRANSFERS
 document.getElementById("sendMoneyBtn").onclick=async()=>{
  const recipientId = document.getElementById("transferRecipient").value;
  const amtInput = document.getElementById("transferAmount");
@@ -478,55 +530,180 @@ document.getElementById("sendMoneyBtn").onclick=async()=>{
  done();
  
  try {
-  const tRef = push(ref(db, "transfers/" + recipientId));
-  await set(tRef, {
-   fromName: validName(),
-   amount: amount,
-   ts: Date.now()
-  });
-  
-  const cRef = push(ref(db, "chat"));
-  await set(cRef, {
-   name: "💸 SYSTEM",
-   text: `${validName()} sent ${money(amount)} to ${recName}!`,
-   ts: Date.now(),
-   playerId: "system"
-  });
-  
+  await set(push(ref(db, "transfers/" + recipientId)), { fromName: validName(), amount: amount, ts: Date.now() });
+  await set(push(ref(db, "chat")), { name: "💸 SYSTEM", text: `${validName()} sent ${money(amount)} to ${recName}!`, ts: Date.now(), playerId: "system" });
   toast(`Sent ${money(amount)} to ${recName}!`);
- } catch(e) {
-  console.error(e);
-  toast("Transfer failed.");
- }
+ } catch(e) { console.error(e); toast("Transfer failed."); }
 };
 
 let transferListenerActive = false;
 function listenForTransfers(){
  if(!firebaseReady || transferListenerActive) return;
  transferListenerActive = true;
- const myTransfersRef = ref(db, "transfers/" + playerId);
- onChildAdded(myTransfersRef, async (snap) => {
+ onChildAdded(ref(db, "transfers/" + playerId), async (snap) => {
   const val = snap.val();
   if(!val) return;
   const amt = Number(val.amount)||0;
-  if(amt > 0){
-   cash += amt;
-   done();
-   toast(`💸 You received ${money(amt)} from ${val.fromName || "a player"}!`);
-  }
+  if(amt > 0){ cash += amt; done(); toast(`💸 You received ${money(amt)} from ${val.fromName || "a player"}!`); }
   await remove(ref(db, "transfers/" + playerId + "/" + snap.key));
  });
 }
 
-// COIN FLIP MINIGAME LOGIC
-document.getElementById("flipAllInBtn").onclick=()=>{
- document.getElementById("flipBet").value = Math.max(0, Math.floor(cash));
+// BOUNTIES & HITMEN LOGIC
+document.getElementById("placeBountyBtn").onclick = async () => {
+ const targetId = document.getElementById("bountyTarget").value;
+ const amt = Math.floor(Number(document.getElementById("bountyAmt").value)||0);
+ if(!targetId){ toast("Select a target player."); return; }
+ if(amt < 1000){ toast("Minimum bounty is $1,000."); return; }
+ if(cash < amt){ toast("You don't have enough cash for that bounty."); return; }
+
+ const targetName = allPlayers[targetId]?.name || "Player";
+ cash -= amt;
+ done();
+
+ try {
+  const targetRef = ref(db, "leaderboard/" + targetId + "/bountyAmount");
+  const snap = await get(targetRef);
+  const currentBounty = Number(snap.val()) || 0;
+  await update(ref(db, "leaderboard/" + targetId), { bountyAmount: currentBounty + amt });
+  
+  await set(push(ref(db, "chat")), {
+   name: "🎯 BOUNTY ALERT",
+   text: `⚠️ ${validName()} placed a ${money(amt)} bounty on ${targetName}! Total Bounty: ${money(currentBounty + amt)}`,
+   ts: Date.now(),
+   playerId: "system"
+  });
+  toast(`Placed ${money(amt)} bounty on ${targetName}!`);
+  document.getElementById("bountyAmt").value = "";
+ } catch(e) { console.error(e); toast("Failed to place bounty."); }
 };
 
+document.getElementById("executeHitBtn").onclick = async () => {
+ const targetId = document.getElementById("bountyTarget").value;
+ const fee = 5000;
+ if(!targetId){ toast("Select a target player."); return; }
+ if(cash < fee){ toast("Executing a hit requires a $5,000 hitman fee."); return; }
+
+ const targetName = allPlayers[targetId]?.name || "Player";
+ cash -= fee;
+ done();
+
+ try {
+  await set(push(ref(db, "hits/" + targetId)), { attackerName: validName(), attackerId: playerId, ts: Date.now() });
+  toast(`🗡️ Hit dispatched against ${targetName}! Awaiting result...`);
+ } catch(e) { console.error(e); toast("Hit failed."); }
+};
+
+let hitListenerActive = false;
+function listenForHits(){
+ if(!firebaseReady || hitListenerActive) return;
+ hitListenerActive = true;
+ onChildAdded(ref(db, "hits/" + playerId), async (snap) => {
+  const val = snap.val();
+  if(!val) return;
+  const attackerName = val.attackerName || "An assassin";
+  const attackerId = val.attackerId;
+  
+  if(bodyguards){
+   bodyguards = false;
+   cash += 5000; // Counter-steal the fee!
+   done();
+   await set(push(ref(db, "chat")), {
+    name: "💂 BODYGUARD DEFENSE",
+    text: `🛡️ ${validName()}'s Bodyguards blocked a hitman sent by ${attackerName}! ${validName()} pocketed the $5,000 fee!`,
+    ts: Date.now(),
+    playerId: "system"
+   });
+   toast(`💂 Your bodyguards blocked ${attackerName}'s hitman! Received $5,000!`);
+  } else {
+   const bountyAwarded = bountyAmount;
+   const cashStolen = Math.floor(cash * 0.05);
+   cash = Math.max(0, cash - cashStolen);
+   bountyAmount = 0;
+   done();
+   
+   if(attackerId){
+    await set(push(ref(db, "transfers/" + attackerId)), {
+     fromName: "🎯 BOUNTY REWARD & STOLEN CASH",
+     amount: bountyAwarded + cashStolen,
+     ts: Date.now()
+    });
+   }
+
+   await set(push(ref(db, "chat")), {
+    name: "🗡️ HIT EXECUTED",
+    text: `💥 ${attackerName} successfully executed a hit on ${validName()}! Collected ${money(bountyAwarded)} bounty and ${money(cashStolen)} stolen cash!`,
+    ts: Date.now(),
+    playerId: "system"
+   });
+   toast(`💥 Hit executed on you by ${attackerName}! Lost ${money(cashStolen)} cash.`);
+  }
+  await remove(ref(db, "hits/" + playerId + "/" + snap.key));
+ });
+}
+
+// BLACK MARKET & DARK POOL LOGIC
+function checkSecAudit(){
+ if(Math.random() < 0.25){
+  const fine = Math.floor(portfolio() * 0.20);
+  cash = Math.max(0, cash - fine);
+  done();
+  toast(`🚨 SEC AUDIT! You were caught and fined ${money(fine)}!`);
+  set(push(ref(db, "chat")), {
+   name: "🚨 SEC AUDIT",
+   text: `🚨 ${validName()} was audited by the SEC for illegal market trades and fined ${money(fine)}!`,
+   ts: Date.now(),
+   playerId: "system"
+  });
+  return true;
+ }
+ return false;
+}
+
+document.getElementById("buyInsiderTipBtn").onclick = () => {
+ const cost = 10000;
+ if(cash < cost){ toast("Insider tips cost $10,000."); return; }
+ cash -= cost;
+ 
+ const keys = Object.keys(stocks);
+ const randomStock = keys[Math.floor(Math.random() * keys.length)];
+ const isSurge = Math.random() > 0.5;
+ 
+ if(isSurge){
+  stocks[randomStock].price *= 1.15;
+  stocks[randomStock].change = 15;
+ } else {
+  stocks[randomStock].price = Math.max(1, stocks[randomStock].price * 0.85);
+  stocks[randomStock].change = -15;
+ }
+ stocks[randomStock].history.push(stocks[randomStock].price);
+ done();
+
+ toast(`📁 INSIDER TIP: ${randomStock} moved by ${isSurge ? '+15%' : '-15%'}!`);
+ checkSecAudit();
+};
+
+document.getElementById("buyMarketPumpBtn").onclick = () => {
+ const cost = 25000;
+ if(cash < cost){ toast("Illegal Market Pump costs $25,000."); return; }
+ cash -= cost;
+ 
+ Object.values(stocks).forEach(s => {
+  s.price *= 1.12;
+  s.change = 12;
+  s.history.push(s.price);
+ });
+ done();
+
+ toast("🚀 ILLEGAL PUMP: All stocks pumped +12%!");
+ checkSecAudit();
+};
+
+// COIN FLIP CASINO LOGIC
+document.getElementById("flipAllInBtn").onclick=()=>{ document.getElementById("flipBet").value = Math.max(0, Math.floor(cash)); };
 document.getElementById("flipBtn").onclick=()=>{
  if(isFlipping) return;
- const betInput = document.getElementById("flipBet");
- const bet = Math.floor(Number(betInput.value)||0);
+ const bet = Math.floor(Number(document.getElementById("flipBet").value)||0);
  const chosenSide = document.getElementById("flipSide").value;
  const resEl = document.getElementById("flipResult");
  const coinIcon = document.getElementById("coinIcon");
@@ -543,18 +720,11 @@ document.getElementById("flipBtn").onclick=()=>{
 
  setTimeout(()=>{
   coinIcon.classList.remove("flipping");
-  const outcomes = ["HEADS", "TAILS"];
-  const winSide = outcomes[Math.floor(Math.random() * 2)];
-  
-  if(winSide === "HEADS"){
-   coinIcon.textContent = "👑";
-  } else {
-   coinIcon.textContent = "⚡";
-  }
+  const winSide = Math.random() > 0.5 ? "HEADS" : "TAILS";
+  coinIcon.textContent = winSide === "HEADS" ? "👑" : "⚡";
 
   if(chosenSide === winSide){
-   const reward = bet * 2;
-   cash += reward;
+   cash += bet * 2;
    resEl.innerHTML = `<span class="green">🎉 WINNER! It was ${winSide}! You won +${money(bet)}!</span>`;
    toast(`🎉 Coin Flip WON! +${money(bet)}`);
   } else {
@@ -567,57 +737,34 @@ document.getElementById("flipBtn").onclick=()=>{
  }, 1000);
 };
 
+// CHEAT CODES & SIMULATORS
 let code="";document.addEventListener("keydown",e=>{if(e.key.length===1){code=(code+e.key.toLowerCase()).slice(-5);
 if(code.endsWith("op919")){document.getElementById("cheatPanel").style.display="block";toast("🔓 Free Buy Panel unlocked");code=""}
 if(code.endsWith("op918")){document.getElementById("simuPanel").style.display="block";toast("⚡ Event Simulator unlocked");code=""}
 }});
 
 document.getElementById("cheatBuy").onclick=()=>{const t=document.getElementById("cheatStock").value,q=Math.max(1,Math.floor(Number(document.getElementById("cheatQty").value)||1));stocks[t].shares+=q;done();toast(`Free bought ${formatQty(q)} ${t} share${q>1?"s":""}.`)};
-
 document.getElementById("simuCrash").onclick=()=>{
- if(insurance){insurance=false;toast("🛡️️ Insurance blocked the simulated crash!");render();return}
- Object.values(stocks).forEach(s=>{
-  s.price=Math.max(1,s.price*0.72);
-  s.change=-28;
-  s.history.push(s.price);
- });
- render();upload(true);
- toast("💥 SIMULATED CRASH TRIGGERED!");
+ if(insurance){insurance=false;toast("🛡 Insurance blocked the simulated crash!");render();return}
+ Object.values(stocks).forEach(s=>{ s.price=Math.max(1,s.price*0.72); s.change=-28; s.history.push(s.price); });
+ render();upload(true); toast("💥 SIMULATED CRASH TRIGGERED!");
 };
-
 document.getElementById("simuSurge").onclick=()=>{
- Object.values(stocks).forEach(s=>{
-  s.price=s.price*1.15;
-  s.change=15;
-  s.history.push(s.price);
- });
- render();upload(true);
- toast("🚀 SIMULATED SURGE TRIGGERED!");
+ Object.values(stocks).forEach(s=>{ s.price=s.price*1.15; s.change=15; s.history.push(s.price); });
+ render();upload(true); toast("🚀 SIMULATED SURGE TRIGGERED!");
 };
 
 document.getElementById("resetBtn").onclick=async()=>{
  if(!confirm("Reset your game, stocks, cash, and properties back to the starting state?"))return;
  cash=STARTING_CASH;
  Object.values(stocks).forEach(s=>{s.shares=0;s.change=0;s.history=[s.price]});
- propertiesOwned={};
- propertyTimers={};
- insurance=false;boostOwned=0;speedOwned=0;botOwned=0;goldBars=0;
- localStorage.removeItem(PROPS);
- localStorage.removeItem("simuPropTimers");
+ propertiesOwned={}; propertyTimers={};
+ insurance=false; bodyguards=false; boostOwned=0; speedOwned=0; botOwned=0; goldBars=0; bountyAmount=0;
+ localStorage.removeItem(PROPS); localStorage.removeItem("simuPropTimers");
  
  const key = accountKey();
- if(key && firebaseReady){
-  try {
-   await remove(ref(db, "accounts/" + key));
-  } catch(e) {
-   console.error(e);
-  }
- }
- 
- render();
- lastUploadedValue=null;
- upload(true);
- toast("Game reset.");
+ if(key && firebaseReady){ try { await remove(ref(db, "accounts/" + key)); } catch(e) { console.error(e); } }
+ render(); lastUploadedValue=null; upload(true); toast("Game reset.");
 };
 
 render();
