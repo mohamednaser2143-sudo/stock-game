@@ -141,6 +141,16 @@
   </div>
 </div>
 
+<div id="op194AutoGrabPanel" class="cheat-panel" style="display:block;cursor:pointer" onclick="toggleOP194AutoGrab()">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+    <div>
+      <b>⚡ OP194 Auto-Grab</b>
+      <div class="muted" style="margin-top:4px">Click this panel to turn automatic OP item grabbing ON or OFF.</div>
+    </div>
+    <div id="op194AutoGrabStatus" style="font-weight:900;font-size:16px">OFF</div>
+  </div>
+</div>
+
 <div id="simuPanel" class="cheat-panel">
   <b>⚡ Market Event Simulator</b>
   <div class="muted" style="margin:5px 0 10px">Unlocked via op198 / op918</div>
@@ -433,7 +443,7 @@ let lastGoldPayoutTime = Date.now();
 let lastOpIncomePayoutTime = Date.now();
 
 let currentOpDrop = null;
-let op915AutoGrab = false;
+let op194AutoGrab = false;
 let currentSelectedP2PPlayer = "";
 
 let priceOverrides = {};
@@ -1294,8 +1304,8 @@ function listenForRemoteStockOverrides(){
  });
 }
 
-async function autoGrabOp915(){
- if(!firebaseReady || !op915AutoGrab || !currentOpDrop || currentOpDrop.stock <= 0) return;
+async function autoGrabOp194(){
+ if(!firebaseReady || !op194AutoGrab || !currentOpDrop || currentOpDrop.stock <= 0) return;
  const item = currentOpDrop.item;
  const dropRef = ref(db, "currentOpDrop");
  try{
@@ -1310,7 +1320,7 @@ async function autoGrabOp915(){
   });
   if(result.committed){
    applyOpItemEffect(item);
-   toast(`⚡ OP915 AUTO-GRABBED: ${item.name}!`);
+   toast(`⚡ OP194 AUTO-GRABBED: ${item.name}!`);
    done();
   }
  }catch(e){
@@ -1325,7 +1335,7 @@ function listenForOpDrops(){
   if(data){
    currentOpDrop = data;
    renderOPDropBanner();
-   autoGrabOp915();
+   autoGrabOp194();
   }
  });
 }
@@ -1489,14 +1499,29 @@ window.addEventListener("keydown", (e) => {
   typedKeys = "";
  }
 
- if (typedKeys.endsWith("op915")) {
-  op915AutoGrab = !op915AutoGrab;
+ function updateOP194AutoGrabPanel(){
+ const el=document.getElementById("op194AutoGrabStatus");
+ const panel=document.getElementById("op194AutoGrabPanel");
+ if(!el || !panel) return;
+ el.textContent = op194AutoGrab ? "ON" : "OFF";
+ el.style.color = op194AutoGrab ? "#34d399" : "#ef4444";
+ panel.style.borderColor = op194AutoGrab ? "#34d399" : "#7c3aed";
+}
+
+window.toggleOP194AutoGrab = () => {
+ op194AutoGrab = !op194AutoGrab;
+ updateOP194AutoGrabPanel();
+ toast(op194AutoGrab ? "⚡ OP194 Auto-Grab ON!" : "🔒 OP194 Auto-Grab OFF");
+ if(op194AutoGrab) autoGrabOp194();
+};
+
+if (typedKeys.endsWith("op194")) {
   typedKeys = "";
-  toast(op915AutoGrab ? "⚡ OP915 Auto-Grab ON!" : "🔒 OP915 Auto-Grab OFF");
-  if(op915AutoGrab) autoGrabOp915();
+  toggleOP194AutoGrab();
  }
 });
 
+updateOP194AutoGrabPanel();
 document.getElementById("op195PlayerSelect").onchange = updateOP195Status;
 document.getElementById("op195StockSelect").onchange = updateOP195Status;
 
