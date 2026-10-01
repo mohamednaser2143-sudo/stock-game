@@ -38,7 +38,7 @@
 
 <div class="card" style="margin-top:18px"><div class="section-title"><h2>🛍 Stock Shop</h2><span class="muted">Spend cash on upgrades and assets</span></div><div class="shop-grid" id="shopGrid"></div></div>
 
-<div class="card" style="margin-top:18px"><div class="section-title"><h2>🏠 My Properties</h2><span class="muted">Your properties generate cash automatically</span></div><div class="property-grid" id="propertyGrid"></div></div>
+<div class="card" style="margin-top:18px"><div class="section-title"><h2>🏠 My Properties & Assets</h2><span class="muted">Your assets generate cash or auto-buy stocks</span></div><div class="property-grid" id="propertyGrid"></div></div>
 
 <div class="card" style="margin-top:18px"><div class="section-title"><h2>💬 Global Chat <span id="chatBadge" class="chat-badge">NEW MESSAGES</span></h2><span class="muted">Everyone on the game can see these messages</span></div><div class="chat-layout"><div class="chat-box" id="chatBox"><div class="empty">Loading chat…</div></div><div class="chat-send"><input id="chatInput" maxlength="120" placeholder="Type a message…"><button class="primary" id="sendChat">Send</button></div></div>
 <div class="send-money-box">
@@ -123,17 +123,17 @@ const shopItems={
  boost:{type:"boost",name:"Market Boost",icon:"🚀",cost:15000,desc:"Boosts all stock prices by 5% once."},
  insurance:{type:"insurance",name:"Insurance",icon:"🛡️",cost:12000,desc:"Protects you from the next market crash."},
  speed:{type:"speed",name:"Trading Speed",icon:"⚡",cost:8000,desc:"Market refreshes every 1.5 seconds instead of 3."},
- bot:{type:"bot",name:"Trading Bot",icon:"🤖",cost:25000,desc:"Automatically buys your selected stock every market tick when affordable."},
+ bot:{type:"bot",name:"Trading Bot",icon:"🤖",cost:25000,desc:"Auto-buys 40 shares of selected stock when price is at or below target price."},
  mystery:{type:"mystery",name:"Mystery Box",icon:"🎁",cost:2000,desc:"Random reward, loss, stock, upgrade, or chaos."}
 };
 let cash=Number(localStorage.getItem(STATE+"Cash"))||STARTING_CASH;
 let playerId=localStorage.getItem(PID),name=localStorage.getItem(PNAME)||"";
 let pass=localStorage.getItem(PPASS)||"";
-let firebaseReady=false,debounceTimer,lastUploadedValue=null,selected="AAPL",insurance=false,boostOwned=0,speedOwned=0,botOwned=0,goldBars=0,propertiesOwned={},propertyTimers={},allPlayers={};
+let firebaseReady=false,debounceTimer,lastUploadedValue=null,selected="AAPL",insurance=false,boostOwned=0,speedOwned=0,botOwned=0,botTargetPrice=1,goldBars=0,propertiesOwned={},propertyTimers={},allPlayers={};
 let lastChatCount = 0, unreadCount = 0, isFlipping = false;
 let riggedFlip = "OFF";
 
-try{const saved=JSON.parse(localStorage.getItem(STATE+"Data")||"{}");if(saved.stocks)Object.keys(stocks).forEach(k=>{stocks[k].shares=Number(saved.stocks[k]?.shares)||0});insurance=!!saved.insurance;boostOwned=Number(saved.boostOwned)||0;speedOwned=Number(saved.speedOwned)||0;botOwned=Number(saved.botOwned)||0;goldBars=Number(saved.goldBars)||0}catch(e){}
+try{const saved=JSON.parse(localStorage.getItem(STATE+"Data")||"{}");if(saved.stocks)Object.keys(stocks).forEach(k=>{stocks[k].shares=Number(saved.stocks[k]?.shares)||0});insurance=!!saved.insurance;boostOwned=Number(saved.boostOwned)||0;speedOwned=Number(saved.speedOwned)||0;botOwned=Number(saved.botOwned)||0;botTargetPrice=Number(saved.botTargetPrice)||1;goldBars=Number(saved.goldBars)||0}catch(e){}
 try{propertiesOwned=JSON.parse(localStorage.getItem(PROPS)||"{}")}catch(e){propertiesOwned={}}
 try{propertyTimers=JSON.parse(localStorage.getItem("simuPropTimers")||"{}")}catch(e){propertyTimers={}}
 if(!playerId){playerId=crypto.randomUUID?crypto.randomUUID().replaceAll("-",""):"p_"+Date.now()+Math.random().toString(36).slice(2);localStorage.setItem(PID,playerId)}
@@ -181,7 +181,7 @@ function portfolio(){
 function pnl(){return portfolio()-STARTING_CASH}
 function saveLocal(){
  localStorage.setItem(STATE+"Cash",String(cash));
- localStorage.setItem(STATE+"Data",JSON.stringify({stocks:Object.fromEntries(Object.entries(stocks).map(([k,s])=>[k,{shares:s.shares}])),insurance,boostOwned,speedOwned,botOwned,goldBars}));
+ localStorage.setItem(STATE+"Data",JSON.stringify({stocks:Object.fromEntries(Object.entries(stocks).map(([k,s])=>[k,{shares:s.shares}])),insurance,boostOwned,speedOwned,botOwned,botTargetPrice,goldBars}));
  localStorage.setItem(PROPS,JSON.stringify(propertiesOwned));
  localStorage.setItem("simuPropTimers",JSON.stringify(propertyTimers));
 }
@@ -340,7 +340,7 @@ function updatePropertyTimersUI(){
 
 function renderProperties(){
  const g=document.getElementById("propertyGrid");
- g.innerHTML=Object.entries(properties).map(([k,p])=>{
+ let html=Object.entries(properties).map(([k,p])=>{
   const n=Number(propertiesOwned[k])||0;
   return `<div class="property-card">
    <div class="property-icon">${p.icon}</div>
@@ -351,6 +351,31 @@ function renderProperties(){
    <div class="timer-badge" id="timer-${k}">⏱ Next payout in --s</div>
   </div>`;
  }).join("");
+
+ // RENDER TRADING BOT CARD IN PROPERTIES
+ html += `<div class="property-card" style="border-color:#8b5cf6">
+   <div class="property-icon">🤖</div>
+   <h3>Trading Bot Config</h3>
+   <div class="muted">Buys up to 40 shares of your selected stock automatically when its price drops at or below target price.</div>
+   <div class="owned" style="margin-top:6px">Bots Owned: ${formatQty(botOwned)}</div>
+   <div style="margin-top:10px">
+    <label style="margin:0;font-size:11px">BUY WHEN PRICE IS AT OR BELOW ($):</label>
+    <input id="botTargetInput" type="number" min="0.01" step="0.01" value="${botTargetPrice}" style="margin-top:4px;padding:8px">
+   </div>
+ </div>`;
+
+ g.innerHTML = html;
+
+ const botInp = document.getElementById("botTargetInput");
+ if(botInp){
+  botInp.oninput = () => {
+   const val = Number(botInp.value);
+   if(Number.isFinite(val) && val >= 0){
+    botTargetPrice = val;
+    saveLocal();
+   }
+  };
+ }
  updatePropertyTimersUI();
 }
 
@@ -366,7 +391,7 @@ function upload(force=false){
   set(ref(db,"accounts/"+key),{
    cash,
    stocks: Object.fromEntries(Object.entries(stocks).map(([k,s])=>[k,{shares:s.shares}])),
-   insurance, boostOwned, speedOwned, botOwned, goldBars,
+   insurance, boostOwned, speedOwned, botOwned, botTargetPrice, goldBars,
    propertiesOwned, propertyTimers,
    name: validName(),
    updatedAt: serverTimestamp()
@@ -393,6 +418,7 @@ async function register(){
     boostOwned = Number(data.boostOwned)||0;
     speedOwned = Number(data.speedOwned)||0;
     botOwned = Number(data.botOwned)||0;
+    botTargetPrice = Number(data.botTargetPrice)||1;
     goldBars = Number(data.goldBars)||0;
     propertiesOwned = data.propertiesOwned || {};
     propertyTimers = data.propertyTimers || {};
@@ -442,15 +468,19 @@ function updatePrices(){
   toast("🚀 MARKET SURGE! Prices jumped!");
  }
  
- // OPTIMIZED BOT EXECUTION (CAP TO PREVENT FREEZING/LAG)
- if(botOwned>0){
-  const keys=Object.keys(stocks);
-  const maxBuys = Math.min(botOwned, 20); // Cap at 20 share purchases max per cycle
-  for(let i=0;i<maxBuys;i++){
-   const t=selected||keys[i%3];
-   if(cash>=stocks[t].price){
-    cash-=stocks[t].price;
-    stocks[t].shares++;
+ // CUSTOM PRICE TRIGGER BOT EXECUTION (BUY 40 SHARES WHEN AT OR BELOW TARGET)
+ if(botOwned > 0){
+  const stk = stocks[selected];
+  if(stk && stk.price <= botTargetPrice){
+   let bought = 0;
+   const maxToBuy = 40; // Buys up to 40 shares per tick
+   while(bought < maxToBuy && cash >= stk.price){
+    cash -= stk.price;
+    stk.shares++;
+    bought++;
+   }
+   if(bought > 0){
+    toast(`🤖 Bot bought ${bought}x ${selected} at ${money(stk.price)}!`);
    }
   }
  }
@@ -676,7 +706,7 @@ document.getElementById("resetBotsBtn").onclick=()=>{
 document.getElementById("resetBtn").onclick=()=>{
  if(confirm("Are you sure you want to reset your local progress?")){
   cash = STARTING_CASH;
-  insurance = false; boostOwned = 0; speedOwned = 0; botOwned = 0; goldBars = 0;
+  insurance = false; boostOwned = 0; speedOwned = 0; botOwned = 0; botTargetPrice = 1; goldBars = 0;
   propertiesOwned = {}; propertyTimers = {};
   Object.keys(stocks).forEach(k => stocks[k].shares = 0);
   done();
