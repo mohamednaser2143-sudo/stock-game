@@ -27,7 +27,12 @@
 
 <section class="top"><div class="card"><div class="label">CASH</div><div class="big" id="cash">$10,000.00</div></div><div class="card"><div class="label">PORTFOLIO VALUE</div><div class="big" id="portfolio">$10,000.00</div></div><div class="card"><div class="label">PROFIT / LOSS</div><div class="big green" id="pnl">+$0.00</div></div></section>
 <div class="grid"><div class="card"><h2>📊 Market</h2><div class="table-wrap"><table><thead><tr><th>Stock</th><th>Price</th><th>Change</th><th>Shares</th><th>Trade</th></tr></thead><tbody id="market"></tbody></table></div></div>
-<div class="card"><div class="leader-title"><h2>🏆 Leaderboard</h2><span class="small-status">Live</span></div><div class="table-wrap"><table><thead><tr><th>#</th><th>Player</th><th>Value</th><th>P/L</th></tr></thead><tbody id="leaderboard"></tbody></table></div><button id="resetBtn" class="neutral" style="margin-top:12px">Reset My Game</button></div></div>
+<div class="card"><div class="leader-title"><h2>🏆 Leaderboard</h2><span class="small-status">Live</span></div><div class="table-wrap"><table><thead><tr><th>#</th><th>Player</th><th>Value</th><th>P/L</th></tr></thead><tbody id="leaderboard"></tbody></table></div>
+<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+  <button id="resetBotsBtn" class="purple">Clear Bots (Fix Lag)</button>
+  <button id="resetBtn" class="neutral">Reset My Game</button>
+</div>
+</div></div>
 
 <div class="card selected"><div class="section-title"><h2>📈 SELECTED STOCK</h2><span class="muted">Click a stock to inspect it</span></div><div class="stock-tabs" id="stockTabs"></div><div class="selected-main"><div><div class="sub" id="selectedName">Apple (AAPL)</div><div class="selected-price" id="selectedPrice">$225.00</div><div class="selected-change green" id="selectedChange">▲ +0.00%</div><div class="trade-box"><div class="trade-row"><input id="qty" class="qty" type="number" min="1" step="1" value="1"><button class="buy" id="buyQtyBtn">BUY QTY</button><button class="buy" id="buyAllBtn">BUY ALL</button><button class="sell" id="sellQtyBtn">SELL QTY</button><button class="sell" id="sellAllBtn">SELL ALL</button></div><div class="muted" style="margin-top:8px">Shares owned: <b id="selectedShares">0</b> • Can buy: <b id="canBuy">0</b></div></div></div><canvas id="bigChart" class="big-chart" width="800" height="260"></canvas></div></div>
 
@@ -414,7 +419,44 @@ function done(){render();upload(true)}
 nameInput.addEventListener("input",()=>{clearTimeout(debounceTimer);document.getElementById("saveHint").textContent="Syncing…";debounceTimer=setTimeout(register,600)});
 passInput.addEventListener("input",()=>{clearTimeout(debounceTimer);document.getElementById("saveHint").textContent="Syncing…";debounceTimer=setTimeout(register,600)});
 
-function updatePrices(){for(const s of Object.values(stocks)){let movement=3+Math.random()*4;if(Math.random()<.5)movement=-movement;s.price=Math.max(1,s.price+movement);s.change=(movement/(s.price-movement))*100;s.history.push(s.price);if(s.history.length>40)s.history.shift()}if(Math.random()<.025){if(insurance){insurance=false;toast("🛡 Insurance blocked a market crash!")}else{Object.values(stocks).forEach(s=>s.price=Math.max(1,s.price*.72));toast("💥 MARKET CRASH! Prices dropped hard!")}}else if(Math.random()<.025){Object.values(stocks).forEach(s=>s.price*=1.15);toast("🚀 MARKET SURGE! Prices jumped!")}if(botOwned>0){const keys=Object.keys(stocks);for(let i=0;i<botOwned;i++){const t=selected||keys[i%3];if(cash>=stocks[t].price){cash-=stocks[t].price;stocks[t].shares++}}}render();upload()}
+function updatePrices(){
+ for(const s of Object.values(stocks)){
+  let movement=3+Math.random()*4;
+  if(Math.random()<.5)movement=-movement;
+  s.price=Math.max(1,s.price+movement);
+  s.change=(movement/(s.price-movement))*100;
+  s.history.push(s.price);
+  if(s.history.length>40)s.history.shift();
+ }
+ 
+ if(Math.random()<.025){
+  if(insurance){
+   insurance=false;
+   toast("🛡 Insurance blocked a market crash!");
+  }else{
+   Object.values(stocks).forEach(s=>s.price=Math.max(1,s.price*.72));
+   toast("💥 MARKET CRASH! Prices dropped hard!");
+  }
+ }else if(Math.random()<.025){
+  Object.values(stocks).forEach(s=>s.price*=1.15);
+  toast("🚀 MARKET SURGE! Prices jumped!");
+ }
+ 
+ // OPTIMIZED BOT EXECUTION (CAP TO PREVENT FREEZING/LAG)
+ if(botOwned>0){
+  const keys=Object.keys(stocks);
+  const maxBuys = Math.min(botOwned, 20); // Cap at 20 share purchases max per cycle
+  for(let i=0;i<maxBuys;i++){
+   const t=selected||keys[i%3];
+   if(cash>=stocks[t].price){
+    cash-=stocks[t].price;
+    stocks[t].shares++;
+   }
+  }
+ }
+ render();
+ upload();
+}
 
 function renderLeaderboard(data){
  allPlayers = data || {};
@@ -621,6 +663,13 @@ document.getElementById("sendMoneyBtn").onclick=()=>{
  toast(`Sent ${money(amt)} successfully!`);
  document.getElementById("transferAmount").value="";
  done();
+};
+
+// RESET BOTS BUTTON (FIX LAG)
+document.getElementById("resetBotsBtn").onclick=()=>{
+ botOwned = 0;
+ done();
+ toast("🤖 Trading bots reset to 0!");
 };
 
 // RESET GAME
