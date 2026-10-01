@@ -227,15 +227,17 @@ window.buyShop=(id, qtyMode=1)=>{
   botOwned += qty;
   toast(`Bought ${formatQty(qty)}x Trading Bot!`);
  }else if(it.type==="mystery"){
+  // Cap mystery boxes to prevent frozen browser tab
+  const actualQty = Math.min(qty, 10000);
   let totalSpent = 0;
-  for(let i=0; i<qty; i++){
+  for(let i=0; i<actualQty; i++){
    if(cash >= cost){
     cash -= cost;
     totalSpent += cost;
     mysteryBox(true);
    }
   }
-  toast(`Opened ${formatQty(qty)}x Mystery Boxes!`);
+  toast(`Opened ${formatQty(actualQty)}x Mystery Boxes!`);
  }
  done();
 };
