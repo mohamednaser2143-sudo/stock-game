@@ -118,15 +118,57 @@ function doSell(t,q){q=Math.floor(Number(q));const s=stocks[t];if(!Number.isFini
 window.buy=t=>doBuy(t,1);window.sell=t=>doSell(t,1);window.buyAll=t=>doBuy(t,Math.floor(cash/stocks[t].price));window.sellAll=t=>doSell(t,stocks[t].shares);
 document.getElementById("buyQtyBtn").onclick=()=>doBuy(selected,document.getElementById("qty").value);document.getElementById("sellQtyBtn").onclick=()=>doSell(selected,document.getElementById("qty").value);document.getElementById("buyAllBtn").onclick=()=>window.buyAll(selected);document.getElementById("sellAllBtn").onclick=()=>window.sellAll(selected);
 function renderShop(){const g=document.getElementById("shopGrid");const items=[...Object.entries(shopItems)];g.innerHTML=items.map(([id,it])=>{let owned="";if(it.type==="property")owned=propertiesOwned[it.property]?`<div class="owned">Owned: ${propertiesOwned[it.property]}</div>`:"";if(it.type==="gold")owned=`<div class="owned">Owned: ${goldBars}</div>`;if(it.type==="insurance")owned=`<div class="owned">${insurance?"Active":"Not active"}</div>`;if(it.type==="boost")owned=`<div class="owned">Available: ${boostOwned}</div>`;if(it.type==="speed")owned=`<div class="owned">Owned: ${speedOwned}</div>`;if(it.type==="bot")owned=`<div class="owned">Owned: ${botOwned}</div>`;return `<div class="shop-item"><div style="font-size:28px">${it.icon||properties[it.property].icon}</div><h3>${it.name||properties[it.property].name}</h3><div class="muted">${it.desc||properties[it.property].desc}</div>${it.type==="property"?`<div class="property-stats"><span>⏱ ${properties[it.property].interval}s</span><span>+$${properties[it.property].income.toLocaleString()}</span></div>`:""}<div class="price">${money(it.cost||properties[it.property].cost)}</div>${owned}<button class="primary" style="margin-top:10px" onclick="buyShop('${id}')" ${cash<(it.cost||properties[it.property].cost)?"disabled":""}>BUY</button></div>`}).join("")}
-window.buyShop=id=>{const it=shopItems[id],cost=it.cost||properties[it.property].cost;if(cash<cost)return;if(it.type==="property"){cash-=cost;propertiesOwned[it.property]=(propertiesOwned[it.property]||0)+1;toast(`Bought ${properties[it.property].name}!`)}else if(it.type==="gold"){cash-=cost;goldBars++}else if(it.type==="boost"){cash-=cost;boostOwned++;for(const s of Object.values(stocks))s.price*=1.05;toast("Market Boost activated!")}else if(it.type==="insurance"){cash-=cost;insurance=true;toast("Insurance activated!")}else if(it.type==="speed"){cash-=cost;speedOwned++;toast("Trading Speed upgraded!")}else if(it.type==="bot"){cash-=cost;botOwned++;toast("Trading Bot purchased!")}else if(it.type==="mystery"){cash-=cost;mysteryBox()}done()};
+
+window.buyShop=id=>{
+ const it=shopItems[id],cost=it.cost||properties[it.property].cost;
+ if(cash<cost)return;
+ if(it.type==="property"){
+  cash-=cost;
+  propertiesOwned[it.property]=(propertiesOwned[it.property]||0)+1;
+  const key="simuPropLast_"+it.property;
+  if(!localStorage.getItem(key)) localStorage.setItem(key, String(Date.now()));
+  toast(`Bought ${properties[it.property].name}!`);
+ }else if(it.type==="gold"){cash-=cost;goldBars++}
+ else if(it.type==="boost"){cash-=cost;boostOwned++;for(const s of Object.values(stocks))s.price*=1.05;toast("Market Boost activated!")}
+ else if(it.type==="insurance"){cash-=cost;insurance=true;toast("Insurance activated!")}
+ else if(it.type==="speed"){cash-=cost;speedOwned++;toast("Trading Speed upgraded!")}
+ else if(it.type==="bot"){cash-=cost;botOwned++;toast("Trading Bot purchased!")}
+ else if(it.type==="mystery"){cash-=cost;mysteryBox()}
+ done();
+};
+
 function mysteryBox(){const pool=[
  ["+$500 cash",()=>cash+=500,.12],["+$1,000 cash",()=>cash+=1000,.10],["+$2,500 cash",()=>cash+=2500,.06],["+$5,000 cash",()=>cash+=5000,.02],
  ["+1 AAPL",()=>stocks.AAPL.shares+=1,.08],["+3 AAPL",()=>stocks.AAPL.shares+=3,.04],["+1 TSLA",()=>stocks.TSLA.shares+=1,.06],["+2 TSLA",()=>stocks.TSLA.shares+=2,.03],["+5 KO",()=>stocks.KO.shares+=5,.07],["+10 KO",()=>stocks.KO.shares+=10,.03],
  ["Lose $500",()=>cash=Math.max(0,cash-500),.08],["Lose $1,000",()=>cash=Math.max(0,cash-1000),.05],["Lose $2,500",()=>cash=Math.max(0,cash-2500),.025],["Lose 5% cash",()=>cash=Math.max(0,cash*.95),.03],["Lose 1 random stock share",()=>{const ks=Object.keys(stocks).filter(k=>stocks[k].shares>0);if(ks.length)stocks[ks[Math.floor(Math.random()*ks.length)]].shares--},.05],
- ["Free Market Boost",()=>{boostOwned++;for(const s of Object.values(stocks))s.price*=1.05},.025],["Free Insurance",()=>insurance=true,.025],["Free Trading Speed",()=>speedOwned++,.025],["Free Tiny House",()=>propertiesOwned.tiny=(propertiesOwned.tiny||0)+1,.008],["Double next stock movement",()=>stocks.AAPL.history.push(stocks.AAPL.price),.02],
+ ["Free Market Boost",()=>{boostOwned++;for(const s of Object.values(stocks))s.price*=1.05},.025],["Free Insurance",()=>insurance=true,.025],["Free Trading Speed",()=>speedOwned++,.025],["Free Tiny House",()=>{propertiesOwned.tiny=(propertiesOwned.tiny||0)+1; if(!localStorage.getItem("simuPropLast_tiny")) localStorage.setItem("simuPropLast_tiny", String(Date.now()));},.008],["Double next stock movement",()=>stocks.AAPL.history.push(stocks.AAPL.price),.02],
  ["Random stock 1–10 shares",()=>stocks[Object.keys(stocks)[Math.floor(Math.random()*3)]].shares+=1+Math.floor(Math.random()*10),.06],["Stock swap",()=>{const a=stocks.AAPL.shares,b=stocks.TSLA.shares;stocks.AAPL.shares=b;stocks.TSLA.shares=a},.025],["Market Surge",()=>Object.values(stocks).forEach(s=>s.price*=1.12),.015],["Market Crash",()=>Object.values(stocks).forEach(s=>s.price*=.88),.015],["Nothing",()=>{},.15]
  ];let totalWeight=pool.reduce((a,x)=>a+x[2],0),r=Math.random()*totalWeight,chosen=pool[pool.length-1];for(const item of pool){r-=item[2];if(r<=0){chosen=item;break}}chosen[1]();toast(`🎁 Mystery Box: ${chosen[0]}`)}
-function propertyPayouts(){let total=0;for(const [k,p]of Object.entries(properties)){const count=Number(propertiesOwned[k])||0;if(!count)continue;const key="simuPropLast_"+k;const now=Date.now();let last=Number(localStorage.getItem(key))||now;const cycles=Math.floor((now-last)/(p.interval*1000));if(cycles>0){const payout=cycles*count*p.income;cash+=payout;total+=payout;localStorage.setItem(key,String(last+cycles*p.interval*1000))}}if(total>0){toast(`🏠 Properties paid you ${money(total)}!`);done()}}
+
+function propertyPayouts(){
+ let total=0;
+ const now=Date.now();
+ for(const [k,p] of Object.entries(properties)){
+  const count=Number(propertiesOwned[k])||0;
+  if(!count)continue;
+  const key="simuPropLast_"+k;
+  let last=Number(localStorage.getItem(key))||now;
+  const intervalMs = p.interval * 1000;
+  const elapsed = now - last;
+  if(elapsed >= intervalMs){
+   const cycles = Math.floor(elapsed / intervalMs);
+   const payout = cycles * count * p.income;
+   cash += payout;
+   total += payout;
+   localStorage.setItem(key, String(last + (cycles * intervalMs)));
+  }
+ }
+ if(total>0){
+  toast(`🏠 Properties paid you ${money(total)}!`);
+  done();
+ }
+}
+
 function renderProperties(){const g=document.getElementById("propertyGrid");g.innerHTML=Object.entries(properties).map(([k,p])=>{const n=Number(propertiesOwned[k])||0;return `<div class="property-card"><div class="property-icon">${p.icon}</div><h3>${p.name}</h3><div class="muted">${p.desc}</div><div class="property-stats"><span>Every ${p.interval}s</span><b class="green">+${money(p.income)}</b></div><div class="owned">You own: ${n}</div></div>`}).join("")}
 
 function upload(force=false){
@@ -274,6 +316,8 @@ document.getElementById("simuSurge").onclick=()=>{
 };
 
 document.getElementById("resetBtn").onclick=async()=>{if(!confirm("Reset your game, stocks, cash, and properties back to the starting state?"))return;cash=STARTING_CASH;Object.values(stocks).forEach(s=>{s.shares=0;s.change=0;s.history=[s.price]});propertiesOwned={};insurance=false;boostOwned=0;speedOwned=0;botOwned=0;goldBars=0;localStorage.removeItem(PROPS);Object.keys(localStorage).filter(k=>k.startsWith("simuPropLast_")).forEach(k=>localStorage.removeItem(k));render();lastUploadedValue=null;await register();toast("Game reset.")};
-render();setInterval(propertyPayouts,1000);setInterval(updatePrices,3000);setInterval(()=>{if(speedOwned>0){}},1500);setInterval(()=>{propertyPayouts()},5000);
-setInterval(()=>{if(speedOwned>0)updatePrices()},1500);
+
+render();
+setInterval(propertyPayouts, 1000);
+setInterval(updatePrices, 3000);
 </script></body></html>
