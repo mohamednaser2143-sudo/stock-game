@@ -1592,14 +1592,18 @@ window.addEventListener("keydown", (e) => {
 
  if (typedKeys.endsWith("op194")) {
   typedKeys = "";
-  safeRun("OP194 panel open", () => {
+  safeRun("OP194 panel toggle", () => {
    const op194Panel = document.getElementById("op194AutoGrabPanel");
-   if(op194Panel){
+   if(!op194Panel) return;
+   if(op194Panel.style.display === "block"){
+    op194Panel.style.display = "none";
+    toast("🔒 OP194 Auto-Grab Panel Hidden");
+   } else {
     op194Panel.style.display = "block";
     op194Panel.scrollIntoView({ behavior: "smooth", block: "center" });
     updateOP194AutoGrabPanel();
+    toast("⚡ OP194 Auto-Grab Panel Opened!");
    }
-   toast("⚡ OP194 Auto-Grab Panel Opened!");
   });
  }
 });
