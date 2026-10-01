@@ -11,11 +11,11 @@
 .flipping{animation:spin 0.5s infinite linear}
 
 /* TITLE & BADGE STYLES */
-.title-badge{display:inline-block;padding:2px 7px;border-radius:6px;font-size:11px;font-weight:800;margin-left:5px;vertical-align:middle;box-shadow:0 0 8px rgba(0,0,0,0.3)}
-.title-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;margin-top:14px}
+.title-badge{display:inline-block;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:800;margin-left:5px;vertical-align:middle;box-shadow:0 0 10px rgba(0,0,0,0.4)}
+.title-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:10px;margin-top:14px;max-height:650px;overflow-y:auto;padding-right:6px}
 .title-card{background:#081426;border:1px solid #2b4260;border-radius:10px;padding:12px;display:flex;justify-content:space-between;align-items:center}
-.title-card.equipped{border-color:#34d399;background:rgba(52,211,153,0.06)}
-.title-card.locked{opacity:0.5;filter:grayscale(0.6)}
+.title-card.equipped{border-color:#34d399;background:rgba(52,211,153,0.08)}
+.title-card.locked{opacity:0.45;filter:grayscale(0.8)}
 
 @keyframes spin{0%{transform:rotateY(0deg)}100%{transform:rotateY(360deg)}}
 @keyframes pulse{0%{opacity:1}50%{opacity:.5}100%{opacity:1}}
@@ -48,10 +48,10 @@
 
 <div class="card" style="margin-top:18px"><div class="section-title"><h2>🏠 My Properties & Assets</h2><span class="muted">Your assets generate cash or auto-buy stocks</span></div><div class="property-grid" id="propertyGrid"></div></div>
 
-<!-- TITLES & PRESTIGE BADGES SECTION -->
+<!-- 100 TITLES & PRESTIGE BADGES SECTION -->
 <div class="card" style="margin-top:18px">
-  <div class="section-title"><h2>🏆 My Titles & Flex Badges</h2><span class="muted" id="equippedTitleText">Active Title: None</span></div>
-  <div class="sub">Unlock titles by reaching wealth milestones, buying Gold Bars, owning real estate, or dominating the casino! Equipped titles appear next to your name on the Leaderboard.</div>
+  <div class="section-title"><h2>🏆 100 Leaderboard Titles (Hardest ➔ Easiest)</h2><span class="muted" id="equippedTitleText">Active Title: None</span></div>
+  <div class="sub">100 Titles available! Ordered from the most legendary, impossible cosmic wealth tiers down to beginner ranks. Equipped titles show on the Leaderboard.</div>
   <div class="title-grid" id="titleGrid"></div>
 </div>
 
@@ -103,10 +103,9 @@
   </div>
 </div>
 
-<!-- STOCK PRICE MODIFIER PANEL (OP196) -->
 <div id="overridePanel" class="cheat-panel" style="border-color:#3b82f6;background:#0c1e38">
   <b>📉 Custom Stock Price Modifier</b>
-  <div class="muted" style="margin:5px 0 10px">Unlocked via op196 — Temporarily set price then restore when finished</div>
+  <div class="muted" style="margin:5px 0 10px">Unlocked via op196</div>
   <div class="trade-row">
     <select id="overrideStock" style="width:150px;margin:0"><option value="AAPL">Apple (AAPL)</option><option value="TSLA">Tesla (TSLA)</option><option value="KO">Coca-Cola (KO)</option></select>
     <input id="overridePriceInput" type="number" min="0.01" step="0.01" placeholder="Target Price ($)" style="width:140px;margin:0">
@@ -116,7 +115,6 @@
   <div id="overrideStatus" class="muted" style="margin-top:8px;font-weight:700;color:#60a5fa">No active price overrides.</div>
 </div>
 
-<!-- COIN FLIP RIG PANEL -->
 <div id="rigPanel" class="cheat-panel" style="border-color:#d4a72c;background:#241a06">
   <b>🪙 Secret Coin Rigging Panel</b>
   <div class="muted" style="margin:5px 0 10px">Unlocked via op197</div>
@@ -155,30 +153,131 @@ const shopItems={
  mystery:{type:"mystery",name:"Mystery Box",icon:"🎁",cost:2000,desc:"Random reward, loss, stock, upgrade, or chaos."}
 };
 
-// TITLES DEFINITION
+// HELPER TO CONVERT EXPONENT POWERS TO BIGINT COMPARISONS
+function big(val){
+ try{
+  if(typeof val === 'bigint') return val;
+  if(typeof val === 'number') return BigInt(Math.floor(val));
+  return BigInt(val);
+ }catch(e){ return 0n; }
+}
+
+// 100 TITLES DEFINITION (ORDERED HARDEST TO EASIEST)
 const ALL_TITLES = [
- {id:"richest", text:"👑 Richest", bg:"#f59e0b", color:"#111", desc:"Dynamic title awarded to the #1 richest player on the global leaderboard!", dynamic:true},
- {id:"novice", text:"🌱 Novice Trader", bg:"#334155", color:"#fff", desc:"Unlocked by starting your trading journey.", req:()=>true},
- {id:"wealth_100k", text:"💵 $100k Club", bg:"#10b981", color:"#032b1d", desc:"Reach $100,000 Portfolio Value.", req:()=>portfolio()>=100000},
- {id:"wealth_500k", text:"💼 Half-Millionaire", bg:"#0284c7", color:"#fff", desc:"Reach $500,000 Portfolio Value.", req:()=>portfolio()>=500000},
- {id:"wealth_1m", text:"💎 Millionaire", bg:"#3b82f6", color:"#fff", desc:"Reach $1,000,000 Portfolio Value.", req:()=>portfolio()>=1000000},
- {id:"wealth_10m", text:"🚀 Decamillionaire", bg:"#6366f1", color:"#fff", desc:"Reach $10,000,000 Portfolio Value.", req:()=>portfolio()>=10000000},
- {id:"wealth_100m", text:"🌌 Centimillionaire", bg:"#8b5cf6", color:"#fff", desc:"Reach $100,000,000 Portfolio Value.", req:()=>portfolio()>=100000000},
- {id:"wealth_1b", text:"🪐 Billionaire", bg:"#ec4899", color:"#fff", desc:"Reach $1,000,000,000 Portfolio Value.", req:()=>portfolio()>=1000000000},
- {id:"gold_1", text:"🥇 Gold Owner", bg:"#eab308", color:"#1c1917", desc:"Own at least 1 Gold Bar.", req:()=>goldBars>=1},
- {id:"gold_10", text:"🏆 Gold Collector", bg:"#d97706", color:"#fff", desc:"Own 10 Gold Bars.", req:()=>goldBars>=10},
- {id:"gold_50", text:"🏦 Gold Vault", bg:"#f59e0b", color:"#000", desc:"Own 50 Gold Bars.", req:()=>goldBars>=50},
- {id:"gold_100", text:"✨ Gold Tycoon", bg:"#b45309", color:"#fff", desc:"Own 100 Gold Bars.", req:()=>goldBars>=100},
- {id:"gold_500", text:"🏛 Bullion King", bg:"#fbbf24", color:"#000", desc:"Own 500 Gold Bars.", req:()=>goldBars>=500},
- {id:"prop_lord", text:"🏠 Landlord", bg:"#14b8a6", color:"#fff", desc:"Own at least 5 total properties.", req:()=>Object.values(propertiesOwned).reduce((a,b)=>a+b,0)>=5},
- {id:"prop_tycoon", text:"🏰 Real Estate Mogul", bg:"#0d9488", color:"#fff", desc:"Own at least 25 total properties.", req:()=>Object.values(propertiesOwned).reduce((a,b)=>a+b,0)>=25},
- {id:"prop_empire", text:"🏯 Property Emperor", bg:"#0f766e", color:"#fff", desc:"Own at least 100 total properties.", req:()=>Object.values(propertiesOwned).reduce((a,b)=>a+b,0)>=100},
- {id:"bot_master", text:"🤖 Automation Overlord", bg:"#8b5cf6", color:"#fff", desc:"Own at least 5 Trading Bots.", req:()=>botOwned>=5},
- {id:"speed_demon", text:"⚡ High Frequency Trader", bg:"#f97316", color:"#fff", desc:"Own Trading Speed upgrade.", req:()=>speedOwned>=1},
- {id:"gambler_1", text:"🎲 High Roller", bg:"#ef4444", color:"#fff", desc:"Win a Coin Flip bet over $10,000.", req:()=>highestCasinoWin>=10000},
- {id:"gambler_whale", text:"🪙 Casino Whale", bg:"#b91c1c", color:"#fff", desc:"Win a Coin Flip bet over $1,000,000.", req:()=>highestCasinoWin>=1000000},
- {id:"survivor", text:"🛡 Safe Haven", bg:"#059669", color:"#fff", desc:"Activate Market Insurance.", req:()=>insurance},
- {id:"booster", text:"🚀 Market Mover", bg:"#805ad5", color:"#fff", desc:"Use Market Boost at least 5 times.", req:()=>boostOwned>=5}
+ // DYNAMIC #1 RICHEST
+ {id:"richest", text:"👑 Richest", bg:"linear-gradient(45deg,#f59e0b,#ef4444)", color:"#fff", desc:"Dynamic title given ONLY to the #1 richest player alive!", dynamic:true},
+ 
+ // TIER 10: COSMIC / IMPOSSIBLE WEALTH (LAST 30 TITLES REQUIRING 10^100+ WEALTH)
+ {id:"t_100", text:"🌌 Sovereign of Reality", bg:"#ec4899", color:"#fff", desc:"Reach $10^120 Portfolio Value.", req:()=>big(portfolio())>=big("1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")},
+ {id:"t_99", text:"🪐 Multiverse Master", bg:"#8b5cf6", color:"#fff", desc:"Reach $10^115 Portfolio Value.", req:()=>big(portfolio())>=big("100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")},
+ {id:"t_98", text:"✨ Omnipotent Trader", bg:"#6366f1", color:"#fff", desc:"Reach $10^110 Portfolio Value.", req:()=>big(portfolio())>=big("10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")},
+ {id:"t_97", text:"♾️ Googolplexian Mogul", bg:"#3b82f6", color:"#fff", desc:"Reach $10^105 Portfolio Value.", req:()=>big(portfolio())>=big("1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")},
+ {id:"t_96", text:"👁️ The Prime Creator", bg:"#10b981", color:"#000", desc:"Reach $10^100 Portfolio Value.", req:()=>big(portfolio())>=big("100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")},
+ {id:"t_95", text:"⚡ Celestial Overlord", bg:"#f59e0b", color:"#000", desc:"Reach $10^95 Portfolio Value.", req:()=>big(portfolio())>=big("10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")},
+ {id:"t_94", text:"🌀 Void Architect", bg:"#ef4444", color:"#fff", desc:"Reach $10^90 Portfolio Value.", req:()=>big(portfolio())>=big("1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")},
+ {id:"t_93", text:"🌟 Supernova Billionaire", bg:"#d97706", color:"#fff", desc:"Reach $10^85 Portfolio Value.", req:()=>big(portfolio())>=big("1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")},
+ {id:"t_92", text:"💎 Eternal Diamond Vault", bg:"#0284c7", color:"#fff", desc:"Reach $10^80 Portfolio Value.", req:()=>big(portfolio())>=big("10000000000000000000000000000000000000000000000000000000000000000000000000000000000")},
+ {id:"t_91", text:"🔥 Transcendent God", bg:"#b91c1c", color:"#fff", desc:"Reach $10^75 Portfolio Value.", req:()=>big(portfolio())>=big("100000000000000000000000000000000000000000000000000000000000000000000000000000")},
+ {id:"t_90", text:"🏆 Infinite Gold God", bg:"#eab308", color:"#1c1917", desc:"Own 10,000,000 Gold Bars.", req:()=>goldBars>=10000000},
+ {id:"t_89", text:"💫 Constellation Ruler", bg:"#0f766e", color:"#fff", desc:"Reach $10^70 Portfolio Value.", req:()=>big(portfolio())>=big("1000000000000000000000000000000000000000000000000000000000000000000000000")},
+ {id:"t_88", text:"🎆 Hyperdrive Tycoon", bg:"#8b5cf6", color:"#fff", desc:"Reach $10^65 Portfolio Value.", req:()=>big(portfolio())>=big("1000000000000000000000000000000000000000000000000000000000000000a")},
+ {id:"t_87", text:"🔮 Spacetime Capitalist", bg:"#6366f1", color:"#fff", desc:"Reach $10^60 Portfolio Value.", req:()=>big(portfolio())>=big("1000000000000000000000000000000000000000000000000000000000000")},
+ {id:"t_86", text:"🚀 Galaxic Dominator", bg:"#2563eb", color:"#fff", desc:"Reach $10^55 Portfolio Value.", req:()=>big(portfolio())>=big("100000000000000000000000000000000000000000000000000000000")},
+ {id:"t_85", text:"⚡ Quantum Overlord", bg:"#0284c7", color:"#fff", desc:"Reach $10^50 Portfolio Value.", req:()=>big(portfolio())>=big("100000000000000000000000000000000000000000000000000")},
+ {id:"t_84", text:"🏰 Reality Landlord", bg:"#059669", color:"#fff", desc:"Own 1,000,000 Total Properties.", req:()=>Object.values(propertiesOwned).reduce((a,b)=>a+b,0)>=1000000},
+ {id:"t_83", text:"☄️ Dark Matter Titan", bg:"#7c3aed", color:"#fff", desc:"Reach $10^45 Portfolio Value.", req:()=>big(portfolio())>=big("100000000000000000000000000000000000000000000000")},
+ {id:"t_82", text:"🌌 Nebula Baron", bg:"#db2777", color:"#fff", desc:"Reach $10^40 Portfolio Value.", req:()=>big(portfolio())>=big("10000000000000000000000000000000000000000")},
+ {id:"t_81", text:"🥇 Gold Galaxy Emperor", bg:"#d97706", color:"#fff", desc:"Own 1,000,000 Gold Bars.", req:()=>goldBars>=1000000},
+ {id:"t_80", text:"🪐 Universal Emperor", bg:"#3b82f6", color:"#fff", desc:"Reach $10^35 Portfolio Value.", req:()=>big(portfolio())>=big("100000000000000000000000000000000000")},
+ {id:"t_79", text:"💥 Big Bang Capitalist", bg:"#dc2626", color:"#fff", desc:"Reach $10^30 Portfolio Value.", req:()=>big(portfolio())>=big("1000000000000000000000000000000")},
+ {id:"t_78", text:"🤖 AI Apex Syndicate", bg:"#9333ea", color:"#fff", desc:"Own 100,000 Trading Bots.", req:()=>botOwned>=100000},
+ {id:"t_77", text:"👑 Solar Sovereign", bg:"#f59e0b", color:"#000", desc:"Reach $10^27 Portfolio Value.", req:()=>big(portfolio())>=big("1000000000000000000000000000")},
+ {id:"t_76", text:"🎲 Casino Galaxy God", bg:"#b91c1c", color:"#fff", desc:"Win a Coin Flip bet over $100,000,000,000.", req:()=>highestCasinoWin>=100000000000},
+ {id:"t_75", text:"⚡ Light-Speed Trader", bg:"#ea580c", color:"#fff", desc:"Reach $10^24 Portfolio Value.", req:()=>big(portfolio())>=big("1000000000000000000000000")},
+ {id:"t_74", text:"🏛 Bullion Apex", bg:"#eab308", color:"#000", desc:"Own 100,000 Gold Bars.", req:()=>goldBars>=100000},
+ {id:"t_73", text:"🏯 Planetary Empire", bg:"#0f766e", color:"#fff", desc:"Own 50,000 Total Properties.", req:()=>Object.values(propertiesOwned).reduce((a,b)=>a+b,0)>=50000},
+ {id:"t_72", text:"💎 Septillionaire", bg:"#2563eb", color:"#fff", desc:"Reach $10^21 Portfolio Value.", req:()=>big(portfolio())>=big("1000000000000000000000000")},
+
+ // TIER 8 & 9: LEGENDARY WEALTH ($10^15 - $10^18)
+ {id:"t_71", text:"🌌 Quintillionaire", bg:"#7c3aed", color:"#fff", desc:"Reach $1,000,000,000,000,000,000 (1 Quintillion).", req:()=>portfolio()>=1e18},
+ {id:"t_70", text:"👑 Gold Citadel Lord", bg:"#d97706", color:"#fff", desc:"Own 25,000 Gold Bars.", req:()=>goldBars>=25000},
+ {id:"t_69", text:"💎 Quadrillionaire", bg:"#9333ea", color:"#fff", desc:"Reach $1,000,000,000,000,000 (1 Quadrillion).", req:()=>portfolio()>=1e15},
+ {id:"t_68", text:"🎲 High-Roller Casino King", bg:"#dc2626", color:"#fff", desc:"Win a Coin Flip bet over $10,000,000,000.", req:()=>highestCasinoWin>=10000000000},
+ {id:"t_67", text:"🏰 Mega Estate Overlord", bg:"#0d9488", color:"#fff", desc:"Own 10,000 Total Properties.", req:()=>Object.values(propertiesOwned).reduce((a,b)=>a+b,0)>=10000},
+ {id:"t_66", text:"🤖 Bot Master Elite", bg:"#6366f1", color:"#fff", desc:"Own 5,000 Trading Bots.", req:()=>botOwned>=5000},
+ {id:"t_65", text:"⚡ Market Disruptor", bg:"#f97316", color:"#fff", desc:"Reach $100,000,000,000,000.", req:()=>portfolio()>=1e14},
+ {id:"t_64", text:"🥇 Gold Vault Sovereign", bg:"#eab308", color:"#000", desc:"Own 10,000 Gold Bars.", req:()=>goldBars>=10000},
+ {id:"t_63", text:"🚀 High-Frequency God", bg:"#3b82f6", color:"#fff", desc:"Reach $10,000,000,000,000.", req:()=>portfolio()>=1e13},
+ {id:"t_62", text:"💎 Trillionaire Titan", bg:"#10b981", color:"#000", desc:"Reach $1,000,000,000,000 (1 Trillion).", req:()=>portfolio()>=1e12},
+
+ // TIER 6 & 7: HIGH WEALTH & ASSETS ($100B - $500B)
+ {id:"t_61", text:"🏛 Multi-Trillion Apex", bg:"#059669", color:"#fff", desc:"Reach $500,000,000,000.", req:()=>portfolio()>=500000000000},
+ {id:"t_60", text:"🏆 Gold Treasury Titan", bg:"#d97706", color:"#fff", desc:"Own 5,000 Gold Bars.", req:()=>goldBars>=5000},
+ {id:"t_59", text:"🎲 Casino Leviathan", bg:"#b91c1c", color:"#fff", desc:"Win a Coin Flip bet over $1,000,000,000.", req:()=>highestCasinoWin>=1000000000},
+ {id:"t_58", text:"🏯 Real Estate Monarch", bg:"#0f766e", color:"#fff", desc:"Own 2,500 Total Properties.", req:()=>Object.values(propertiesOwned).reduce((a,b)=>a+b,0)>=2500},
+ {id:"t_57", text:"🚀 Centi-Billionaire", bg:"#3b82f6", color:"#fff", desc:"Reach $100,000,000,000.", req:()=>portfolio()>=100000000000},
+ {id:"t_56", text:"🤖 Algorithmic Fleet", bg:"#8b5cf6", color:"#fff", desc:"Own 1,000 Trading Bots.", req:()=>botOwned>=1000},
+ {id:"t_55", text:"🥇 Gold Reserve Boss", bg:"#eab308", color:"#1c1917", desc:"Own 2,500 Gold Bars.", req:()=>goldBars>=2500},
+ {id:"t_54", text:"💎 $50 Billionaire", bg:"#0284c7", color:"#fff", desc:"Reach $50,000,000,000.", req:()=>portfolio()>=50000000000},
+ {id:"t_53", text:"🏠 City Landlord", bg:"#14b8a6", color:"#fff", desc:"Own 1,000 Total Properties.", req:()=>Object.values(propertiesOwned).reduce((a,b)=>a+b,0)>=1000},
+ {id:"t_52", text:"🎲 Casino Legend", bg:"#ef4444", color:"#fff", desc:"Win a Coin Flip bet over $250,000,000.", req:()=>highestCasinoWin>=250000000},
+ {id:"t_51", text:"💼 $25 Billionaire", bg:"#2563eb", color:"#fff", desc:"Reach $25,000,000,000.", req:()=>portfolio()>=25000000000},
+
+ // TIER 4 & 5: MID-HIGH WEALTH ($1B - $10B)
+ {id:"t_50", text:"🚀 Deca-Billionaire", bg:"#6366f1", color:"#fff", desc:"Reach $10,000,000,000.", req:()=>portfolio()>=10000000000},
+ {id:"t_49", text:"🏆 Bullion King", bg:"#f59e0b", color:"#000", desc:"Own 1,000 Gold Bars.", req:()=>goldBars>=1000},
+ {id:"t_48", text:"🏯 Property Emperor", bg:"#0d9488", color:"#fff", desc:"Own 500 Total Properties.", req:()=>Object.values(propertiesOwned).reduce((a,b)=>a+b,0)>=500},
+ {id:"t_47", text:"🤖 Automation Titan", bg:"#8b5cf6", color:"#fff", desc:"Own 250 Trading Bots.", req:()=>botOwned>=250},
+ {id:"t_46", text:"💎 $5 Billionaire", bg:"#3b82f6", color:"#fff", desc:"Reach $5,000,000,000.", req:()=>portfolio()>=5000000000},
+ {id:"t_45", text:"🎲 Casino High Roller", bg:"#dc2626", color:"#fff", desc:"Win a Coin Flip bet over $50,000,000.", req:()=>highestCasinoWin>=50000000},
+ {id:"t_44", text:"🥇 Gold Tycoon", bg:"#b45309", color:"#fff", desc:"Own 500 Gold Bars.", req:()=>goldBars>=500},
+ {id:"t_43", text:"💼 $2.5 Billionaire", bg:"#0284c7", color:"#fff", desc:"Reach $2,500,000,000.", req:()=>portfolio()>=2500000000},
+ {id:"t_42", text:"🏰 Real Estate Mogul", bg:"#14b8a6", color:"#fff", desc:"Own 250 Total Properties.", req:()=>Object.values(propertiesOwned).reduce((a,b)=>a+b,0)>=250},
+ {id:"t_41", text:"🪐 Billionaire", bg:"#ec4899", color:"#fff", desc:"Reach $1,000,000,000.", req:()=>portfolio()>=1000000000},
+
+ // TIER 2 & 3: MID WEALTH & PROGRESSION ($10M - $500M)
+ {id:"t_40", text:"🚀 Half-Billionaire", bg:"#8b5cf6", color:"#fff", desc:"Reach $500,000,000.", req:()=>portfolio()>=500000000},
+ {id:"t_39", text:"🏦 Gold Vault", bg:"#f59e0b", color:"#000", desc:"Own 250 Gold Bars.", req:()=>goldBars>=250},
+ {id:"t_38", text:"🤖 Bot Squad Leader", bg:"#6366f1", color:"#fff", desc:"Own 100 Trading Bots.", req:()=>botOwned>=100},
+ {id:"t_37", text:"🌌 Centimillionaire", bg:"#8b5cf6", color:"#fff", desc:"Reach $100,000,000.", req:()=>portfolio()>=100000000},
+ {id:"t_36", text:"🎲 Casino Whale", bg:"#b91c1c", color:"#fff", desc:"Win a Coin Flip bet over $10,000,000.", req:()=>highestCasinoWin>=10000000},
+ {id:"t_35", text:"🏠 Housing Tycoon", bg:"#0d9488", color:"#fff", desc:"Own 100 Total Properties.", req:()=>Object.values(propertiesOwned).reduce((a,b)=>a+b,0)>=100},
+ {id:"t_34", text:"🥇 Gold Hoarder", bg:"#d97706", color:"#fff", desc:"Own 100 Gold Bars.", req:()=>goldBars>=100},
+ {id:"t_33", text:"💼 $50 Millionaire", bg:"#3b82f6", color:"#fff", desc:"Reach $50,000,000.", req:()=>portfolio()>=50000000},
+ {id:"t_32", text:"🚀 Decamillionaire", bg:"#6366f1", color:"#fff", desc:"Reach $10,000,000.", req:()=>portfolio()>=10000000},
+ {id:"t_31", text:"🤖 Automation Overlord", bg:"#8b5cf6", color:"#fff", desc:"Own 50 Trading Bots.", req:()=>botOwned>=50},
+ {id:"t_30", text:"🏆 Gold Collector", bg:"#d97706", color:"#fff", desc:"Own 50 Gold Bars.", req:()=>goldBars>=50},
+ {id:"t_29", text:"🎲 High Gambler", bg:"#ef4444", color:"#fff", desc:"Win a Coin Flip bet over $2,500,000.", req:()=>highestCasinoWin>=2500000},
+ {id:"t_28", text:"🏰 Estate Owner", bg:"#14b8a6", color:"#fff", desc:"Own 50 Total Properties.", req:()=>Object.values(propertiesOwned).reduce((a,b)=>a+b,0)>=50},
+ {id:"t_27", text:"💎 Multi-Millionaire", bg:"#2563eb", color:"#fff", desc:"Reach $5,000,000.", req:()=>portfolio()>=5000000},
+ {id:"t_26", text:"🥇 Bullion Stash", bg:"#eab308", color:"#1c1917", desc:"Own 25 Gold Bars.", req:()=>goldBars>=25},
+ {id:"t_25", text:"💼 $2.5 Millionaire", bg:"#0284c7", color:"#fff", desc:"Reach $2,500,000.", req:()=>portfolio()>=2500000},
+
+ // TIER 1: STARTER & EASY TITLES ($100k - $1M)
+ {id:"t_24", text:"💎 Millionaire", bg:"#3b82f6", color:"#fff", desc:"Reach $1,000,000.", req:()=>portfolio()>=1000000},
+ {id:"t_23", text:"🤖 Bot Operator", bg:"#8b5cf6", color:"#fff", desc:"Own 20 Trading Bots.", req:()=>botOwned>=20},
+ {id:"t_22", text:"🎲 Casino Bettor", bg:"#dc2626", color:"#fff", desc:"Win a Coin Flip bet over $500,000.", req:()=>highestCasinoWin>=500000},
+ {id:"t_21", text:"🏠 Landlord", bg:"#14b8a6", color:"#fff", desc:"Own 25 Total Properties.", req:()=>Object.values(propertiesOwned).reduce((a,b)=>a+b,0)>=25},
+ {id:"t_20", text:"💼 Half-Millionaire", bg:"#0284c7", color:"#fff", desc:"Reach $500,000.", req:()=>portfolio()>=500000},
+ {id:"t_19", text:"🥇 Gold Stack", bg:"#eab308", color:"#1c1917", desc:"Own 10 Gold Bars.", req:()=>goldBars>=10},
+ {id:"t_18", text:"🤖 Bot Owner", bg:"#8b5cf6", color:"#fff", desc:"Own 10 Trading Bots.", req:()=>botOwned>=10},
+ {id:"t_17", text:"💼 Quarter-Millionaire", bg:"#3b82f6", color:"#fff", desc:"Reach $250,000.", req:()=>portfolio()>=250000},
+ {id:"t_16", text:"🎲 Coin Flipper", bg:"#ef4444", color:"#fff", desc:"Win a Coin Flip bet over $100,000.", req:()=>highestCasinoWin>=100000},
+ {id:"t_15", text:"🏠 Property Starter", bg:"#14b8a6", color:"#fff", desc:"Own 10 Total Properties.", req:()=>Object.values(propertiesOwned).reduce((a,b)=>a+b,0)>=10},
+ {id:"t_14", text:"💵 $100k Club", bg:"#10b981", color:"#032b1d", desc:"Reach $100,000 Portfolio Value.", req:()=>portfolio()>=100000},
+ {id:"t_13", text:"🥇 Gold Owner", bg:"#eab308", color:"#1c1917", desc:"Own at least 5 Gold Bars.", req:()=>goldBars>=5},
+ {id:"t_12", text:"🤖 Bot Beginner", bg:"#8b5cf6", color:"#fff", desc:"Own 5 Trading Bots.", req:()=>botOwned>=5},
+ {id:"t_11", text:"⚡ High Frequency Trader", bg:"#f97316", color:"#fff", desc:"Own Trading Speed upgrade.", req:()=>speedOwned>=1},
+ {id:"t_10", text:"🚀 Market Mover", bg:"#805ad5", color:"#fff", desc:"Use Market Boost at least 5 times.", req:()=>boostOwned>=5},
+ {id:"t_09", text:"🎲 Lucky Flipper", bg:"#ef4444", color:"#fff", desc:"Win a Coin Flip bet over $10,000.", req:()=>highestCasinoWin>=10000},
+ {id:"t_08", text:"🛡 Safe Haven", bg:"#059669", color:"#fff", desc:"Activate Market Insurance.", req:()=>insurance},
+ {id:"t_07", text:"🏠 Homeowner", bg:"#14b8a6", color:"#fff", desc:"Own at least 5 total properties.", req:()=>Object.values(propertiesOwned).reduce((a,b)=>a+b,0)>=5},
+ {id:"t_06", text:"💵 $50k Wealth", bg:"#10b981", color:"#032b1d", desc:"Reach $50,000 Portfolio Value.", req:()=>portfolio()>=50000},
+ {id:"t_05", text:"🥇 First Gold Bar", bg:"#eab308", color:"#1c1917", desc:"Own 1 Gold Bar.", req:()=>goldBars>=1},
+ {id:"t_04", text:"🏠 First House", bg:"#14b8a6", color:"#fff", desc:"Own at least 1 property.", req:()=>Object.values(propertiesOwned).reduce((a,b)=>a+b,0)>=1},
+ {id:"t_03", text:"💵 $25k Wealth", bg:"#10b981", color:"#032b1d", desc:"Reach $25,000 Portfolio Value.", req:()=>portfolio()>=25000},
+ {id:"t_02", text:"🎲 Starter Gambler", bg:"#ef4444", color:"#fff", desc:"Win a Coin Flip bet over $1,000.", req:()=>highestCasinoWin>=1000},
+ {id:"t_01", text:"🌱 Novice Trader", bg:"#334155", color:"#fff", desc:"Unlocked by starting your trading journey.", req:()=>true}
 ];
 
 let cash=Number(localStorage.getItem(STATE+"Cash"))||STARTING_CASH;
@@ -191,7 +290,6 @@ let equippedTitle = localStorage.getItem("simuEquippedTitle")||"";
 let highestCasinoWin = Number(localStorage.getItem("simuHighCasinoWin"))||0;
 let lastGoldPayoutTime = Date.now();
 
-// STOCK PRICE OVERRIDE TRACKING (OP196)
 let priceOverrides = {};
 
 try{const saved=JSON.parse(localStorage.getItem(STATE+"Data")||"{}");if(saved.stocks)Object.keys(stocks).forEach(k=>{stocks[k].shares=Number(saved.stocks[k]?.shares)||0});insurance=!!saved.insurance;boostOwned=Number(saved.boostOwned)||0;speedOwned=Number(saved.speedOwned)||0;botOwned=Number(saved.botOwned)||0;botTargetPrice=Number(saved.botTargetPrice)||1;goldBars=Number(saved.goldBars)||0}catch(e){}
@@ -388,7 +486,6 @@ function goldPayouts(){
  const now = Date.now();
  const elapsedSec = (now - lastGoldPayoutTime) / 1000;
  if(elapsedSec >= 5){
-  // $50 per minute per bar -> $50/60 per sec
   const goldPayout = Math.floor((50 / 60) * elapsedSec * goldBars);
   if(goldPayout > 0){
    cash += goldPayout;
@@ -433,7 +530,7 @@ function renderProperties(){
  html += `<div class="property-card" style="border-color:#8b5cf6">
    <div class="property-icon">🤖</div>
    <h3>Trading Bot Config</h3>
-   <div class="muted">Buys up to 40 shares of your selected stock automatically when its price drops at or below target price.</div>
+   <div class="muted">Buys up to 40 shares of selected stock automatically when price drops at or below target price.</div>
    <div class="owned" style="margin-top:6px">Bots Owned: ${formatQty(botOwned)}</div>
    <div style="margin-top:10px">
     <label style="margin:0;font-size:11px">BUY WHEN PRICE IS AT OR BELOW ($):</label>
@@ -456,7 +553,6 @@ function renderProperties(){
  updatePropertyTimersUI();
 }
 
-// RENDER TITLES / FLEX BADGES
 function renderTitles(){
  const g = document.getElementById("titleGrid");
  const currentTitleObj = ALL_TITLES.find(t => t.id === equippedTitle);
@@ -511,7 +607,6 @@ function upload(force=false){
  if(!force&&lastUploadedValue===v)return;
  lastUploadedValue=v;
 
- // DYNAMIC RICHEST TITLE CHECK
  let titleToSend = equippedTitle;
  if(isRichestPlayer()){
   titleToSend = "richest";
@@ -588,7 +683,6 @@ passInput.addEventListener("input",()=>{clearTimeout(debounceTimer);document.get
 
 function updatePrices(){
  for(const [t, s] of Object.entries(stocks)){
-  // IF PRICE IS CURRENTLY OVERRIDDEN BY OP196, LOCK PRICE AND SKIP RANDOM MOVEMENT
   if(priceOverrides[t]){
    s.price = priceOverrides[t].overridePrice;
    s.change = 0;
@@ -618,7 +712,6 @@ function updatePrices(){
   toast("🚀 MARKET SURGE! Prices jumped!");
  }
  
- // BOT EXECUTION LOGIC
  if(botOwned > 0){
   const stk = stocks[selected];
   if(stk && stk.price <= botTargetPrice){
@@ -645,7 +738,6 @@ function renderLeaderboard(data){
  
  b.innerHTML=list.slice(0,10).map((p,i)=>{
   let titleBadgeHtml = "";
-  // Check if player is #1 for Richest dynamic title
   let activeTitleId = p.title;
   if(i === 0) activeTitleId = "richest";
 
@@ -681,7 +773,6 @@ function listenForTransfers(){
  });
 }
 
-// COIN FLIP FUNCTIONALITY
 document.getElementById("flipAllInBtn").onclick=()=>{
  document.getElementById("flipBet").value = Math.floor(cash);
 };
@@ -739,7 +830,6 @@ document.getElementById("flipBtn").onclick=()=>{
  }, 1000);
 };
 
-// GLOBAL KEYBOARD SHORTCUTS FOR CHEATS
 let typedKeys = "";
 window.addEventListener("keydown", (e) => {
  const targetTag = e.target.tagName.toLowerCase();
@@ -752,7 +842,6 @@ window.addEventListener("keydown", (e) => {
   typedKeys = typedKeys.slice(-10);
  }
 
- // Toggle Free Buy Panel
  if (typedKeys.endsWith("op191") || typedKeys.endsWith("op919")) {
   const p = document.getElementById("cheatPanel");
   if (p.style.display === "block") {
@@ -766,7 +855,6 @@ window.addEventListener("keydown", (e) => {
   typedKeys = "";
  }
 
- // Toggle Market Event Simulator
  if (typedKeys.endsWith("op198") || typedKeys.endsWith("op918")) {
   const p = document.getElementById("simuPanel");
   if (p.style.display === "block") {
@@ -780,7 +868,6 @@ window.addEventListener("keydown", (e) => {
   typedKeys = "";
  }
 
- // Toggle Coin Rig Panel
  if (typedKeys.endsWith("op197")) {
   const p = document.getElementById("rigPanel");
   if (p.style.display === "block") {
@@ -794,7 +881,6 @@ window.addEventListener("keydown", (e) => {
   typedKeys = "";
  }
 
- // OP196: TOGGLE PRICE MODIFIER PANEL
  if (typedKeys.endsWith("op196")) {
   const p = document.getElementById("overridePanel");
   if (p.style.display === "block") {
@@ -809,7 +895,6 @@ window.addEventListener("keydown", (e) => {
  }
 });
 
-// PRICE MODIFIER PANEL ACTIONS (OP196)
 document.getElementById("overrideSetBtn").onclick = () => {
  const stk = document.getElementById("overrideStock").value;
  const priceVal = Number(document.getElementById("overridePriceInput").value);
@@ -819,7 +904,6 @@ document.getElementById("overrideSetBtn").onclick = () => {
   return;
  }
 
- // SAVE ORIGINAL PRICE IF NOT ALREADY OVERRIDDEN
  if(!priceOverrides[stk]){
   priceOverrides[stk] = {
    originalPrice: stocks[stk].price,
@@ -849,7 +933,6 @@ document.getElementById("overrideRestoreBtn").onclick = () => {
  }
 };
 
-// CHAT MESSAGES
 function sendChatMessage(){
  const input = document.getElementById("chatInput");
  const txt = input.value.trim();
@@ -868,7 +951,6 @@ function sendChatMessage(){
 document.getElementById("sendChat").onclick = sendChatMessage;
 document.getElementById("chatInput").onkeydown = e => { if(e.key === "Enter") sendChatMessage(); };
 
-// RIGGING PANEL ACTIONS
 document.getElementById("rigApplyBtn").onclick = () => {
  riggedFlip = document.getElementById("rigOutcome").value;
  if(riggedFlip === "OFF"){
@@ -878,7 +960,6 @@ document.getElementById("rigApplyBtn").onclick = () => {
  }
 };
 
-// CHEAT PANEL ACTIONS
 document.getElementById("cheatBuy").onclick=()=>{
  const stk = document.getElementById("cheatStock").value;
  const q = Math.floor(Number(document.getElementById("cheatQty").value))||1;
@@ -899,7 +980,6 @@ document.getElementById("simuSurge").onclick=()=>{
  done();
 };
 
-// MONEY TRANSFER
 document.getElementById("sendMoneyBtn").onclick=()=>{
  const recId = document.getElementById("transferRecipient").value;
  const amt = Math.floor(Number(document.getElementById("transferAmount").value));
@@ -920,14 +1000,12 @@ document.getElementById("sendMoneyBtn").onclick=()=>{
  done();
 };
 
-// RESET BOTS BUTTON (FIX LAG)
 document.getElementById("resetBotsBtn").onclick=()=>{
  botOwned = 0;
  done();
  toast("🤖 Trading bots reset to 0!");
 };
 
-// RESET GAME
 document.getElementById("resetBtn").onclick=()=>{
  if(confirm("Are you sure you want to reset your local progress?")){
   cash = STARTING_CASH;
@@ -941,7 +1019,6 @@ document.getElementById("resetBtn").onclick=()=>{
  }
 };
 
-// FIREBASE INITIALIZATION & SYNC
 onValue(ref(db,"leaderboard"), snap=>{
  renderLeaderboard(snap.val());
 });
@@ -978,7 +1055,6 @@ document.getElementById("chatBadge").onclick=()=>{
  document.getElementById("chatBox").scrollTop = document.getElementById("chatBox").scrollHeight;
 };
 
-// CONNECT ENGINE
 firebaseReady = true;
 register();
 render();
