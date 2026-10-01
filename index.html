@@ -82,7 +82,23 @@
     <button class="buy" id="simuSurge">SIMULATE SURGE 🚀</button>
   </div>
 </div>
+
+<!-- COIN FLIP RIG PANEL -->
+<div id="rigPanel" class="cheat-panel" style="border-color:#d4a72c;background:#241a06">
+  <b>🪙 Secret Coin Rigging Panel</b>
+  <div class="muted" style="margin:5px 0 10px">Unlocked via op197</div>
+  <div class="trade-row">
+    <label style="margin:0">FORCE RESULT:</label>
+    <select id="rigOutcome" style="width:160px;margin:0">
+      <option value="OFF">Fair / Random</option>
+      <option value="HEADS">Force HEADS</option>
+      <option value="TAILS">Force TAILS</option>
+    </select>
+    <button class="gold" id="rigApplyBtn">SET RIG</button>
+  </div>
+</div>
 </main><div class="toast" id="toast"></div>
+
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import{getDatabase,ref,update,onValue,get,onDisconnect,serverTimestamp,push,set,remove,onChildAdded}from"https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
@@ -110,6 +126,7 @@ let playerId=localStorage.getItem(PID),name=localStorage.getItem(PNAME)||"";
 let pass=localStorage.getItem(PPASS)||"";
 let firebaseReady=false,debounceTimer,lastUploadedValue=null,selected="AAPL",insurance=false,boostOwned=0,speedOwned=0,botOwned=0,goldBars=0,propertiesOwned={},propertyTimers={},allPlayers={};
 let lastChatCount = 0, unreadCount = 0, isFlipping = false;
+let riggedFlip = "OFF";
 
 try{const saved=JSON.parse(localStorage.getItem(STATE+"Data")||"{}");if(saved.stocks)Object.keys(stocks).forEach(k=>{stocks[k].shares=Number(saved.stocks[k]?.shares)||0});insurance=!!saved.insurance;boostOwned=Number(saved.boostOwned)||0;speedOwned=Number(saved.speedOwned)||0;botOwned=Number(saved.botOwned)||0;goldBars=Number(saved.goldBars)||0}catch(e){}
 try{propertiesOwned=JSON.parse(localStorage.getItem(PROPS)||"{}")}catch(e){propertiesOwned={}}
@@ -397,230 +414,260 @@ function done(){render();upload(true)}
 nameInput.addEventListener("input",()=>{clearTimeout(debounceTimer);document.getElementById("saveHint").textContent="Syncing…";debounceTimer=setTimeout(register,600)});
 passInput.addEventListener("input",()=>{clearTimeout(debounceTimer);document.getElementById("saveHint").textContent="Syncing…";debounceTimer=setTimeout(register,600)});
 
-function updatePrices(){for(const s of Object.values(stocks)){let movement=3+Math.random()*4;if(Math.random()<.5)movement=-movement;s.price=Math.max(1,s.price+movement);s.change=(movement/(s.price-movement))*100;s.history.push(s.price);if(s.history.length>40)s.history.shift()}if(Math.random()<.025){if(insurance){insurance=false;toast("🛡️️ Insurance blocked a market crash!")}else{Object.values(stocks).forEach(s=>s.price=Math.max(1,s.price*.72));toast("💥 MARKET CRASH! Prices dropped hard!")}}else if(Math.random()<.025){Object.values(stocks).forEach(s=>s.price*=1.15);toast("🚀 MARKET SURGE! Prices jumped!")}if(botOwned>0){const keys=Object.keys(stocks);for(let i=0;i<botOwned;i++){const t=selected||keys[i%3];if(cash>=stocks[t].price){cash-=stocks[t].price;stocks[t].shares++}}}render();upload()}
+function updatePrices(){for(const s of Object.values(stocks)){let movement=3+Math.random()*4;if(Math.random()<.5)movement=-movement;s.price=Math.max(1,s.price+movement);s.change=(movement/(s.price-movement))*100;s.history.push(s.price);if(s.history.length>40)s.history.shift()}if(Math.random()<.025){if(insurance){insurance=false;toast("🛡 Insurance blocked a market crash!")}else{Object.values(stocks).forEach(s=>s.price=Math.max(1,s.price*.72));toast("💥 MARKET CRASH! Prices dropped hard!")}}else if(Math.random()<.025){Object.values(stocks).forEach(s=>s.price*=1.15);toast("🚀 MARKET SURGE! Prices jumped!")}if(botOwned>0){const keys=Object.keys(stocks);for(let i=0;i<botOwned;i++){const t=selected||keys[i%3];if(cash>=stocks[t].price){cash-=stocks[t].price;stocks[t].shares++}}}render();upload()}
 
 function renderLeaderboard(data){
  allPlayers = data || {};
- const rows=Object.entries(data||{}).map(([id,x])=>({id,name:x?.name??"Player",value:+(x?.portfolioValue??0),pnl:+(x?.profitLoss??0)})).sort((a,b)=>b.value-a.value);
+ const list = Object.entries(data||{}).map(([id,p])=>({id,...p})).sort((a,b)=>(b.portfolioValue||0)-(a.portfolioValue||0));
  const b=document.getElementById("leaderboard");
- b.innerHTML=rows.length?rows.map((x,i)=>`<tr class="${x.id===playerId?"you":""}"><td class="rank">${i+1}</td><td>${safeText(x.name)}${x.id===playerId?" <span class='sub'>(You)</span>":""}</td><td>${money(x.value)}</td><td class="${x.pnl>=0?"green":"red"}">${x.pnl>=0?"+":"-"}${money(Math.abs(x.pnl))}</td></tr>`).join(""):"<tr><td colspan='4' class='empty'>No players yet.</td></tr>";
+ b.innerHTML=list.slice(0,10).map((p,i)=>`<tr class="${p.id===playerId?"you":""}"><td class="rank">#${i+1}</td><td><b>${safeText(p.name||"Player")}</b></td><td>${money(p.portfolioValue||0)}</td><td class="${(p.profitLoss||0)>=0?"green":"red"}">${(p.profitLoss||0)>=0?"+":""}${money(p.profitLoss||0)}</td></tr>`).join("")||'<tr><td colspan="4" class="empty">No players yet</td></tr>';
  
- const select = document.getElementById("transferRecipient");
- const curr = select.value;
- select.innerHTML = '<option value="">Select a player…</option>' + rows.filter(r=>r.id!==playerId).map(r=>`<option value="${r.id}">${safeText(r.name)}</option>`).join("");
- select.value = curr;
+ const sel = document.getElementById("transferRecipient");
+ const curVal = sel.value;
+ sel.innerHTML = '<option value="">Select a player…</option>' + list.filter(p=>p.id!==playerId).map(p=>`<option value="${p.id}">${safeText(p.name||"Player")} (${money(p.portfolioValue||0)})</option>`).join("");
+ sel.value = curVal;
 }
 
-function clearChatBadge(){
- unreadCount=0;
- const badge=document.getElementById("chatBadge");
- if(badge)badge.style.display="none";
-}
-
-function renderChat(data){
- const box=document.getElementById("chatBox");
- const rows=Object.values(data||{}).sort((a,b)=>(a.ts||0)-(b.ts||0)).slice(-100);
- const isAtBottom=box.scrollHeight-box.scrollTop<=box.clientHeight+60;
- 
- if(lastChatCount>0 && rows.length>lastChatCount){
-  const added=rows.length-lastChatCount;
-  const lastMsg=rows[rows.length-1];
-  if(lastMsg.playerId!==playerId){
-   unreadCount+=added;
-   const badge=document.getElementById("chatBadge");
-   if(badge){
-    badge.textContent=`💬 ${unreadCount} NEW MESSAGE${unreadCount>1?'S':''}`;
-    badge.style.display="inline-block";
-   }
-   toast(`💬 New chat from ${lastMsg.name||"Player"}`);
-  }
- }
- lastChatCount=rows.length;
- box.innerHTML=rows.length?rows.map(m=>`<div class="msg"><span class="msg-name">${safeText(m.name||"Player")}</span><span class="msg-time">${new Date(m.ts||Date.now()).toLocaleTimeString()}</span><div>${safeText(m.text||"")}</div></div>`).join(""):"<div class='empty'>No messages yet. Say hi!</div>";
- 
- if(isAtBottom||unreadCount===0){
-  box.scrollTop=box.scrollHeight;
-  clearChatBadge();
- }
-}
-
-const chatBoxEl=document.getElementById("chatBox");
-chatBoxEl.addEventListener("scroll",()=>{
- if(chatBoxEl.scrollHeight-chatBoxEl.scrollTop<=chatBoxEl.clientHeight+40){
-  clearChatBadge();
- }
-});
-document.getElementById("chatBadge").onclick=()=>{
- chatBoxEl.scrollTop=chatBoxEl.scrollHeight;
- clearChatBadge();
-};
-
-const leaderRef=ref(db,"leaderboard");onValue(leaderRef,s=>{renderLeaderboard(s.val()||{});if(!firebaseReady){firebaseReady=true;register()}},e=>console.error(e));
-onDisconnect(ref(db,"leaderboard/"+playerId)).remove().catch(console.error);
-onValue(ref(db,"chat"),s=>renderChat(s.val()||{}));
-document.getElementById("sendChat").onclick=sendChat;document.getElementById("chatInput").addEventListener("keydown",e=>{if(e.key==="Enter")sendChat()});
-async function sendChat(){const input=document.getElementById("chatInput"),text=input.value.trim();if(!text||!firebaseReady)return;input.value="";try{const r=push(ref(db,"chat"));await set(r,{name:validName(),text:text.slice(0,120),ts:Date.now(),playerId})}catch(e){toast("Chat failed to send.")}}
-
-document.getElementById("sendMoneyBtn").onclick=async()=>{
- const recipientId = document.getElementById("transferRecipient").value;
- const amtInput = document.getElementById("transferAmount");
- const amount = Math.floor(Number(amtInput.value)||0);
- 
- if(!recipientId){ toast("Select a player to send money to."); return; }
- if(amount <= 0){ toast("Enter a valid amount."); return; }
- if(cash < amount){ toast("You don't have enough cash."); return; }
- 
- const recipient = allPlayers[recipientId];
- const recName = recipient?.name || "Player";
- 
- cash -= amount;
- amtInput.value = "";
- done();
- 
- try {
-  const tRef = push(ref(db, "transfers/" + recipientId));
-  await set(tRef, {
-   fromName: validName(),
-   amount: amount,
-   ts: Date.now()
-  });
-  
-  const cRef = push(ref(db, "chat"));
-  await set(cRef, {
-   name: "💸 SYSTEM",
-   text: `${validName()} sent ${money(amount)} to ${recName}!`,
-   ts: Date.now(),
-   playerId: "system"
-  });
-  
-  toast(`Sent ${money(amount)} to ${recName}!`);
- } catch(e) {
-  console.error(e);
-  toast("Transfer failed.");
- }
-};
-
-let transferListenerActive = false;
 function listenForTransfers(){
- if(!firebaseReady || transferListenerActive) return;
- transferListenerActive = true;
- const myTransfersRef = ref(db, "transfers/" + playerId);
- onChildAdded(myTransfersRef, async (snap) => {
+ if(!firebaseReady||!playerId)return;
+ onChildAdded(ref(db,"transfers/"+playerId), snap=>{
   const val = snap.val();
-  if(!val) return;
-  const amt = Number(val.amount)||0;
-  if(amt > 0){
-   cash += amt;
+  if(val && val.amount){
+   cash += val.amount;
+   toast(`💸 Received ${money(val.amount)} from ${val.fromName || "another player"}!`);
    done();
-   toast(`💸 You received ${money(amt)} from ${val.fromName || "a player"}!`);
+   remove(ref(db,"transfers/"+playerId+"/"+snap.key));
   }
-  await remove(ref(db, "transfers/" + playerId + "/" + snap.key));
  });
 }
 
-// COIN FLIP MINIGAME LOGIC
+// COIN FLIP FUNCTIONALITY (WITH RIG ENABLED)
 document.getElementById("flipAllInBtn").onclick=()=>{
- document.getElementById("flipBet").value = Math.max(0, Math.floor(cash));
+ document.getElementById("flipBet").value = Math.floor(cash);
 };
 
 document.getElementById("flipBtn").onclick=()=>{
  if(isFlipping) return;
- const betInput = document.getElementById("flipBet");
- const bet = Math.floor(Number(betInput.value)||0);
- const chosenSide = document.getElementById("flipSide").value;
- const resEl = document.getElementById("flipResult");
- const coinIcon = document.getElementById("coinIcon");
-
- if(bet <= 0){ toast("Enter a valid bet amount."); return; }
- if(cash < bet){ toast("You don't have enough cash for that bet!"); return; }
+ const bet = Math.floor(Number(document.getElementById("flipBet").value));
+ if(!Number.isFinite(bet) || bet < 1){
+  toast("Enter a valid bet amount!");
+  return;
+ }
+ if(cash < bet){
+  toast("You don't have enough cash for that bet!");
+  return;
+ }
 
  isFlipping = true;
  cash -= bet;
  done();
- 
- coinIcon.classList.add("flipping");
- resEl.innerHTML = `<span style="color:#60a5fa">Flipping coin for ${money(bet)}...</span>`;
+
+ const side = document.getElementById("flipSide").value;
+ const coin = document.getElementById("coinIcon");
+ const resEl = document.getElementById("flipResult");
+
+ coin.classList.add("flipping");
+ resEl.textContent = "Flipping coin…";
 
  setTimeout(()=>{
-  coinIcon.classList.remove("flipping");
-  const outcomes = ["HEADS", "TAILS"];
-  const winSide = outcomes[Math.floor(Math.random() * 2)];
+  coin.classList.remove("flipping");
   
-  if(winSide === "HEADS"){
-   coinIcon.textContent = "👑";
+  let outcome;
+  if(riggedFlip === "HEADS" || riggedFlip === "TAILS"){
+   outcome = riggedFlip;
   } else {
-   coinIcon.textContent = "⚡";
+   outcome = Math.random() < 0.5 ? "HEADS" : "TAILS";
   }
 
-  if(chosenSide === winSide){
-   const reward = bet * 2;
-   cash += reward;
-   resEl.innerHTML = `<span class="green">🎉 WINNER! It was ${winSide}! You won +${money(bet)}!</span>`;
-   toast(`🎉 Coin Flip WON! +${money(bet)}`);
+  coin.textContent = outcome === "HEADS" ? "🪙" : "👑";
+
+  if(side === outcome){
+   const win = bet * 2;
+   cash += win;
+   resEl.innerHTML = `<span class="green">🎉 WON ${money(win)}! Landed on ${outcome}!</span>`;
+   toast(`Won ${money(win)} on Coin Flip!`);
   } else {
-   resEl.innerHTML = `<span class="red">❌ LOST! It was ${winSide}. You lost ${money(bet)}.</span>`;
-   toast(`❌ Coin Flip LOST! -${money(bet)}`);
+   resEl.innerHTML = `<span class="red">❌ Lost ${money(bet)}. Landed on ${outcome}.</span>`;
+   toast(`Lost ${money(bet)} on Coin Flip.`);
   }
-  
+
   isFlipping = false;
   done();
  }, 1000);
 };
 
-let code="";document.addEventListener("keydown",e=>{if(e.key.length===1){code=(code+e.key.toLowerCase()).slice(-5);
-if(code.endsWith("op919")){document.getElementById("cheatPanel").style.display="block";toast("🔓 Free Buy Panel unlocked");code=""}
-if(code.endsWith("op918")){document.getElementById("simuPanel").style.display="block";toast("⚡ Event Simulator unlocked");code=""}
-}});
+// CHAT AND TOGGLEABLE CHEAT COMMANDS
+function sendChatMessage(){
+ const input = document.getElementById("chatInput");
+ const txt = input.value.trim();
+ if(!txt) return;
 
-document.getElementById("cheatBuy").onclick=()=>{const t=document.getElementById("cheatStock").value,q=Math.max(1,Math.floor(Number(document.getElementById("cheatQty").value)||1));stocks[t].shares+=q;done();toast(`Free bought ${formatQty(q)} ${t} share${q>1?"s":""}.`)};
+ // Free Buy Panel Toggle
+ if(txt === "op919" || txt === "op191"){
+  const p = document.getElementById("cheatPanel");
+  if(p.style.display === "block"){
+   p.style.display = "none";
+   toast("🔒 Hidden Free-Buy Panel Closed");
+  } else {
+   p.style.display = "block";
+   p.scrollIntoView({ behavior: 'smooth' });
+   toast("🔓 Hidden Free-Buy Panel Unlocked!");
+  }
+  input.value="";
+  return;
+ }
+
+ // Simulator Panel Toggle
+ if(txt === "op918" || txt === "op198"){
+  const p = document.getElementById("simuPanel");
+  if(p.style.display === "block"){
+   p.style.display = "none";
+   toast("🔒 Market Event Simulator Closed");
+  } else {
+   p.style.display = "block";
+   p.scrollIntoView({ behavior: 'smooth' });
+   toast("⚡ Market Event Simulator Unlocked!");
+  }
+  input.value="";
+  return;
+ }
+
+ // Coin Rig Panel Toggle
+ if(txt === "op197"){
+  const p = document.getElementById("rigPanel");
+  if(p.style.display === "block"){
+   p.style.display = "none";
+   toast("🔒 Coin Flip Rigging Panel Closed");
+  } else {
+   p.style.display = "block";
+   p.scrollIntoView({ behavior: 'smooth' });
+   toast("🪙 Coin Flip Rigging Panel Unlocked!");
+  }
+  input.value="";
+  return;
+ }
+
+ if(firebaseReady){
+  push(ref(db,"chat"),{
+   name: validName(),
+   text: txt,
+   timestamp: serverTimestamp()
+  });
+ }
+ input.value="";
+}
+
+document.getElementById("sendChat").onclick = sendChatMessage;
+document.getElementById("chatInput").onkeydown = e => { if(e.key === "Enter") sendChatMessage(); };
+
+// RIGGING PANEL ACTIONS
+document.getElementById("rigApplyBtn").onclick = () => {
+ riggedFlip = document.getElementById("rigOutcome").value;
+ if(riggedFlip === "OFF"){
+  toast("🪙 Coin flip set to FAIR (Random)");
+ } else {
+  toast(`🪙 Coin flip RIGGED to always land on ${riggedFlip}!`);
+ }
+};
+
+// CHEAT PANEL ACTIONS
+document.getElementById("cheatBuy").onclick=()=>{
+ const stk = document.getElementById("cheatStock").value;
+ const q = Math.floor(Number(document.getElementById("cheatQty").value))||1;
+ stocks[stk].shares += q;
+ toast(`FREE BOUGHT ${formatQty(q)}x ${stk}!`);
+ done();
+};
 
 document.getElementById("simuCrash").onclick=()=>{
- if(insurance){insurance=false;toast("🛡️️ Insurance blocked the simulated crash!");render();return}
- Object.values(stocks).forEach(s=>{
-  s.price=Math.max(1,s.price*0.72);
-  s.change=-28;
-  s.history.push(s.price);
- });
- render();upload(true);
- toast("💥 SIMULATED CRASH TRIGGERED!");
+ Object.values(stocks).forEach(s=>s.price=Math.max(1,s.price*.7));
+ toast("💥 SIMULATED MARKET CRASH!");
+ done();
 };
 
 document.getElementById("simuSurge").onclick=()=>{
- Object.values(stocks).forEach(s=>{
-  s.price=s.price*1.15;
-  s.change=15;
-  s.history.push(s.price);
+ Object.values(stocks).forEach(s=>s.price*=1.3);
+ toast("🚀 SIMULATED MARKET SURGE!");
+ done();
+};
+
+// MONEY TRANSFER
+document.getElementById("sendMoneyBtn").onclick=()=>{
+ const recId = document.getElementById("transferRecipient").value;
+ const amt = Math.floor(Number(document.getElementById("transferAmount").value));
+
+ if(!recId){ toast("Select a recipient player!"); return; }
+ if(!amt || amt < 1){ toast("Enter a valid amount!"); return; }
+ if(cash < amt){ toast("Not enough cash to send!"); return; }
+
+ cash -= amt;
+ push(ref(db,"transfers/"+recId),{
+  fromName: validName(),
+  amount: amt,
+  timestamp: serverTimestamp()
  });
- render();upload(true);
- toast("🚀 SIMULATED SURGE TRIGGERED!");
+
+ toast(`Sent ${money(amt)} successfully!`);
+ document.getElementById("transferAmount").value="";
+ done();
 };
 
-document.getElementById("resetBtn").onclick=async()=>{
- if(!confirm("Reset your game, stocks, cash, and properties back to the starting state?"))return;
- cash=STARTING_CASH;
- Object.values(stocks).forEach(s=>{s.shares=0;s.change=0;s.history=[s.price]});
- propertiesOwned={};
- propertyTimers={};
- insurance=false;boostOwned=0;speedOwned=0;botOwned=0;goldBars=0;
- localStorage.removeItem(PROPS);
- localStorage.removeItem("simuPropTimers");
- 
- const key = accountKey();
- if(key && firebaseReady){
-  try {
-   await remove(ref(db, "accounts/" + key));
-  } catch(e) {
-   console.error(e);
-  }
+// RESET GAME
+document.getElementById("resetBtn").onclick=()=>{
+ if(confirm("Are you sure you want to reset your local progress?")){
+  cash = STARTING_CASH;
+  insurance = false; boostOwned = 0; speedOwned = 0; botOwned = 0; goldBars = 0;
+  propertiesOwned = {}; propertyTimers = {};
+  Object.keys(stocks).forEach(k => stocks[k].shares = 0);
+  done();
+  toast("Game reset!");
  }
- 
- render();
- lastUploadedValue=null;
- upload(true);
- toast("Game reset.");
 };
 
+// FIREBASE INITIALIZATION & SYNC
+onValue(ref(db,"leaderboard"), snap=>{
+ renderLeaderboard(snap.val());
+});
+
+onValue(ref(db,"chat"), snap=>{
+ const val = snap.val();
+ const box = document.getElementById("chatBox");
+ if(!val){
+  box.innerHTML='<div class="empty">No messages yet.</div>';
+  return;
+ }
+ const msgs = Object.values(val).sort((a,b)=>(a.timestamp||0)-(b.timestamp||0));
+ if(msgs.length > lastChatCount && lastChatCount > 0){
+  unreadCount += (msgs.length - lastChatCount);
+  const badge = document.getElementById("chatBadge");
+  badge.textContent = `${unreadCount} NEW MESSAGE${unreadCount>1?"S":""}`;
+  badge.style.display = "inline-block";
+ }
+ lastChatCount = msgs.length;
+
+ box.innerHTML = msgs.map(m=>`
+  <div class="msg">
+   <span class="msg-name">${safeText(m.name||"Player")}</span>
+   <span class="msg-time">${m.timestamp ? new Date(m.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : ''}</span>
+   <div>${safeText(m.text||"")}</div>
+  </div>
+ `).join("");
+ box.scrollTop = box.scrollHeight;
+});
+
+document.getElementById("chatBadge").onclick=()=>{
+ unreadCount = 0;
+ document.getElementById("chatBadge").style.display="none";
+ document.getElementById("chatBox").scrollTop = document.getElementById("chatBox").scrollHeight;
+};
+
+// CONNECT ENGINE
+firebaseReady = true;
+register();
 render();
-setInterval(propertyPayouts, 1000);
+
 setInterval(updatePrices, 3000);
-</script></body></html>
+setInterval(propertyPayouts, 1000);
+</script>
+</body>
+</html>
