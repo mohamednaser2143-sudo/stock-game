@@ -48,6 +48,30 @@
     <button id="resetBotsBtn" class="purple">Clear Bots (Fix Lag)</button>
     <button id="resetBtn" class="neutral">Reset My Game</button>
   </div>
+
+  <!-- MY SHOP & PLAYER MARKETPLACE SECTION -->
+  <div class="p2p-box">
+    <div class="section-title">
+      <h3 style="margin:0">🏪 My Shop & Player Market</h3>
+      <select id="p2pViewPlayer" style="width:auto;margin:0;padding:6px 10px"><option value="">View Player's Store…</option></select>
+    </div>
+    
+    <!-- LIST AN ITEM FORM -->
+    <div style="margin-top:10px;padding-top:10px;border-top:1px solid #1e2d42">
+      <div class="sub" style="margin-bottom:6px">List Your Asset or OP Item for Sale:</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <select id="p2pItemSelect" style="flex:1;margin:0"></select>
+        <input id="p2pPriceInput" type="number" min="1" placeholder="Sell Price ($)" style="width:130px;margin:0">
+        <button class="gold" id="p2pListBtn">LIST ITEM</button>
+      </div>
+    </div>
+
+    <!-- VIEW MARKETPLACE ITEMS -->
+    <div style="margin-top:12px">
+      <div id="p2pStoreTitle" class="muted" style="font-weight:700">Viewing: Your Listings</div>
+      <div class="p2p-grid" id="p2pGrid"><div class="empty" style="grid-column:1/-1">No items listed.</div></div>
+    </div>
+  </div>
 </div></div>
 
 <div class="card selected"><div class="section-title"><h2>📈 SELECTED STOCK</h2><span class="muted">Click a stock to inspect it</span></div><div class="stock-tabs" id="stockTabs"></div><div class="selected-main"><div><div class="sub" id="selectedName">Apple (AAPL)</div><div class="selected-price" id="selectedPrice">$225.00</div><div class="selected-change green" id="selectedChange">▲ +0.00%</div><div class="trade-box"><div class="trade-row"><input id="qty" class="qty" type="number" min="1" step="1" value="1"><button class="buy" id="buyQtyBtn">BUY QTY</button><button class="buy" id="buyAllBtn">BUY ALL</button><button class="sell" id="sellQtyBtn">SELL QTY</button><button class="sell" id="sellAllBtn">SELL ALL</button></div><div class="muted" style="margin-top:8px">Shares owned: <b id="selectedShares">0</b> • Can buy: <b id="canBuy">0</b></div></div></div><canvas id="bigChart" class="big-chart" width="800" height="260"></canvas></div></div>
@@ -65,35 +89,7 @@
   <div class="shop-grid" id="shopGrid"></div>
 </div>
 
-<div class="card" style="margin-top:18px">
-  <div class="section-title"><h2>🏠 My Properties & Assets</h2><span class="muted">Your assets generate cash or auto-buy stocks</span></div>
-  <div class="property-grid" id="propertyGrid"></div>
-
-  <!-- MY SHOP & PLAYER MARKETPLACE SECTION (RELOCATED HERE UNDER PROPERTIES & ASSETS) -->
-  <div class="p2p-box">
-    <div class="section-title">
-      <h3 style="margin:0">🏪 My Shop & Player Market</h3>
-      <select id="p2pViewPlayer" style="width:auto;margin:0;padding:6px 10px"><option value="">View Player's Store…</option></select>
-    </div>
-    
-    <!-- LIST AN ITEM FORM WITH AMOUNT AND SELL PRICE -->
-    <div style="margin-top:10px;padding-top:10px;border-top:1px solid #1e2d42">
-      <div class="sub" style="margin-bottom:6px">List Your Asset, Stock Shares, or OP Item for Sale:</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
-        <select id="p2pItemSelect" style="flex:1.5;margin:0"></select>
-        <input id="p2pAmountInput" type="number" min="1" step="1" value="1" placeholder="Amount / Qty" style="width:110px;margin:0">
-        <input id="p2pPriceInput" type="number" min="1" step="1" placeholder="Sell Price ($)" style="width:130px;margin:0">
-        <button class="gold" id="p2pListBtn">LIST ITEM</button>
-      </div>
-    </div>
-
-    <!-- VIEW MARKETPLACE ITEMS -->
-    <div style="margin-top:12px">
-      <div id="p2pStoreTitle" class="muted" style="font-weight:700">Viewing: Your Listings</div>
-      <div class="p2p-grid" id="p2pGrid"><div class="empty" style="grid-column:1/-1">No items listed.</div></div>
-    </div>
-  </div>
-</div>
+<div class="card" style="margin-top:18px"><div class="section-title"><h2>🏠 My Properties & Assets</h2><span class="muted">Your assets generate cash or auto-buy stocks</span></div><div class="property-grid" id="propertyGrid"></div></div>
 
 <!-- 100 TITLES & PRESTIGE BADGES SECTION -->
 <div class="card" style="margin-top:18px">
@@ -176,11 +172,6 @@
   </div>
 </div>
 
-<div id="op915Panel" class="cheat-panel" style="border-color:#ec4899;background:#2e0828">
-  <b>⚡ OP Item Auto-Grabber (cheat op915)</b>
-  <div class="muted" style="margin:5px 0 10px">Status: <span id="op915StatusText" style="color:#f472b6;font-weight:bold">ACTIVE - Auto-Grabbing drops instantly!</span></div>
-</div>
-
 <!-- OP195 PLAYER STOCK CONTROL PANEL -->
 <div id="playerControlPanel" class="cheat-panel" style="border-color:#10b981;background:#042318">
   <b>🎮 Player Stock Control Panel</b>
@@ -229,27 +220,197 @@ const shopItems={
  mystery:{type:"mystery",name:"Mystery Box",icon:"🎁",cost:2000,desc:"Random reward, loss, stock, upgrade, or chaos."}
 };
 
+// 50+ OVERPOWERED RANDOM ITEMS FOR THE 3-MINUTE SHOP SPAWNER
 const OVERPOWERED_ITEMS = [
+  // 1-10: INFINITE MONEY PRINTING GENERATORS
   {id:"op_gen_1", name:"Quantum Cash Machine", icon:"🌀", cost:50000, desc:"Generates +$10,000 passive income every single second!", effect:{type:"income", amount:10000}},
   {id:"op_gen_2", name:"Federal Reserve Press", icon:"💵", cost:150000, desc:"Generates +$50,000 passive income every single second!", effect:{type:"income", amount:50000}},
   {id:"op_gen_3", name:"Sub-Atomic Money Mint", icon:"⚛️", cost:500000, desc:"Generates +$250,000 passive income every single second!", effect:{type:"income", amount:250000}},
   {id:"op_gen_4", name:"Dark Matter Synthesizer", icon:"🌌", cost:2500000, desc:"Generates +$1,000,000 passive cash per second!", effect:{type:"income", amount:1000000}},
   {id:"op_gen_5", name:"Galactic Money Matrix", icon:"🪐", cost:10000000, desc:"Generates +$5,000,000 passive income every second!", effect:{type:"income", amount:5000000}},
+  {id:"op_gen_6", name:"Multiverse Treasury", icon:"🔮", cost:50000000, desc:"Generates +$25,000,000 passive income every second!", effect:{type:"income", amount:25000000}},
+  {id:"op_gen_7", name:"Time-Dilation Vault", icon:"⏳", cost:250000000, desc:"Generates +$100,000,000 passive income every second!", effect:{type:"income", amount:100000000}},
+  {id:"op_gen_8", name:"Infinite Money Vortex", icon:"🌀", cost:1000000000, desc:"Generates +$500,000,000 passive income every second!", effect:{type:"income", amount:500000000}},
+  {id:"op_gen_9", name:"Cosmic Duplicator", icon:"✨", cost:5000000000, desc:"Generates +$2,500,000,000 passive income every second!", effect:{type:"income", amount:2500000000}},
+  {id:"op_gen_10", name:"Sovereign Wealth Core", icon:"👑", cost:25000000000, desc:"Generates +$10,000,000,000 passive income every second!", effect:{type:"income", amount:10000000000}},
+
+  // 11-20: INSTANT BILLIONS & TRILLIONS CASH DROPS
   {id:"op_cash_11", name:"Secret Oligarch Safe", icon:"🧰", cost:10000, desc:"Grants an instant +$1,000,000 Cash payout!", effect:{type:"cash", amount:1000000}},
   {id:"op_cash_12", name:"Central Bank Wire", icon:"🏦", cost:100000, desc:"Grants an instant +$25,000,000 Cash payout!", effect:{type:"cash", amount:25000000}},
-  {id:"op_title_21", name:"Title: 👑 Ruler of Reality", icon:"👑", cost:1000000, desc:"Unlocks and equips title '👑 Ruler of Reality'.", effect:{type:"title", titleId:"t_title_21", titleText:"👑 Ruler of Reality", bg:"linear-gradient(45deg,#ec4899,#8b5cf6)", color:"#fff"}},
+  {id:"op_cash_13", name:"Offshore Account Transfer", icon:"🏝️", cost:500000, desc:"Grants an instant +$100,000,000 Cash payout!", effect:{type:"cash", amount:100000000}},
+  {id:"op_cash_14", name:"Sovereign Vault Payout", icon:"🏛️", cost:2000000, desc:"Grants an instant +$500,000,000 Cash payout!", effect:{type:"cash", amount:500000000}},
+  {id:"op_cash_15", name:"Trillionaire's Checkbook", icon:"💳", cost:10000000, desc:"Grants an instant +$2,500,000,000 Cash payout!", effect:{type:"cash", amount:2500000000}},
+  {id:"op_cash_16", name:"Billionaire Trust Fund", icon:"💼", cost:50000000, desc:"Grants an instant +$10,000,000,000 Cash payout!", effect:{type:"cash", amount:10000000000}},
+  {id:"op_cash_17", name:"Supernova Capital Grant", icon:"💥", cost:250000000, desc:"Grants an instant +$50,000,000,000 Cash payout!", effect:{type:"cash", amount:50000000000}},
+  {id:"op_cash_18", name:"Global Monopoly Grant", icon:"🎩", cost:1000000000, desc:"Grants an instant +$250,000,000,000 Cash payout!", effect:{type:"cash", amount:250000000000}},
+  {id:"op_cash_19", name:"Interstellar Wealth Wire", icon:"📡", cost:5000000000, desc:"Grants an instant +$1,000,000,000,000 Cash payout!", effect:{type:"cash", amount:1000000000000}},
+  {id:"op_cash_20", name:"Infinity Capital Injector", icon:"💎", cost:25000000000, desc:"Grants an instant +$10,000,000,000,000 Cash payout!", effect:{type:"cash", amount:10000000000000}},
+
+  // 21-30: PRESTIGE TITLES
+  {id:"op_title_21", name:"Title: 👑 Ruler of Reality", icon:"👑", cost:1000000, desc:"Unlocks and equips the custom prestige title '👑 Ruler of Reality'.", effect:{type:"title", titleId:"t_title_21", titleText:"👑 Ruler of Reality", bg:"linear-gradient(45deg,#ec4899,#8b5cf6)", color:"#fff"}},
+  {id:"op_title_22", name:"Title: 🌌 Sovereign of Existence", icon:"🌌", cost:5000000, desc:"Unlocks and equips the custom title '🌌 Sovereign of Existence'.", effect:{type:"title", titleId:"t_title_22", titleText:"🌌 Sovereign of Existence", bg:"linear-gradient(45deg,#3b82f6,#10b981)", color:"#fff"}},
+  {id:"op_title_23", name:"Title: ⚡ Stock Market Architect", icon:"⚡", cost:25000000, desc:"Unlocks and equips the custom title '⚡ Stock Market Architect'.", effect:{type:"title", titleId:"t_title_23", titleText:"⚡ Stock Market Architect", bg:"linear-gradient(45deg,#f59e0b,#ef4444)", color:"#fff"}},
+  {id:"op_title_24", name:"Title: 🔮 Infinite Wealth God", icon:"🔮", cost:100000000, desc:"Unlocks and equips the custom title '🔮 Infinite Wealth God'.", effect:{type:"title", titleId:"t_title_24", titleText:"🔮 Infinite Wealth God", bg:"linear-gradient(45deg,#8b5cf6,#d97706)", color:"#fff"}},
+  {id:"op_title_25", name:"Title: 🪐 Cosmic Monopoly Master", icon:"🪐", cost:500000000, desc:"Unlocks and equips the custom title '🪐 Cosmic Monopoly Master'.", effect:{type:"title", titleId:"t_title_25", titleText:"🪐 Cosmic Monopoly Master", bg:"linear-gradient(45deg,#06b6d4,#3b82f6)", color:"#fff"}},
+  {id:"op_title_26", name:"Title: 💎 Diamond Hands Emperor", icon:"💎", cost:2500000000, desc:"Unlocks and equips the custom title '💎 Diamond Hands Emperor'.", effect:{type:"title", titleId:"t_title_26", titleText:"💎 Diamond Hands Emperor", bg:"linear-gradient(45deg,#38bdf8,#818cf8)", color:"#fff"}},
+  {id:"op_title_27", name:"Title: 🔥 Transcendent Tycoon", icon:"🔥", cost:10000000000, desc:"Unlocks and equips the custom title '🔥 Transcendent Tycoon'.", effect:{type:"title", titleId:"t_title_27", titleText:"🔥 Transcendent Tycoon", bg:"linear-gradient(45deg,#f97316,#dc2626)", color:"#fff"}},
+  {id:"op_title_28", name:"Title: 👁️ Omnipotent Market Lord", icon:"👁️️", cost:50000000000, desc:"Unlocks and equips the custom title '👁️️ Omnipotent Market Lord'.", effect:{type:"title", titleId:"t_title_28", titleText:"👁️ Omnipotent Market Lord", bg:"linear-gradient(45deg,#10b981,#059669)", color:"#fff"}},
+  {id:"op_title_29", name:"Title: 🌀 Void Wealth Titan", icon:"🌀", cost:250000000000, desc:"Unlocks and equips the custom title '🌀 Void Wealth Titan'.", effect:{type:"title", titleId:"t_title_29", titleText:"🌀 Void Wealth Titan", bg:"linear-gradient(45deg,#6366f1,#4f46e5)", color:"#fff"}},
+  {id:"op_title_30", name:"Title: ♾️ Eternal Market Deity", icon:"♾️", cost:1000000000000, desc:"Unlocks and equips the ultimate title '♾️ Eternal Market Deity'.", effect:{type:"title", titleId:"t_title_30", titleText:"♾️ Eternal Market Deity", bg:"linear-gradient(45deg,#f59e0b,#eab308)", color:"#000"}},
+
+  // 31-40: STOCK SHARE MULTIPLIER PACKETS
   {id:"op_stock_31", name:"Apple Stock Takeover (10,000 AAPL)", icon:"🍏", cost:100000, desc:"Instantly adds +10,000 AAPL shares directly to your portfolio!", effect:{type:"shares", stock:"AAPL", amount:10000}},
+  {id:"op_stock_32", name:"Tesla Fleet Control (10,000 TSLA)", icon:"⚡", cost:200000, desc:"Instantly adds +10,000 TSLA shares directly to your portfolio!", effect:{type:"shares", stock:"TSLA", amount:10000}},
+  {id:"op_stock_33", name:"Coca-Cola Monopoly (50,000 KO)", icon:"🥤", cost:150000, desc:"Instantly adds +50,000 KO shares directly to your portfolio!", effect:{type:"shares", stock:"KO", amount:50000}},
+  {id:"op_stock_34", name:"Mega Apple Vault (100,000 AAPL)", icon:"🍏", cost:1000000, desc:"Instantly adds +100,000 AAPL shares directly to your portfolio!", effect:{type:"shares", stock:"AAPL", amount:100000}},
+  {id:"op_stock_35", name:"Tesla Gigafactory Stash (100,000 TSLA)", icon:"⚡", cost:2000000, desc:"Instantly adds +100,000 TSLA shares directly to your portfolio!", effect:{type:"shares", stock:"TSLA", amount:100000}},
+  {id:"op_stock_36", name:"Coca-Cola Treasury (500,000 KO)", icon:"🥤", cost:1500000, desc:"Instantly adds +500,000 KO shares directly to your portfolio!", effect:{type:"shares", stock:"KO", amount:500000}},
+  {id:"op_stock_37", name:"Cosmic Apple Injection (1,000,000 AAPL)", icon:"🍏", cost:10000000, desc:"Instantly adds +1,000,000 AAPL shares to your portfolio!", effect:{type:"shares", stock:"AAPL", amount:1000000}},
+  {id:"op_stock_38", name:"Galactic Tesla Dominance (1,000,000 TSLA)", icon:"⚡", cost:20000000, desc:"Instantly adds +1,000,000 TSLA shares to your portfolio!", effect:{type:"shares", stock:"TSLA", amount:1000000}},
+  {id:"op_stock_39", name:"Global Coca-Cola Reserve (5,000,000 KO)", icon:"🥤", cost:15000000, desc:"Instantly adds +5,000,000 KO shares to your portfolio!", effect:{type:"shares", stock:"KO", amount:5000000}},
+  {id:"op_stock_40", name:"Omnipotent Share Packet (10,000,000 All)", icon:"📦", cost:100000000, desc:"Instantly adds +10,000,000 shares to ALL 3 stocks!", effect:{type:"all_shares", amount:10000000}},
+
+  // 41-45: OP LUCKY MYSTERY BOXES
+  {id:"op_mystery_41", name:"Cosmic OP Mystery Box", icon:"🎁", cost:25000, desc:"Contains high-tier random cash rewards or huge stock packs!", effect:{type:"op_mystery", tier:1}},
+  {id:"op_mystery_42", name:"Infinity Loot Chest", icon:"🧰", cost:250000, desc:"Guarantees at least +$10,000,000 cash or rare property drops!", effect:{type:"op_mystery", tier:2}},
+  {id:"op_mystery_43", name:"Omni-God Mystery Vault", icon:"💎", cost:2500000, desc:"Contains up to +$100,000,000 cash, 50,000 Gold Bars, or 100 Bots!", effect:{type:"op_mystery", tier:3}},
+  {id:"op_mystery_44", name:"Multiverse Secret Box", icon:"🔮", cost:25000000, desc:"Unlocks massive trillion-dollar rewards or cosmic passive items!", effect:{type:"op_mystery", tier:4}},
+  {id:"op_mystery_45", name:"Ultimate Reality Crate", icon:"🌌", cost:250000000, desc:"The most overpowered crate in existence!", effect:{type:"op_mystery", tier:5}},
+
+  // 46-52: SUPERCHARGED BOT & SPEED FLEETS
   {id:"op_bot_46", name:"Wall Street AI Supercomputer", icon:"🖥️", cost:50000, desc:"Instantly grants +100 Trading Bots!", effect:{type:"bots", amount:100}},
-  {id:"op_gold_50", name:"Fort Knox Reserve", icon:"🧱", cost:100000, desc:"Instantly grants +1,000 Gold Bars!", effect:{type:"gold", amount:1000}}
+  {id:"op_bot_47", name:"High-Frequency Bot Swarm", icon:"🤖", cost:500000, desc:"Instantly grants +1,000 Trading Bots!", effect:{type:"bots", amount:1000}},
+  {id:"op_bot_48", name:"Quantum Trading Matrix", icon:"⚡", cost:5000000, desc:"Instantly grants +10,000 Trading Bots!", effect:{type:"bots", amount:10000}},
+  {id:"op_bot_49", name:"Omni-Trader Fleet", icon:"🚀", cost:50000000, desc:"Instantly grants +100,000 Trading Bots!", effect:{type:"bots", amount:100000}},
+  {id:"op_gold_50", name:"Fort Knox Reserve", icon:"🧱", cost:100000, desc:"Instantly grants +1,000 Gold Bars (+ $50,000/min cash dividend)!", effect:{type:"gold", amount:1000}},
+  {id:"op_gold_51", name:"Central Gold Stash", icon:"🥇", cost:1000000, desc:"Instantly grants +10,000 Gold Bars (+ $500,000/min cash dividend)!", effect:{type:"gold", amount:10000}},
+  {id:"op_gold_52", name:"Cosmic Gold Vault", icon:"🌟", cost:10000000, desc:"Instantly grants +100,000 Gold Bars (+ $5,000,000/min dividend)!", effect:{type:"gold", amount:100000}}
 ];
 
-function big(val){try{if(typeof val === 'bigint') return val;if(typeof val === 'number') return BigInt(Math.floor(val));return BigInt(val);}catch(e){ return 0n; }}
+// HELPER TO CONVERT EXPONENT POWERS TO BIGINT COMPARISONS
+function big(val){
+ try{
+  if(typeof val === 'bigint') return val;
+  if(typeof val === 'number') return BigInt(Math.floor(val));
+  return BigInt(val);
+ }catch(e){ return 0n; }
+}
 
+// 100 TITLES DEFINITION (ORDERED HARDEST TO EASIEST)
 const ALL_TITLES = [
+ // DYNAMIC #1 RICHEST
  {id:"richest", text:"👑 Richest", bg:"linear-gradient(45deg,#f59e0b,#ef4444)", color:"#fff", desc:"Dynamic title given ONLY to the #1 richest player alive!", dynamic:true},
+ 
+ // TIER 10: COSMIC / IMPOSSIBLE WEALTH (LAST 30 TITLES REQUIRING 10^100+ WEALTH)
  {id:"t_100", text:"🌌 Sovereign of Reality", bg:"#ec4899", color:"#fff", desc:"Reach $10^120 Portfolio Value.", req:()=>big(portfolio())>=big("1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")},
+ {id:"t_99", text:"🪐 Multiverse Master", bg:"#8b5cf6", color:"#fff", desc:"Reach $10^115 Portfolio Value.", req:()=>big(portfolio())>=big("100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")},
+ {id:"t_98", text:"✨ Omnipotent Trader", bg:"#6366f1", color:"#fff", desc:"Reach $10^110 Portfolio Value.", req:()=>big(portfolio())>=big("10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")},
+ {id:"t_97", text:"♾️ Googolplexian Mogul", bg:"#3b82f6", color:"#fff", desc:"Reach $10^105 Portfolio Value.", req:()=>big(portfolio())>=big("1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")},
+ {id:"t_96", text:"👁️ The Prime Creator", bg:"#10b981", color:"#000", desc:"Reach $10^100 Portfolio Value.", req:()=>big(portfolio())>=big("100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")},
+ {id:"t_95", text:"⚡ Celestial Overlord", bg:"#f59e0b", color:"#000", desc:"Reach $10^95 Portfolio Value.", req:()=>big(portfolio())>=big("10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")},
+ {id:"t_94", text:"🌀 Void Architect", bg:"#ef4444", color:"#fff", desc:"Reach $10^90 Portfolio Value.", req:()=>big(portfolio())>=big("1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")},
+ {id:"t_93", text:"🌟 Supernova Billionaire", bg:"#d97706", color:"#fff", desc:"Reach $10^85 Portfolio Value.", req:()=>big(portfolio())>=big("1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")},
+ {id:"t_92", text:"💎 Eternal Diamond Vault", bg:"#0284c7", color:"#fff", desc:"Reach $10^80 Portfolio Value.", req:()=>big(portfolio())>=big("10000000000000000000000000000000000000000000000000000000000000000000000000000000000")},
+ {id:"t_91", text:"🔥 Transcendent God", bg:"#b91c1c", color:"#fff", desc:"Reach $10^75 Portfolio Value.", req:()=>big(portfolio())>=big("100000000000000000000000000000000000000000000000000000000000000000000000000000")},
+ {id:"t_90", text:"🏆 Infinite Gold God", bg:"#eab308", color:"#1c1917", desc:"Own 10,000,000 Gold Bars.", req:()=>goldBars>=10000000},
+ {id:"t_89", text:"💫 Constellation Ruler", bg:"#0f766e", color:"#fff", desc:"Reach $10^70 Portfolio Value.", req:()=>big(portfolio())>=big("1000000000000000000000000000000000000000000000000000000000000000000000000")},
+ {id:"t_88", text:"🎆 Hyperdrive Tycoon", bg:"#8b5cf6", color:"#fff", desc:"Reach $10^65 Portfolio Value.", req:()=>big(portfolio())>=big("1000000000000000000000000000000000000000000000000000000000000000a")},
+ {id:"t_87", text:"🔮 Spacetime Capitalist", bg:"#6366f1", color:"#fff", desc:"Reach $10^60 Portfolio Value.", req:()=>big(portfolio())>=big("1000000000000000000000000000000000000000000000000000000000000")},
+ {id:"t_86", text:"🚀 Galaxic Dominator", bg:"#2563eb", color:"#fff", desc:"Reach $10^55 Portfolio Value.", req:()=>big(portfolio())>=big("100000000000000000000000000000000000000000000000000000000")},
+ {id:"t_85", text:"⚡ Quantum Overlord", bg:"#0284c7", color:"#fff", desc:"Reach $10^50 Portfolio Value.", req:()=>big(portfolio())>=big("100000000000000000000000000000000000000000000000000")},
+ {id:"t_84", text:"🏰 Reality Landlord", bg:"#059669", color:"#fff", desc:"Own 1,000,000 Total Properties.", req:()=>Object.values(propertiesOwned).reduce((a,b)=>a+b,0)>=1000000},
+ {id:"t_83", text:"☄️ Dark Matter Titan", bg:"#7c3aed", color:"#fff", desc:"Reach $10^45 Portfolio Value.", req:()=>big(portfolio())>=big("100000000000000000000000000000000000000000000000")},
+ {id:"t_82", text:"🌌 Nebula Baron", bg:"#db2777", color:"#fff", desc:"Reach $10^40 Portfolio Value.", req:()=>big(portfolio())>=big("10000000000000000000000000000000000000000")},
+ {id:"t_81", text:"🥇 Gold Galaxy Emperor", bg:"#d97706", color:"#fff", desc:"Own 1,000,000 Gold Bars.", req:()=>goldBars>=1000000},
+ {id:"t_80", text:"🪐 Universal Emperor", bg:"#3b82f6", color:"#fff", desc:"Reach $10^35 Portfolio Value.", req:()=>big(portfolio())>=big("100000000000000000000000000000000000")},
+ {id:"t_79", text:"💥 Big Bang Capitalist", bg:"#dc2626", color:"#fff", desc:"Reach $10^30 Portfolio Value.", req:()=>big(portfolio())>=big("1000000000000000000000000000000")},
+ {id:"t_78", text:"🤖 AI Apex Syndicate", bg:"#9333ea", color:"#fff", desc:"Own 100,000 Trading Bots.", req:()=>botOwned>=100000},
+ {id:"t_77", text:"👑 Solar Sovereign", bg:"#f59e0b", color:"#000", desc:"Reach $10^27 Portfolio Value.", req:()=>big(portfolio())>=big("1000000000000000000000000000")},
+ {id:"t_76", text:"🎲 Casino Galaxy God", bg:"#b91c1c", color:"#fff", desc:"Win a Coin Flip bet over $100,000,000,000.", req:()=>highestCasinoWin>=100000000000},
+ {id:"t_75", text:"⚡ Light-Speed Trader", bg:"#ea580c", color:"#fff", desc:"Reach $10^24 Portfolio Value.", req:()=>big(portfolio())>=big("1000000000000000000000000")},
+ {id:"t_74", text:"🏛 Bullion Apex", bg:"#eab308", color:"#000", desc:"Own 100,000 Gold Bars.", req:()=>goldBars>=100000},
+ {id:"t_73", text:"🏯 Planetary Empire", bg:"#0f766e", color:"#fff", desc:"Own 50,000 Total Properties.", req:()=>Object.values(propertiesOwned).reduce((a,b)=>a+b,0)>=50000},
+ {id:"t_72", text:"💎 Septillionaire", bg:"#2563eb", color:"#fff", desc:"Reach $10^21 Portfolio Value.", req:()=>big(portfolio())>=big("1000000000000000000000000")},
+
+ // TIER 8 & 9: LEGENDARY WEALTH ($10^15 - $10^18)
+ {id:"t_71", text:"🌌 Quintillionaire", bg:"#7c3aed", color:"#fff", desc:"Reach $1,000,000,000,000,000,000 (1 Quintillion).", req:()=>portfolio()>=1e18},
+ {id:"t_70", text:"👑 Gold Citadel Lord", bg:"#d97706", color:"#fff", desc:"Own 25,000 Gold Bars.", req:()=>goldBars>=25000},
+ {id:"t_69", text:"💎 Quadrillionaire", bg:"#9333ea", color:"#fff", desc:"Reach $1,000,000,000,000,000 (1 Quadrillion).", req:()=>portfolio()>=1e15},
+ {id:"t_68", text:"🎲 High-Roller Casino King", bg:"#dc2626", color:"#fff", desc:"Win a Coin Flip bet over $10,000,000,000.", req:()=>highestCasinoWin>=10000000000},
+ {id:"t_67", text:"🏰 Mega Estate Overlord", bg:"#0d9488", color:"#fff", desc:"Own 10,000 Total Properties.", req:()=>Object.values(propertiesOwned).reduce((a,b)=>a+b,0)>=10000},
+ {id:"t_66", text:"🤖 Bot Master Elite", bg:"#6366f1", color:"#fff", desc:"Own 5,000 Trading Bots.", req:()=>botOwned>=5000},
+ {id:"t_65", text:"⚡ Market Disruptor", bg:"#f97316", color:"#fff", desc:"Reach $100,000,000,000,000.", req:()=>portfolio()>=1e14},
+ {id:"t_64", text:"🥇 Gold Vault Sovereign", bg:"#eab308", color:"#000", desc:"Own 10,000 Gold Bars.", req:()=>goldBars>=10000},
+ {id:"t_63", text:"🚀 High-Frequency God", bg:"#3b82f6", color:"#fff", desc:"Reach $10,000,000,000,000.", req:()=>portfolio()>=1e13},
+ {id:"t_62", text:"💎 Trillionaire Titan", bg:"#10b981", color:"#000", desc:"Reach $1,000,000,000,000 (1 Trillion).", req:()=>portfolio()>=1e12},
+
+ // TIER 6 & 7: HIGH WEALTH & ASSETS ($100B - $500B)
+ {id:"t_61", text:"🏛 Multi-Trillion Apex", bg:"#059669", color:"#fff", desc:"Reach $500,000,000,000.", req:()=>portfolio()>=500000000000},
+ {id:"t_60", text:"🏆 Gold Treasury Titan", bg:"#d97706", color:"#fff", desc:"Own 5,000 Gold Bars.", req:()=>goldBars>=5000},
+ {id:"t_59", text:"🎲 Casino Leviathan", bg:"#b91c1c", color:"#fff", desc:"Win a Coin Flip bet over $1,000,000,000.", req:()=>highestCasinoWin>=1000000000},
+ {id:"t_58", text:"🏯 Real Estate Monarch", bg:"#0f766e", color:"#fff", desc:"Own 2,500 Total Properties.", req:()=>Object.values(propertiesOwned).reduce((a,b)=>a+b,0)>=2500},
+ {id:"t_57", text:"🚀 Centi-Billionaire", bg:"#3b82f6", color:"#fff", desc:"Reach $100,000,000,000.", req:()=>portfolio()>=100000000000},
+ {id:"t_56", text:"🤖 Algorithmic Fleet", bg:"#8b5cf6", color:"#fff", desc:"Own 1,000 Trading Bots.", req:()=>botOwned>=1000},
+ {id:"t_55", text:"🥇 Gold Reserve Boss", bg:"#eab308", color:"#1c1917", desc:"Own 2,500 Gold Bars.", req:()=>goldBars>=2500},
+ {id:"t_54", text:"💎 $50 Billionaire", bg:"#0284c7", color:"#fff", desc:"Reach $50,000,000,000.", req:()=>portfolio()>=50000000000},
+ {id:"t_53", text:"🏠 City Landlord", bg:"#14b8a6", color:"#fff", desc:"Own 1,000 Total Properties.", req:()=>Object.values(propertiesOwned).reduce((a,b)=>a+b,0)>=1000},
+ {id:"t_52", text:"🎲 Casino Legend", bg:"#ef4444", color:"#fff", desc:"Win a Coin Flip bet over $250,000,000.", req:()=>highestCasinoWin>=250000000},
+ {id:"t_51", text:"💼 $25 Billionaire", bg:"#2563eb", color:"#fff", desc:"Reach $25,000,000,000.", req:()=>portfolio()>=25000000000},
+
+ // TIER 4 & 5: MID-HIGH WEALTH ($1B - $10B)
+ {id:"t_50", text:"🚀 Deca-Billionaire", bg:"#6366f1", color:"#fff", desc:"Reach $10,000,000,000.", req:()=>portfolio()>=10000000000},
+ {id:"t_49", text:"🏆 Bullion King", bg:"#f59e0b", color:"#000", desc:"Own 1,000 Gold Bars.", req:()=>goldBars>=1000},
+ {id:"t_48", text:"🏯 Property Emperor", bg:"#0d9488", color:"#fff", desc:"Own 500 Total Properties.", req:()=>Object.values(propertiesOwned).reduce((a,b)=>a+b,0)>=500},
+ {id:"t_47", text:"🤖 Automation Titan", bg:"#8b5cf6", color:"#fff", desc:"Own 250 Trading Bots.", req:()=>botOwned>=250},
+ {id:"t_46", text:"💎 $5 Billionaire", bg:"#3b82f6", color:"#fff", desc:"Reach $5,000,000,000.", req:()=>portfolio()>=5000000000},
+ {id:"t_45", text:"🎲 Casino High Roller", bg:"#dc2626", color:"#fff", desc:"Win a Coin Flip bet over $50,000,000.", req:()=>highestCasinoWin>=50000000},
+ {id:"t_44", text:"🥇 Gold Tycoon", bg:"#b45309", color:"#fff", desc:"Own 500 Gold Bars.", req:()=>goldBars>=500},
+ {id:"t_43", text:"💼 $2.5 Billionaire", bg:"#0284c7", color:"#fff", desc:"Reach $2,500,000,000.", req:()=>portfolio()>=2500000000},
+ {id:"t_42", text:"🏰 Real Estate Mogul", bg:"#14b8a6", color:"#fff", desc:"Own 250 Total Properties.", req:()=>Object.values(propertiesOwned).reduce((a,b)=>a+b,0)>=250},
+ {id:"t_41", text:"🪐 Billionaire", bg:"#ec4899", color:"#fff", desc:"Reach $1,000,000,000.", req:()=>portfolio()>=1000000000},
+
+ // TIER 2 & 3: MID WEALTH & PROGRESSION ($10M - $500M)
+ {id:"t_40", text:"🚀 Half-Billionaire", bg:"#8b5cf6", color:"#fff", desc:"Reach $500,000,000.", req:()=>portfolio()>=500000000},
+ {id:"t_39", text:"🏦 Gold Vault", bg:"#f59e0b", color:"#000", desc:"Own 250 Gold Bars.", req:()=>goldBars>=250},
+ {id:"t_38", text:"🤖 Bot Squad Leader", bg:"#6366f1", color:"#fff", desc:"Own 100 Trading Bots.", req:()=>botOwned>=100},
+ {id:"t_37", text:"🌌 Centimillionaire", bg:"#8b5cf6", color:"#fff", desc:"Reach $100,000,000.", req:()=>portfolio()>=100000000},
+ {id:"t_36", text:"🎲 Casino Whale", bg:"#b91c1c", color:"#fff", desc:"Win a Coin Flip bet over $10,000,000.", req:()=>highestCasinoWin>=10000000},
+ {id:"t_35", text:"🏠 Housing Tycoon", bg:"#0d9488", color:"#fff", desc:"Own 100 Total Properties.", req:()=>Object.values(propertiesOwned).reduce((a,b)=>a+b,0)>=100},
+ {id:"t_34", text:"🥇 Gold Hoarder", bg:"#d97706", color:"#fff", desc:"Own 100 Gold Bars.", req:()=>goldBars>=100},
+ {id:"t_33", text:"💼 $50 Millionaire", bg:"#3b82f6", color:"#fff", desc:"Reach $50,000,000.", req:()=>portfolio()>=50000000},
+ {id:"t_32", text:"🚀 Decamillionaire", bg:"#6366f1", color:"#fff", desc:"Reach $10,000,000.", req:()=>portfolio()>=10000000},
+ {id:"t_31", text:"🤖 Automation Overlord", bg:"#8b5cf6", color:"#fff", desc:"Own 50 Trading Bots.", req:()=>botOwned>=50},
+ {id:"t_30", text:"🏆 Gold Collector", bg:"#d97706", color:"#fff", desc:"Own 50 Gold Bars.", req:()=>goldBars>=50},
+ {id:"t_29", text:"🎲 High Gambler", bg:"#ef4444", color:"#fff", desc:"Win a Coin Flip bet over $2,500,000.", req:()=>highestCasinoWin>=2500000},
+ {id:"t_28", text:"🏰 Estate Owner", bg:"#14b8a6", color:"#fff", desc:"Own 50 Total Properties.", req:()=>Object.values(propertiesOwned).reduce((a,b)=>a+b,0)>=50},
+ {id:"t_27", text:"💎 Multi-Millionaire", bg:"#2563eb", color:"#fff", desc:"Reach $5,000,000.", req:()=>portfolio()>=5000000},
+ {id:"t_26", text:"🥇 Bullion Stash", bg:"#eab308", color:"#1c1917", desc:"Own 25 Gold Bars.", req:()=>goldBars>=25},
+ {id:"t_25", text:"💼 $2.5 Millionaire", bg:"#0284c7", color:"#fff", desc:"Reach $2,500,000.", req:()=>portfolio()>=2500000},
+
+ // TIER 1: STARTER & EASY TITLES ($100k - $1M)
  {id:"t_24", text:"💎 Millionaire", bg:"#3b82f6", color:"#fff", desc:"Reach $1,000,000.", req:()=>portfolio()>=1000000},
+ {id:"t_23", text:"🤖 Bot Operator", bg:"#8b5cf6", color:"#fff", desc:"Own 20 Trading Bots.", req:()=>botOwned>=20},
+ {id:"t_22", text:"🎲 Casino Bettor", bg:"#dc2626", color:"#fff", desc:"Win a Coin Flip bet over $500,000.", req:()=>highestCasinoWin>=500000},
+ {id:"t_21", text:"🏠 Landlord", bg:"#14b8a6", color:"#fff", desc:"Own 25 Total Properties.", req:()=>Object.values(propertiesOwned).reduce((a,b)=>a+b,0)>=25},
+ {id:"t_20", text:"💼 Half-Millionaire", bg:"#0284c7", color:"#fff", desc:"Reach $500,000.", req:()=>portfolio()>=500000},
+ {id:"t_19", text:"🥇 Gold Stack", bg:"#eab308", color:"#1c1917", desc:"Own 10 Gold Bars.", req:()=>goldBars>=10},
+ {id:"t_18", text:"🤖 Bot Owner", bg:"#8b5cf6", color:"#fff", desc:"Own 10 Trading Bots.", req:()=>botOwned>=10},
+ {id:"t_17", text:"💼 Quarter-Millionaire", bg:"#3b82f6", color:"#fff", desc:"Reach $250,000.", req:()=>portfolio()>=250000},
+ {id:"t_16", text:"🎲 Coin Flipper", bg:"#ef4444", color:"#fff", desc:"Win a Coin Flip bet over $100,000.", req:()=>highestCasinoWin>=100000},
+ {id:"t_15", text:"🏠 Property Starter", bg:"#14b8a6", color:"#fff", desc:"Own 10 Total Properties.", req:()=>Object.values(propertiesOwned).reduce((a,b)=>a+b,0)>=10},
  {id:"t_14", text:"💵 $100k Club", bg:"#10b981", color:"#032b1d", desc:"Reach $100,000 Portfolio Value.", req:()=>portfolio()>=100000},
+ {id:"t_13", text:"🥇 Gold Owner", bg:"#eab308", color:"#1c1917", desc:"Own at least 5 Gold Bars.", req:()=>goldBars>=5},
+ {id:"t_12", text:"🤖 Bot Beginner", bg:"#8b5cf6", color:"#fff", desc:"Own 5 Trading Bots.", req:()=>botOwned>=5},
+ {id:"t_11", text:"⚡ High Frequency Trader", bg:"#f97316", color:"#fff", desc:"Own Trading Speed upgrade.", req:()=>speedOwned>=1},
+ {id:"t_10", text:"🚀 Market Mover", bg:"#805ad5", color:"#fff", desc:"Use Market Boost at least 5 times.", req:()=>boostOwned>=5},
+ {id:"t_09", text:"🎲 Lucky Flipper", bg:"#ef4444", color:"#fff", desc:"Win a Coin Flip bet over $10,000.", req:()=>highestCasinoWin>=10000},
+ {id:"t_08", text:"🛡 Safe Haven", bg:"#059669", color:"#fff", desc:"Activate Market Insurance.", req:()=>insurance},
+ {id:"t_07", text:"🏠 Homeowner", bg:"#14b8a6", color:"#fff", desc:"Own at least 5 total properties.", req:()=>Object.values(propertiesOwned).reduce((a,b)=>a+b,0)>=5},
+ {id:"t_06", text:"💵 $50k Wealth", bg:"#10b981", color:"#032b1d", desc:"Reach $50,000 Portfolio Value.", req:()=>portfolio()>=50000},
+ {id:"t_05", text:"🥇 First Gold Bar", bg:"#eab308", color:"#1c1917", desc:"Own 1 Gold Bar.", req:()=>goldBars>=1},
+ {id:"t_04", text:"🏠 First House", bg:"#14b8a6", color:"#fff", desc:"Own at least 1 property.", req:()=>Object.values(propertiesOwned).reduce((a,b)=>a+b,0)>=1},
+ {id:"t_03", text:"💵 $25k Wealth", bg:"#10b981", color:"#032b1d", desc:"Reach $25,000 Portfolio Value.", req:()=>portfolio()>=25000},
+ {id:"t_02", text:"🎲 Starter Gambler", bg:"#ef4444", color:"#fff", desc:"Win a Coin Flip bet over $1,000.", req:()=>highestCasinoWin>=1000},
  {id:"t_01", text:"🌱 Novice Trader", bg:"#334155", color:"#fff", desc:"Unlocked by starting your trading journey.", req:()=>true}
 ];
 
@@ -261,7 +422,6 @@ let opItemsOwned = {};
 let opPassiveIncome = 0;
 let lastChatCount = 0, unreadCount = 0, isFlipping = false;
 let riggedFlip = "OFF";
-let op915AutoGrab = localStorage.getItem("simuOp915") === "true";
 let equippedTitle = localStorage.getItem("simuEquippedTitle")||"";
 let customTitlesUnlocked = {};
 let highestCasinoWin = Number(localStorage.getItem("simuHighCasinoWin"))||0;
@@ -271,6 +431,8 @@ let lastOpIncomePayoutTime = Date.now();
 let currentOpDrop = null;
 let currentSelectedP2PPlayer = "";
 
+let priceOverrides = {};
+
 try{const saved=JSON.parse(localStorage.getItem(STATE+"Data")||"{}");if(saved.stocks)Object.keys(stocks).forEach(k=>{stocks[k].shares=Number(saved.stocks[k]?.shares)||0});insurance=!!saved.insurance;boostOwned=Number(saved.boostOwned)||0;speedOwned=Number(saved.speedOwned)||0;botOwned=Number(saved.botOwned)||0;botTargetPrice=Number(saved.botTargetPrice)||1;goldBars=Number(saved.goldBars)||0;opItemsOwned=saved.opItemsOwned||{};customTitlesUnlocked=saved.customTitlesUnlocked||{};recalcOpPassiveIncome();}catch(e){}
 try{propertiesOwned=JSON.parse(localStorage.getItem(PROPS)||"{}")}catch(e){propertiesOwned={}}
 try{propertyTimers=JSON.parse(localStorage.getItem("simuPropTimers")||"{}")}catch(e){propertyTimers={}}
@@ -278,10 +440,6 @@ if(!playerId){playerId=crypto.randomUUID?crypto.randomUUID().replaceAll("-",""):
 
 const nameInput=document.getElementById("name");nameInput.value=name;
 const passInput=document.getElementById("pass");passInput.value=pass;
-
-if(op915AutoGrab){
- document.getElementById("op915Panel").style.display = "block";
-}
 
 function recalcOpPassiveIncome(){
  opPassiveIncome = 0;
@@ -293,26 +451,43 @@ function recalcOpPassiveIncome(){
  }
 }
 
+function accountKey(){
+ const n=validName().toLowerCase().replace(/[^a-z0-9]/g,"");
+ const p=passInput.value.trim();
+ if(!n || !p) return null;
+ return "user_"+btoa(n+":"+p).replace(/=/g,"").replace(/[^a-zA-Z0-9]/g,"");
+}
+
 function money(n){
  const num = Number(n);
  if(!Number.isFinite(num)) return "$0.00";
  const abs = Math.abs(num);
  const sign = num < 0 ? "-" : "";
- if(abs >= 1e12) return sign + "$" + abs.toExponential(2);
- if(abs >= 1e9) return sign + "$" + (abs / 1e9).toFixed(2) + "B";
- if(abs >= 1e6) return sign + "$" + (abs / 1e6).toFixed(2) + "M";
+ 
+ if(abs >= 1e12){
+  return sign + "$" + abs.toExponential(2);
+ } else if(abs >= 1e9){
+  return sign + "$" + (abs / 1e9).toFixed(2) + "B";
+ } else if(abs >= 1e6){
+  return sign + "$" + (abs / 1e6).toFixed(2) + "M";
+ }
  return sign + "$" + abs.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
 }
 
 function formatQty(n){
  const num = Number(n);
  if(!Number.isFinite(num)) return "0";
+ if(num >= 1e12) return num.toExponential(2);
  return num.toLocaleString();
 }
 
 function safeText(v){const e=document.createElement("span");e.textContent=String(v??"");return e.innerHTML}
 function validName(){return(nameInput.value.trim()||"Player").slice(0,20)}
-function portfolio(){return cash + Object.values(stocks).reduce((a,s)=>a + (s.price * s.shares), 0);}
+
+function portfolio(){
+ return cash + Object.values(stocks).reduce((a,s)=>a + (s.price * s.shares), 0);
+}
+
 function pnl(){return portfolio()-STARTING_CASH}
 function saveLocal(){
  localStorage.setItem(STATE+"Cash",String(cash));
@@ -320,7 +495,7 @@ function saveLocal(){
  localStorage.setItem(PROPS,JSON.stringify(propertiesOwned));
  localStorage.setItem("simuPropTimers",JSON.stringify(propertyTimers));
  localStorage.setItem("simuEquippedTitle",equippedTitle);
- localStorage.setItem("simuOp915",String(op915AutoGrab));
+ localStorage.setItem("simuHighCasinoWin",String(highestCasinoWin));
 }
 function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.style.display="block";clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.style.display="none",2600)}
 
@@ -331,7 +506,6 @@ function render(){
  document.getElementById("cash").textContent=money(cash);document.getElementById("portfolio").textContent=money(portfolio());const p=pnl(),pe=document.getElementById("pnl");pe.textContent=(p>=0?"+":"-")+money(Math.abs(p));pe.className="big "+(p>=0?"green":"red");
  renderSelected();renderShop();renderProperties();renderTitles();updateP2PListDropdown();saveLocal();
 }
-
 function drawSmall(t){const s=stocks[t],c=document.getElementById("chart-"+t);if(!c)return;const x=c.getContext("2d"),w=c.width,h=c.height,v=s.history,min=Math.min(...v),max=Math.max(...v),r=max-min||1;x.clearRect(0,0,w,h);x.beginPath();v.forEach((n,i)=>{const px=v.length===1?w/2:i/(v.length-1)*(w-4)+2,py=h-4-(n-min)/r*(h-8);i?x.lineTo(px,py):x.moveTo(px,py)});x.strokeStyle=s.change>=0?"#10b981":"#ef4444";x.lineWidth=2;x.stroke()}
 function drawBig(){const c=document.getElementById("bigChart"),s=stocks[selected],x=c.getContext("2d"),w=c.width,h=c.height,v=s.history,min=Math.min(...v),max=Math.max(...v),r=max-min||1;x.clearRect(0,0,w,h);x.strokeStyle="#243957";x.lineWidth=1;for(let i=1;i<5;i++){x.beginPath();x.moveTo(0,i*h/5);x.lineTo(w,i*h/5);x.stroke()}x.beginPath();v.forEach((n,i)=>{const px=v.length===1?w/2:i/(v.length-1)*(w-8)+4,py=h-8-(n-min)/r*(h-16);i?x.lineTo(px,py):x.moveTo(px,py)});x.strokeStyle=s.change>=0?"#10b981":"#ef4444";x.lineWidth=3;x.stroke()}
 function renderSelected(){const s=stocks[selected];document.getElementById("selectedName").textContent=`${s.name} (${selected})`;document.getElementById("selectedPrice").textContent=money(s.price);const e=document.getElementById("selectedChange");e.textContent=`${s.change>=0?"▲":"▼"} ${s.change>=0?"+":""}${s.change.toFixed(2)}%`;e.className="selected-change "+(s.change>=0?"green":"red");document.getElementById("selectedShares").textContent=formatQty(s.shares);document.getElementById("canBuy").textContent=formatQty(Math.floor(cash/s.price));document.getElementById("stockTabs").innerHTML=Object.entries(stocks).map(([t,z])=>`<button class="stock-tab ${t===selected?"active":""}" onclick="selectStock('${t}')">${z.name} ${t}</button>`).join("");drawBig()}
@@ -347,7 +521,7 @@ function renderShop(){
  g.innerHTML=items.map(([id,it])=>{
   let owned="";
   if(it.type==="property")owned=propertiesOwned[it.property]?`<div class="owned">Owned: ${formatQty(propertiesOwned[it.property])}</div>`:"";
-  if(it.type==="gold")owned=`<div class="owned">Owned: ${formatQty(goldBars)}</div>`;
+  if(it.type==="gold")owned=`<div class="owned">Owned: ${formatQty(goldBars)} (Payout: +${money(goldBars*50)}/min)</div>`;
   if(it.type==="insurance")owned=`<div class="owned">${insurance?"Active":"Not active"}</div>`;
   if(it.type==="boost")owned=`<div class="owned">Times Boosted: ${formatQty(boostOwned)}</div>`;
   if(it.type==="speed")owned=`<div class="owned">Owned: ${formatQty(speedOwned)}</div>`;
@@ -361,6 +535,7 @@ function renderShop(){
    <div style="font-size:28px">${it.icon||properties[it.property].icon}</div>
    <h3>${it.name||properties[it.property].name}</h3>
    <div class="muted">${it.desc||properties[it.property].desc}</div>
+   ${it.type==="property"?`<div class="property-stats"><span>⏱ ${properties[it.property].interval}s</span><span>+${money(properties[it.property].income)}</span></div>`:""}
    <div class="price">${money(cost)}</div>
    ${owned}
    <div class="shop-btn-row">
@@ -401,11 +576,6 @@ function renderOPDropBanner(){
    BUY OP ITEM NOW (${money(item.cost)})
   </button>
  </div>`;
-
- // CHEAT OP915: AUTO GRAB OP ITEM INSTANTLY!
- if(op915AutoGrab && canAfford && currentOpDrop.stock > 0){
-  claimOpDrop();
- }
 }
 
 window.claimOpDrop = async () => {
@@ -424,7 +594,7 @@ window.claimOpDrop = async () => {
     currentData.claimedBy = validName();
     return currentData;
    } else {
-    return;
+    return; // Abort transaction if already claimed
    }
   });
 
@@ -438,6 +608,7 @@ window.claimOpDrop = async () => {
   }
  } catch (e) {
   console.error(e);
+  toast("Transaction failed, try again!");
  }
 };
 
@@ -445,42 +616,170 @@ function applyOpItemEffect(item){
  opItemsOwned[item.id] = (opItemsOwned[item.id] || 0) + 1;
  const eff = item.effect;
  if(!eff) return;
- if(eff.type === "cash") cash += eff.amount;
- else if(eff.type === "income") recalcOpPassiveIncome();
- else if(eff.type === "shares" && stocks[eff.stock]) stocks[eff.stock].shares += eff.amount;
- else if(eff.type === "bots") botOwned += eff.amount;
- else if(eff.type === "gold") goldBars += eff.amount;
+
+ if(eff.type === "cash"){
+  cash += eff.amount;
+  toast(`💰 Received +${money(eff.amount)} Cash!`);
+ } else if(eff.type === "income"){
+  recalcOpPassiveIncome();
+  toast(`⚡ Passive Income increased by +${money(eff.amount)}/sec!`);
+ } else if(eff.type === "shares"){
+  if(stocks[eff.stock]) stocks[eff.stock].shares += eff.amount;
+  toast(`📈 Added +${formatQty(eff.amount)} ${eff.stock} shares!`);
+ } else if(eff.type === "all_shares"){
+  Object.values(stocks).forEach(s => s.shares += eff.amount);
+  toast(`📦 Added +${formatQty(eff.amount)} shares to ALL stocks!`);
+ } else if(eff.type === "title"){
+  customTitlesUnlocked[eff.titleId] = eff;
+  equippedTitle = eff.titleId;
+  toast(`🏆 Unlocked & Equipped title: ${eff.titleText}!`);
+ } else if(eff.type === "bots"){
+  botOwned += eff.amount;
+  toast(`🤖 Received +${formatQty(eff.amount)} Trading Bots!`);
+ } else if(eff.type === "gold"){
+  goldBars += eff.amount;
+  toast(`🥇 Received +${formatQty(eff.amount)} Gold Bars!`);
+ } else if(eff.type === "op_mystery"){
+  triggerOpMysteryBox(eff.tier);
+ }
+}
+
+function triggerOpMysteryBox(tier){
+ const bonus = Math.pow(10, tier) * 100000;
+ cash += bonus;
+ toast(`🎁 OP Mystery Box Tier ${tier} granted +${money(bonus)}!`);
 }
 
 window.buyShop=(id, qtyMode=1)=>{
  const it=shopItems[id], cost=it.cost||properties[it.property].cost;
  if(cash<cost) return;
- let qty = (qtyMode === "max" && it.type !== "boost") ? Math.floor(cash / cost) : 1;
+ 
+ let qty = 1;
+ if(qtyMode === "max" && it.type !== "boost"){
+  qty = Math.floor(cash / cost);
+ }
  if(qty < 1) return;
 
  if(it.type==="property"){
+  const pKey=it.property;
   cash -= cost * qty;
-  propertiesOwned[it.property]=(propertiesOwned[it.property]||0)+qty;
-  if(!propertyTimers[it.property]) propertyTimers[it.property]=Date.now();
+  propertiesOwned[pKey]=(propertiesOwned[pKey]||0)+qty;
+  if(!propertyTimers[pKey]){
+   propertyTimers[pKey]=Date.now();
+  }
+  toast(`Bought ${formatQty(qty)}x ${properties[pKey].name}!`);
  }else if(it.type==="gold"){
   cash -= cost * qty;
   goldBars += qty;
+  toast(`Bought ${formatQty(qty)}x Gold Bar! Yield: +${money(goldBars*50)}/min`);
  }else if(it.type==="boost"){
   cash -= cost;
   boostOwned += 1;
-  for(const s of Object.values(stocks)) s.price *= 1.05;
+  for(const s of Object.values(stocks)){
+   s.price *= 1.05;
+  }
+  toast("Activated 1x Market Boost!");
  }else if(it.type==="insurance"){
   cash -= cost;
   insurance = true;
+  toast("Insurance activated!");
  }else if(it.type==="speed"){
   cash -= cost * qty;
   speedOwned += qty;
+  toast(`Bought ${formatQty(qty)}x Trading Speed!`);
  }else if(it.type==="bot"){
   cash -= cost * qty;
   botOwned += qty;
+  toast(`Bought ${formatQty(qty)}x Trading Bot!`);
+ }else if(it.type==="mystery"){
+  const actualQty = Math.min(qty, 10000);
+  for(let i=0; i<actualQty; i++){
+   if(cash >= cost){
+    cash -= cost;
+    mysteryBox(true);
+   }
+  }
+  toast(`Opened ${formatQty(actualQty)}x Mystery Boxes!`);
  }
  done();
 };
+
+function mysteryBox(silent=false){const pool=[
+ ["+$500 cash",()=>cash+=500,.12],["+$1,000 cash",()=>cash+=1000,.10],["+$2,500 cash",()=>cash+=2500,.06],["+$5,000 cash",()=>cash+=5000,.02],
+ ["+1 AAPL",()=>stocks.AAPL.shares+=1,.08],["+3 AAPL",()=>stocks.AAPL.shares+=3,.04],["+1 TSLA",()=>stocks.TSLA.shares+=1,.06],["+2 TSLA",()=>stocks.TSLA.shares+=2,.03],["+5 KO",()=>stocks.KO.shares+=5,.07],["+10 KO",()=>stocks.KO.shares+=10,.03],
+ ["Lose $500",()=>cash=Math.max(0,cash-500),.08],["Lose $1,000",()=>cash=Math.max(0,cash-1000),.05],["Lose $2,500",()=>cash=Math.max(0,cash-2500),.025],["Lose 5% cash",()=>cash=Math.max(0,cash*.95),.03],["Lose 1 random stock share",()=>{const ks=Object.keys(stocks).filter(k=>stocks[k].shares>0);if(ks.length)stocks[ks[Math.floor(Math.random()*ks.length)]].shares--},.05],
+ ["Free Market Boost",()=>{boostOwned++;for(const s of Object.values(stocks))s.price*=1.05},.025],["Free Insurance",()=>insurance=true,.025],["Free Trading Speed",()=>speedOwned++,.025],["Free Tiny House",()=>{propertiesOwned.tiny=(propertiesOwned.tiny||0)+1;if(!propertyTimers.tiny)propertyTimers.tiny=Date.now();},.008],["Double next stock movement",()=>stocks.AAPL.history.push(stocks.AAPL.price),.02],
+ ["Random stock 1–10 shares",()=>stocks[Object.keys(stocks)[Math.floor(Math.random()*3)]].shares+=1+Math.floor(Math.random()*10),.06],["Stock swap",()=>{const a=stocks.AAPL.shares,b=stocks.TSLA.shares;stocks.AAPL.shares=b;stocks.TSLA.shares=a},.025],["Market Surge",()=>Object.values(stocks).forEach(s=>s.price*=1.12),.015],["Market Crash",()=>Object.values(stocks).forEach(s=>s.price*=.88),.015],["Nothing",()=>{},.15]
+ ];let totalWeight=pool.reduce((a,x)=>a+x[2],0),r=Math.random()*totalWeight,chosen=pool[pool.length-1];for(const item of pool){r-=item[2];if(r<=0){chosen=item;break}}chosen[1]();if(!silent)toast(`🎁 Mystery Box: ${chosen[0]}`)}
+
+function propertyPayouts(){
+ let total=0;
+ const now=Date.now();
+ for(const [k,p] of Object.entries(properties)){
+  const count=Number(propertiesOwned[k])||0;
+  if(!count)continue;
+  let last=propertyTimers[k]||now;
+  const intervalMs = p.interval * 1000;
+  const elapsed = now - last;
+  if(elapsed >= intervalMs){
+   const cycles = Math.floor(elapsed / intervalMs);
+   const payout = cycles * count * p.income;
+   cash += payout;
+   total += payout;
+   propertyTimers[k] = last + (cycles * intervalMs);
+  }
+ }
+ if(total>0){
+  toast(`🏠 Properties paid you ${money(total)}!`);
+  done();
+ }
+ updatePropertyTimersUI();
+}
+
+function goldPayouts(){
+ const now = Date.now();
+ 
+ // Gold Dividends
+ if(goldBars > 0){
+  const elapsedSec = (now - lastGoldPayoutTime) / 1000;
+  if(elapsedSec >= 5){
+   const goldPayout = Math.floor((50 / 60) * elapsedSec * goldBars);
+   if(goldPayout > 0){
+    cash += goldPayout;
+    lastGoldPayoutTime = now;
+    done();
+   }
+  }
+ }
+
+ // OP Passive Income Generators
+ if(opPassiveIncome > 0){
+  const elapsedSecOp = (now - lastOpIncomePayoutTime) / 1000;
+  if(elapsedSecOp >= 1){
+   cash += Math.floor(opPassiveIncome * elapsedSecOp);
+   lastOpIncomePayoutTime = now;
+   done();
+  }
+ }
+}
+
+function updatePropertyTimersUI(){
+ const now=Date.now();
+ for(const [k,p] of Object.entries(properties)){
+  const el=document.getElementById("timer-"+k);
+  if(!el)continue;
+  const count=Number(propertiesOwned[k])||0;
+  if(!count){
+   el.textContent="Not owned";
+   continue;
+  }
+  const last=propertyTimers[k]||now;
+  const intervalMs=p.interval*1000;
+  const elapsed=now-last;
+  const remaining=Math.max(0,Math.ceil((intervalMs-elapsed)/1000));
+  el.textContent=`⏱ Next payout in ${remaining}s`;
+ }
+}
 
 function renderProperties(){
  const g=document.getElementById("propertyGrid");
@@ -492,17 +791,74 @@ function renderProperties(){
    <div class="muted">${p.desc}</div>
    <div class="property-stats"><span>Payout: Every ${p.interval}s</span><b class="green">+${money(p.income)}</b></div>
    <div class="owned">You own: ${formatQty(n)}</div>
+   <div class="timer-badge" id="timer-${k}">⏱ Next payout in --s</div>
   </div>`;
  }).join("");
 
+ // RENDER OWNED OP ITEMS
+ for(const [opId, count] of Object.entries(opItemsOwned)){
+  if(count <= 0) continue;
+  const item = OVERPOWERED_ITEMS.find(x => x.id === opId);
+  if(!item) continue;
+  html += `<div class="property-card" style="border-color:#a855f7">
+   <div class="property-icon">${item.icon}</div>
+   <h3 style="color:#c084fc">${safeText(item.name)}</h3>
+   <div class="muted">${safeText(item.desc)}</div>
+   <div class="owned" style="margin-top:6px;color:#a855f7">Owned OP Count: ${formatQty(count)}</div>
+  </div>`;
+ }
+
+ html += `<div class="property-card" style="border-color:#8b5cf6">
+   <div class="property-icon">🤖</div>
+   <h3>Trading Bot Config</h3>
+   <div class="muted">Buys up to 40 shares of selected stock automatically when price drops at or below target price.</div>
+   <div class="owned" style="margin-top:6px">Bots Owned: ${formatQty(botOwned)}</div>
+   <div style="margin-top:10px">
+    <label style="margin:0;font-size:11px">BUY WHEN PRICE IS AT OR BELOW ($):</label>
+    <input id="botTargetInput" type="number" min="0.01" step="0.01" value="${botTargetPrice}" style="margin-top:4px;padding:8px">
+   </div>
+ </div>`;
+
  g.innerHTML = html;
+
+ const botInp = document.getElementById("botTargetInput");
+ if(botInp){
+  botInp.oninput = () => {
+   const val = Number(botInp.value);
+   if(Number.isFinite(val) && val >= 0){
+    botTargetPrice = val;
+    saveLocal();
+   }
+  };
+ }
+ updatePropertyTimersUI();
 }
 
 function renderTitles(){
  const g = document.getElementById("titleGrid");
- g.innerHTML = ALL_TITLES.map(t => {
-  const isUnlocked = t.req ? t.req() : true;
+ const currentTitleObj = ALL_TITLES.find(t => t.id === equippedTitle) || customTitlesUnlocked[equippedTitle];
+ document.getElementById("equippedTitleText").innerHTML = currentTitleObj 
+  ? `Active Title: <span class="title-badge" style="background:${currentTitleObj.bg};color:${currentTitleObj.color}">${currentTitleObj.text || currentTitleObj.titleText}</span>`
+  : "Active Title: None";
+
+ // Combine base titles + custom unlocked OP titles
+ let displayList = [...ALL_TITLES];
+ for(const [tId, tObj] of Object.entries(customTitlesUnlocked)){
+  displayList.unshift({id: tId, text: tObj.titleText, bg: tObj.bg, color: tObj.color, desc: "Unlocked via OP Shop Drop!", req:()=>true});
+ }
+
+ g.innerHTML = displayList.map(t => {
+  let isUnlocked = false;
+  if(customTitlesUnlocked[t.id]){
+   isUnlocked = true;
+  } else if(t.dynamic && t.id === "richest"){
+   isUnlocked = isRichestPlayer();
+  } else if(t.req) {
+   isUnlocked = t.req();
+  }
+
   const isEquipped = equippedTitle === t.id;
+
   return `<div class="title-card ${isEquipped ? 'equipped' : ''} ${!isUnlocked ? 'locked' : ''}">
    <div>
     <div><span class="title-badge" style="background:${t.bg};color:${t.color}">${t.text}</span></div>
@@ -519,98 +875,804 @@ function renderTitles(){
 }
 
 window.toggleTitle = (id) => {
- equippedTitle = equippedTitle === id ? "" : id;
+ if(equippedTitle === id){
+  equippedTitle = "";
+  toast("Unequipped title.");
+ } else {
+  equippedTitle = id;
+  toast("Equipped new title!");
+ }
  done();
 };
+
+function isRichestPlayer(){
+ const sorted = Object.entries(allPlayers).map(([id,p])=>({id,...p})).sort((a,b)=>(b.portfolioValue||0)-(a.portfolioValue||0));
+ return sorted.length > 0 && sorted[0].id === playerId;
+}
 
 function updateP2PListDropdown(){
  const sel = document.getElementById("p2pItemSelect");
  if(!sel) return;
- let html = `<option value="">Select Item to Sell…</option>`;
- for(const [t, s] of Object.entries(stocks)){
-  if(s.shares > 0) html += `<option value="stock_${t}">${s.name} (${t}) Shares (You have: ${formatQty(s.shares)})</option>`;
- }
+ let opts = '<option value="">Select an item to list…</option>';
+
  for(const [k, p] of Object.entries(properties)){
-  if(propertiesOwned[k] > 0) html += `<option value="prop_${k}">${p.name} (You have: ${formatQty(propertiesOwned[k])})</option>`;
+  const count = Number(propertiesOwned[k]) || 0;
+  if(count > 0){
+   opts += `<option value="property_${k}">Property: ${p.name} (Owned: ${count})</option>`;
+  }
  }
- if(goldBars > 0) html += `<option value="gold_bars">Gold Bars (You have: ${formatQty(goldBars)})</option>`;
+
  for(const [opId, count] of Object.entries(opItemsOwned)){
   if(count > 0){
    const item = OVERPOWERED_ITEMS.find(x => x.id === opId);
-   if(item) html += `<option value="op_${opId}">${item.name} (You have: ${formatQty(count)})</option>`;
+   if(item){
+    opts += `<option value="op_${opId}">OP Item: ${item.name} (Owned: ${count})</option>`;
+   }
   }
  }
- sel.innerHTML = html;
+
+ sel.innerHTML = opts;
 }
 
-// P2P LIST ITEM WITH CUSTOM AMOUNT & PRICE
-document.getElementById("p2pListBtn").onclick = async () => {
- const itemKey = document.getElementById("p2pItemSelect").value;
- const amount = Math.floor(Number(document.getElementById("p2pAmountInput").value));
- const price = Number(document.getElementById("p2pPriceInput").value);
+document.getElementById("p2pListBtn").onclick = () => {
+ const itemVal = document.getElementById("p2pItemSelect").value;
+ const price = Math.floor(Number(document.getElementById("p2pPriceInput").value));
 
- if(!itemKey) return toast("Select an item to list!");
- if(!amount || amount < 1) return toast("Enter a valid amount/quantity!");
- if(!price || price < 1) return toast("Enter a valid sell price!");
+ if(!itemVal){ toast("Select an item to list!"); return; }
+ if(!price || price < 1){ toast("Enter a valid price!"); return; }
 
- let itemData = null;
-
- if(itemKey.startsWith("stock_")){
-  const ticker = itemKey.replace("stock_", "");
-  if(stocks[ticker].shares < amount) return toast(`Not enough ${ticker} shares!`);
-  stocks[ticker].shares -= amount;
-  itemData = { type:"stock", ticker, name:`${amount}x ${stocks[ticker].name} (${ticker})`, qty:amount, icon:"📈" };
- } else if(itemKey.startsWith("prop_")){
-  const pKey = itemKey.replace("prop_", "");
-  if((propertiesOwned[pKey]||0) < amount) return toast("Not enough properties!");
-  propertiesOwned[pKey] -= amount;
-  itemData = { type:"property", propertyKey:pKey, name:`${amount}x ${properties[pKey].name}`, qty:amount, icon:properties[pKey].icon };
- } else if(itemKey === "gold_bars"){
-  if(goldBars < amount) return toast("Not enough Gold Bars!");
-  goldBars -= amount;
-  itemData = { type:"gold", name:`${amount}x Gold Bar`, qty:amount, icon:"🥇" };
- } else if(itemKey.startsWith("op_")){
-  const opId = itemKey.replace("op_", "");
-  if((opItemsOwned[opId]||0) < amount) return toast("Not enough OP items!");
-  opItemsOwned[opId] -= amount;
-  const opObj = OVERPOWERED_ITEMS.find(x => x.id === opId);
-  itemData = { type:"op", opId, name:`${amount}x ${opObj.name}`, qty:amount, icon:opObj.icon, effect:opObj.effect };
- }
-
- if(itemData && firebaseReady){
-  const userListingsRef = ref(db, "marketplace/" + playerId);
-  await push(userListingsRef, {
-   id: Date.now() + "_" + Math.random().toString(36).slice(2),
-   sellerName: validName(),
+ if(itemVal.startsWith("property_")){
+  const propKey = itemVal.replace("property_", "");
+  if((propertiesOwned[propKey]||0) < 1){ toast("You don't own this property!"); return; }
+  propertiesOwned[propKey]--;
+  
+  const listing = {
    sellerId: playerId,
+   sellerName: validName(),
+   itemType: "property",
+   itemKey: propKey,
+   itemName: properties[propKey].name,
+   itemIcon: properties[propKey].icon,
    price: price,
-   amount: amount,
-   item: itemData,
    timestamp: serverTimestamp()
-  });
-  toast("Listed item on Player Market!");
-  done();
- }
-};
+  };
+  push(ref(db, "marketListings/" + playerId), listing);
+ } else if(itemVal.startsWith("op_")){
+  const opId = itemVal.replace("op_", "");
+  if((opItemsOwned[opId]||0) < 1){ toast("You don't own this OP item!"); return; }
+  opItemsOwned[opId]--;
+  recalcOpPassiveIncome();
 
-// CHEAT CODE LISTENER INCLUDING OP915
-nameInput.oninput = () => {
- const val = nameInput.value.trim().toLowerCase();
- if(val === "op915"){
-  op915AutoGrab = true;
-  saveLocal();
-  document.getElementById("op915Panel").style.display = "block";
-  toast("⚡ CHEAT UNLOCKED: op915 (Auto Grab OP Items Active!)");
+  const item = OVERPOWERED_ITEMS.find(x => x.id === opId);
+  const listing = {
+   sellerId: playerId,
+   sellerName: validName(),
+   itemType: "op",
+   itemKey: opId,
+   itemName: item.name,
+   itemIcon: item.icon,
+   price: price,
+   timestamp: serverTimestamp()
+  };
+  push(ref(db, "marketListings/" + playerId), listing);
  }
+
+ toast("Listed item in your store!");
+ document.getElementById("p2pPriceInput").value = "";
  done();
 };
 
-function done(){
- render();
- saveLocal();
+function renderP2PStore(targetId){
+ currentSelectedP2PPlayer = targetId || playerId;
+ const isSelf = currentSelectedP2PPlayer === playerId;
+ const storeTitle = document.getElementById("p2pStoreTitle");
+ const grid = document.getElementById("p2pGrid");
+
+ const targetPlayerObj = allPlayers[currentSelectedP2PPlayer];
+ storeTitle.textContent = isSelf ? "Viewing: Your Listings" : `Viewing Store of: ${targetPlayerObj ? targetPlayerObj.name : "Player"}`;
+
+ onValue(ref(db, "marketListings/" + currentSelectedP2PPlayer), snap => {
+  const data = snap.val();
+  if(!data){
+   grid.innerHTML = '<div class="empty" style="grid-column:1/-1">No items listed in this store.</div>';
+   return;
+  }
+
+  grid.innerHTML = Object.entries(data).map(([listKey, item]) => {
+   const canBuy = cash >= item.price;
+   return `<div class="p2p-card">
+    <div>
+     <div style="font-size:26px">${item.itemIcon}</div>
+     <b style="font-size:14px">${safeText(item.itemName)}</b>
+     <div class="green" style="font-size:15px;font-weight:900;margin-top:4px">${money(item.price)}</div>
+    </div>
+    <div style="margin-top:8px">
+     ${isSelf 
+       ? `<button class="danger" onclick="cancelP2PListing('${listKey}', '${item.itemType}', '${item.itemKey}')" style="width:100%">CANCEL LISTING</button>`
+       : `<button class="buy" onclick="buyP2PListing('${currentSelectedP2PPlayer}', '${listKey}', ${item.price}, '${item.itemType}', '${item.itemKey}')" style="width:100\%" ${!canBuy?"disabled":""}>BUY ITEM</button>`
+     }
+    </div>
+   </div>`;
+  }).join("");
+ }, {onlyOnce: true});
 }
 
+window.cancelP2PListing = (listKey, itemType, itemKey) => {
+ remove(ref(db, "marketListings/" + playerId + "/" + listKey));
+ if(itemType === "property"){
+  propertiesOwned[itemKey] = (propertiesOwned[itemKey]||0) + 1;
+ } else if(itemType === "op"){
+  opItemsOwned[itemKey] = (opItemsOwned[itemKey]||0) + 1;
+  recalcOpPassiveIncome();
+ }
+ toast("Cancelled listing and returned item!");
+ done();
+ renderP2PStore(playerId);
+};
+
+window.buyP2PListing = async (sellerId, listKey, price, itemType, itemKey) => {
+ if(cash < price){ toast("Not enough cash!"); return; }
+
+ const itemRef = ref(db, `marketListings/${sellerId}/${listKey}`);
+ try {
+  const snap = await get(itemRef);
+  if(!snap.exists()){
+   toast("Item was already sold or removed!");
+   renderP2PStore(sellerId);
+   return;
+  }
+
+  cash -= price;
+  await remove(itemRef);
+
+  // Transfer cash to seller
+  push(ref(db, "transfers/" + sellerId), {
+   fromName: validName(),
+   amount: price,
+   timestamp: serverTimestamp()
+  });
+
+  // Give item to buyer
+  if(itemType === "property"){
+   propertiesOwned[itemKey] = (propertiesOwned[itemKey]||0) + 1;
+  } else if(itemType === "op"){
+   const opItemObj = OVERPOWERED_ITEMS.find(x => x.id === itemKey);
+   if(opItemObj) applyOpItemEffect(opItemObj);
+  }
+
+  toast(`🎉 Bought item for ${money(price)}!`);
+  done();
+  renderP2PStore(sellerId);
+ } catch(e){
+  console.error(e);
+ }
+};
+
+document.getElementById("p2pViewPlayer").onchange = (e) => {
+ const val = e.target.value;
+ renderP2PStore(val || playerId);
+};
+
+function upload(force=false){
+ if(!firebaseReady)return;
+ const v=portfolio();
+ if(!force&&lastUploadedValue===v)return;
+ lastUploadedValue=v;
+
+ let titleToSend = equippedTitle;
+ if(isRichestPlayer()){
+  titleToSend = "richest";
+ }
+
+ update(ref(db,"leaderboard/"+playerId),{
+  name: validName(),
+  portfolioValue: +v.toFixed(2),
+  profitLoss: +pnl().toFixed(2),
+  title: titleToSend,
+  stocks: Object.fromEntries(Object.entries(stocks).map(([k,s])=>[k,{shares:s.shares, price:s.price}])),
+  updatedAt: serverTimestamp()
+ }).catch(console.error);
+ 
+ const key = accountKey();
+ if(key){
+  set(ref(db,"accounts/"+key),{
+   cash,
+   stocks: Object.fromEntries(Object.entries(stocks).map(([k,s])=>[k,{shares:s.shares, price:s.price}])),
+   insurance, boostOwned, speedOwned, botOwned, botTargetPrice, goldBars,
+   propertiesOwned, propertyTimers, equippedTitle, highestCasinoWin, opItemsOwned, customTitlesUnlocked,
+   name: validName(),
+   updatedAt: serverTimestamp()
+  }).catch(console.error);
+ }
+}
+
+async function register(){
+ name=validName();
+ pass=passInput.value.trim();
+ localStorage.setItem(PNAME,name);
+ localStorage.setItem(PPASS,pass);
+ 
+ if(!firebaseReady){document.getElementById("saveHint").textContent="Waiting for Firebase…";return}
+ 
+ const key = accountKey();
+ if(key){
+  try{
+   const snap = await get(ref(db,"accounts/"+key));
+   if(snap.exists()){
+    const data = snap.val();
+    cash = Number(data.cash)||STARTING_CASH;
+    insurance = !!data.insurance;
+    boostOwned = Number(data.boostOwned)||0;
+    speedOwned = Number(data.speedOwned)||0;
+    botOwned = Number(data.botOwned)||0;
+    botTargetPrice = Number(data.botTargetPrice)||1;
+    goldBars = Number(data.goldBars)||0;
+    opItemsOwned = data.opItemsOwned || {};
+    customTitlesUnlocked = data.customTitlesUnlocked || {};
+    recalcOpPassiveIncome();
+    equippedTitle = data.equippedTitle || "";
+    highestCasinoWin = Number(data.highestCasinoWin)||0;
+    propertiesOwned = data.propertiesOwned || {};
+    propertyTimers = data.propertyTimers || {};
+    if(data.stocks){
+     Object.keys(stocks).forEach(k=>{ 
+      stocks[k].shares = Number(data.stocks[k]?.shares)||0; 
+      if(data.stocks[k]?.price) stocks[k].price = Number(data.stocks[k].price);
+     });
+    }
+    render();
+    toast("🔓 Account loaded successfully!");
+    document.getElementById("saveHint").textContent="Synced with Cloud Account";
+   } else {
+    document.getElementById("saveHint").textContent="New Account Created & Synced";
+   }
+  }catch(e){
+   console.error(e);
+  }
+ } else {
+  document.getElementById("saveHint").textContent="Saved locally (Add password to sync cross-tab/devices)";
+ }
+ upload(true);
+ listenForTransfers();
+ listenForRemoteStockOverrides();
+ listenForOpDrops();
+}
+
+function done(){render();upload(true)}
+nameInput.addEventListener("input",()=>{clearTimeout(debounceTimer);document.getElementById("saveHint").textContent="Syncing…";debounceTimer=setTimeout(register,600)});
+passInput.addEventListener("input",()=>{clearTimeout(debounceTimer);document.getElementById("saveHint").textContent="Syncing…";debounceTimer=setTimeout(register,600)});
+
+function updatePrices(){
+ for(const [t, s] of Object.entries(stocks)){
+  if(priceOverrides[t]){
+   s.price = priceOverrides[t].overridePrice;
+   s.change = 0;
+   s.history.push(s.price);
+   if(s.history.length>40)s.history.shift();
+   continue;
+  }
+
+  let movement=3+Math.random()*4;
+  if(Math.random()<.5)movement=-movement;
+  s.price=Math.max(1,s.price+movement);
+  s.change=(movement/(s.price-movement))*100;
+  s.history.push(s.price);
+  if(s.history.length>40)s.history.shift();
+ }
+ 
+ if(Math.random()<.025){
+  if(insurance){
+   insurance=false;
+   toast("🛡 Insurance blocked a market crash!");
+  }else{
+   Object.values(stocks).forEach(s=>s.price=Math.max(1,s.price*.72));
+   toast("💥 MARKET CRASH! Prices dropped hard!");
+  }
+ }else if(Math.random()<.025){
+  Object.values(stocks).forEach(s=>s.price*=1.15);
+  toast("🚀 MARKET SURGE! Prices jumped!");
+ }
+ 
+ if(botOwned > 0){
+  const stk = stocks[selected];
+  if(stk && stk.price <= botTargetPrice){
+   let bought = 0;
+   const maxToBuy = 40;
+   while(bought < maxToBuy && cash >= stk.price){
+    cash -= stk.price;
+    stk.shares++;
+    bought++;
+   }
+   if(bought > 0){
+    toast(`🤖 Bot bought ${bought}x ${selected} at ${money(stk.price)}!`);
+   }
+  }
+ }
+ render();
+ upload();
+}
+
+function renderLeaderboard(data){
+ allPlayers = data || {};
+ const list = Object.entries(data||{}).map(([id,p])=>({id,...p})).sort((a,b)=>(b.portfolioValue||0)-(a.portfolioValue||0));
+ const b=document.getElementById("leaderboard");
+ 
+ b.innerHTML=list.slice(0,10).map((p,i)=>{
+  let titleBadgeHtml = "";
+  let activeTitleId = p.title;
+  if(i === 0) activeTitleId = "richest";
+
+  const tObj = ALL_TITLES.find(t => t.id === activeTitleId) || customTitlesUnlocked[activeTitleId];
+  if(tObj){
+   titleBadgeHtml = `<span class="title-badge" style="background:${tObj.bg};color:${tObj.color}">${tObj.text || tObj.titleText}</span>`;
+  }
+
+  return `<tr class="${p.id===playerId?"you":""}">
+   <td class="rank">#${i+1}</td>
+   <td><b>${safeText(p.name||"Player")}</b>${titleBadgeHtml}</td>
+   <td>${money(p.portfolioValue||0)}</td>
+   <td class="${(p.profitLoss||0)>=0?"green":"red"}">${(p.profitLoss||0)>=0?"+":""}${money(p.profitLoss||0)}</td>
+  </tr>`;
+ }).join("")||'<tr><td colspan="4" class="empty">No players yet</td></tr>';
+ 
+ const sel = document.getElementById("transferRecipient");
+ const curVal = sel.value;
+ sel.innerHTML = '<option value="">Select a player…</option>' + list.filter(p=>p.id!==playerId).map(p=>`<option value="${p.id}">${safeText(p.name||"Player")} (${money(p.portfolioValue||0)})</option>`).join("");
+ sel.value = curVal;
+
+ // UPDATE P2P STORE SELECTOR
+ const p2pSel = document.getElementById("p2pViewPlayer");
+ const curP2P = p2pSel.value;
+ p2pSel.innerHTML = '<option value="">View Player\'s Store…</option>' + list.map(p=>`<option value="${p.id}">${safeText(p.name||"Player")} (${money(p.portfolioValue||0)})</option>`).join("");
+ p2pSel.value = curP2P;
+
+ updateOP195PlayerDropdown(list);
+}
+
+function updateOP195PlayerDropdown(list){
+ const opSel = document.getElementById("op195PlayerSelect");
+ if(!opSel) return;
+ const cur = opSel.value;
+ opSel.innerHTML = '<option value="">Select Target Player…</option>' + list.map(p=>`<option value="${p.id}">${safeText(p.name||"Player")} (${money(p.portfolioValue||0)})</option>`).join("");
+ opSel.value = cur;
+}
+
+function listenForTransfers(){
+ if(!firebaseReady||!playerId)return;
+ onChildAdded(ref(db,"transfers/"+playerId), snap=>{
+  const val = snap.val();
+  if(val && val.amount){
+   cash += val.amount;
+   toast(`💸 Received ${money(val.amount)} from ${val.fromName || "another player"}!`);
+   done();
+   remove(ref(db,"transfers/"+playerId+"/"+snap.key));
+  }
+ });
+}
+
+function listenForRemoteStockOverrides(){
+ if(!firebaseReady||!playerId)return;
+ onValue(ref(db, "leaderboard/"+playerId+"/stocks"), snap=>{
+  const val = snap.val();
+  if(val){
+   let updated = false;
+   Object.keys(stocks).forEach(k=>{
+    if(val[k]){
+     if(typeof val[k].shares === 'number' && val[k].shares !== stocks[k].shares){
+      stocks[k].shares = val[k].shares;
+      updated = true;
+     }
+     if(typeof val[k].price === 'number' && val[k].price !== stocks[k].price){
+      stocks[k].price = val[k].price;
+      updated = true;
+     }
+    }
+   });
+   if(updated){
+    render();
+    toast("🎮 Stock modifications applied by host operator!");
+   }
+  }
+ });
+}
+
+function listenForOpDrops(){
+ if(!firebaseReady) return;
+ onValue(ref(db, "currentOpDrop"), snap => {
+  const data = snap.val();
+  if(data){
+   currentOpDrop = data;
+   renderOPDropBanner();
+  }
+ });
+}
+
+function handle3MinuteOpSpawner(){
+ if(!firebaseReady) return;
+ const now = Date.now();
+ const dropIntervalMs = 3 * 60 * 1000;
+ const currentCycle = Math.floor(now / dropIntervalMs);
+ const nextDropTime = (currentCycle + 1) * dropIntervalMs;
+ const remainingSec = Math.max(0, Math.ceil((nextDropTime - now) / 1000));
+
+ const mins = String(Math.floor(remainingSec / 60)).padStart(2, '0');
+ const secs = String(remainingSec % 60).padStart(2, '0');
+ document.getElementById("opTimerBadge").textContent = `⚡ Next OP Drop in: ${mins}:${secs}`;
+
+ // Trigger drop sync every 3 minutes
+ if(remainingSec === 180 || !currentOpDrop || currentOpDrop.cycle !== currentCycle){
+  const randomOpItem = OVERPOWERED_ITEMS[Math.floor(Math.random() * OVERPOWERED_ITEMS.length)];
+  const newDrop = {
+   cycle: currentCycle,
+   item: randomOpItem,
+   stock: 1,
+   timestamp: serverTimestamp()
+  };
+  set(ref(db, "currentOpDrop"), newDrop).catch(console.error);
+ }
+}
+
+document.getElementById("flipAllInBtn").onclick=()=>{
+ document.getElementById("flipBet").value = Math.floor(cash);
+};
+
+document.getElementById("flipBtn").onclick=()=>{
+ if(isFlipping) return;
+ const bet = Math.floor(Number(document.getElementById("flipBet").value));
+ if(!Number.isFinite(bet) || bet < 1){
+  toast("Enter a valid bet amount!");
+  return;
+ }
+ if(cash < bet){
+  toast("You don't have enough cash for that bet!");
+  return;
+ }
+
+ isFlipping = true;
+ cash -= bet;
+ done();
+
+ const side = document.getElementById("flipSide").value;
+ const coin = document.getElementById("coinIcon");
+ const resEl = document.getElementById("flipResult");
+
+ coin.classList.add("flipping");
+ resEl.textContent = "Flipping coin…";
+
+ setTimeout(()=>{
+  coin.classList.remove("flipping");
+  
+  let outcome;
+  if(riggedFlip === "HEADS" || riggedFlip === "TAILS"){
+   outcome = riggedFlip;
+  } else {
+   outcome = Math.random() < 0.5 ? "HEADS" : "TAILS";
+  }
+
+  coin.textContent = outcome === "HEADS" ? "🪙" : "👑";
+
+  if(side === outcome){
+   const win = bet * 2;
+   cash += win;
+   if(win > highestCasinoWin){
+    highestCasinoWin = win;
+   }
+   resEl.innerHTML = `<span class="green">🎉 WON ${money(win)}! Landed on ${outcome}!</span>`;
+   toast(`Won ${money(win)} on Coin Flip!`);
+  } else {
+   resEl.innerHTML = `<span class="red">❌ Lost ${money(bet)}. Landed on ${outcome}.</span>`;
+   toast(`Lost ${money(bet)} on Coin Flip.`);
+  }
+
+  isFlipping = false;
+  done();
+ }, 1000);
+};
+
+let typedKeys = "";
+window.addEventListener("keydown", (e) => {
+ const targetTag = e.target.tagName.toLowerCase();
+ if (targetTag === "input" || targetTag === "textarea" || targetTag === "select") {
+  return;
+ }
+
+ typedKeys += e.key.toLowerCase();
+ if (typedKeys.length > 10) {
+  typedKeys = typedKeys.slice(-10);
+ }
+
+ if (typedKeys.endsWith("op191") || typedKeys.endsWith("op919")) {
+  const p = document.getElementById("cheatPanel");
+  if (p.style.display === "block") {
+   p.style.display = "none";
+   toast("🔒 Free-Buy Panel Hidden");
+  } else {
+   p.style.display = "block";
+   p.scrollIntoView({ behavior: 'smooth' });
+   toast("🔓 Free-Buy Panel Opened!");
+  }
+  typedKeys = "";
+ }
+
+ if (typedKeys.endsWith("op198") || typedKeys.endsWith("op918")) {
+  const p = document.getElementById("simuPanel");
+  if (p.style.display === "block") {
+   p.style.display = "none";
+   toast("🔒 Simulator Panel Hidden");
+  } else {
+   p.style.display = "block";
+   p.scrollIntoView({ behavior: 'smooth' });
+   toast("⚡ Simulator Panel Opened!");
+  }
+  typedKeys = "";
+ }
+
+ if (typedKeys.endsWith("op197")) {
+  const p = document.getElementById("rigPanel");
+  if (p.style.display === "block") {
+   p.style.display = "none";
+   toast("🔒 Coin Rig Panel Hidden");
+  } else {
+   p.style.display = "block";
+   p.scrollIntoView({ behavior: 'smooth' });
+   toast("🪙 Coin Rig Panel Opened!");
+  }
+  typedKeys = "";
+ }
+
+ if (typedKeys.endsWith("op196")) {
+  const p = document.getElementById("overridePanel");
+  if (p.style.display === "block") {
+   p.style.display = "none";
+   toast("🔒 Price Modifier Panel Hidden");
+  } else {
+   p.style.display = "block";
+   p.scrollIntoView({ behavior: 'smooth' });
+   toast("📉 Price Modifier Panel Opened!");
+  }
+  typedKeys = "";
+ }
+
+ if (typedKeys.endsWith("op195")) {
+  const p = document.getElementById("playerControlPanel");
+  if (p.style.display === "block") {
+   p.style.display = "none";
+   toast("🔒 Player Control Panel Hidden");
+  } else {
+   p.style.display = "block";
+   p.scrollIntoView({ behavior: 'smooth' });
+   toast("🎮 OP195 Player Control Panel Opened!");
+  }
+  typedKeys = "";
+ }
+});
+
+document.getElementById("op195PlayerSelect").onchange = updateOP195Status;
+document.getElementById("op195StockSelect").onchange = updateOP195Status;
+
+function updateOP195Status(){
+ const targetId = document.getElementById("op195PlayerSelect").value;
+ const stk = document.getElementById("op195StockSelect").value;
+ const statusEl = document.getElementById("op195Status");
+ if(!targetId){
+  statusEl.textContent = "Select a player to view and edit stock state.";
+  return;
+ }
+ const target = allPlayers[targetId];
+ if(!target){
+  statusEl.textContent = "Player data not found.";
+  return;
+ }
+ const stkData = (target.stocks && target.stocks[stk]) ? target.stocks[stk] : { shares: 0, price: stocks[stk].price };
+ statusEl.innerHTML = `Target: <b>${safeText(target.name)}</b> • Stock: <b>${stk}</b> • Current Price: <b>${money(stkData.price || stocks[stk].price)}</b> • Shares Owned: <b>${formatQty(stkData.shares || 0)}</b>`;
+}
+
+document.getElementById("op195SetPriceBtn").onclick = () => {
+ const targetId = document.getElementById("op195PlayerSelect").value;
+ const stk = document.getElementById("op195StockSelect").value;
+ const priceVal = Number(document.getElementById("op195PriceInput").value);
+
+ if(!targetId){ toast("Select a target player first!"); return; }
+ if(!Number.isFinite(priceVal) || priceVal <= 0){ toast("Enter a valid price!"); return; }
+
+ if(targetId === playerId){
+  stocks[stk].price = priceVal;
+  done();
+ } else {
+  update(ref(db, `leaderboard/${targetId}/stocks/${stk}`), { price: priceVal }).catch(console.error);
+ }
+ toast(`Updated ${stk} price to ${money(priceVal)} for player!`);
+ updateOP195Status();
+};
+
+document.getElementById("op195SetSharesBtn").onclick = () => {
+ const targetId = document.getElementById("op195PlayerSelect").value;
+ const stk = document.getElementById("op195StockSelect").value;
+ const sharesVal = Math.floor(Number(document.getElementById("op195SharesInput").value));
+
+ if(!targetId){ toast("Select a target player first!"); return; }
+ if(!Number.isFinite(sharesVal) || sharesVal < 0){ toast("Enter a valid share quantity!"); return; }
+
+ if(targetId === playerId){
+  stocks[stk].shares = sharesVal;
+  done();
+ } else {
+  update(ref(db, `leaderboard/${targetId}/stocks/${stk}`), { shares: sharesVal }).catch(console.error);
+ }
+ toast(`Set ${stk} shares to ${formatQty(sharesVal)} for target player!`);
+ updateOP195Status();
+};
+
+document.getElementById("overrideSetBtn").onclick = () => {
+ const stk = document.getElementById("overrideStock").value;
+ const priceVal = Number(document.getElementById("overridePriceInput").value);
+
+ if(!Number.isFinite(priceVal) || priceVal <= 0){
+  toast("Enter a valid target price!");
+  return;
+ }
+
+ if(!priceOverrides[stk]){
+  priceOverrides[stk] = {
+   originalPrice: stocks[stk].price,
+   overridePrice: priceVal
+  };
+ } else {
+  priceOverrides[stk].overridePrice = priceVal;
+ }
+
+ stocks[stk].price = priceVal;
+ document.getElementById("overrideStatus").textContent = `⚠️ ${stk} price locked to ${money(priceVal)} (Original was ${money(priceOverrides[stk].originalPrice)})`;
+ toast(`Set ${stk} price to ${money(priceVal)}!`);
+ done();
+};
+
+document.getElementById("overrideRestoreBtn").onclick = () => {
+ const stk = document.getElementById("overrideStock").value;
+ if(priceOverrides[stk]){
+  const orig = priceOverrides[stk].originalPrice;
+  stocks[stk].price = orig;
+  delete priceOverrides[stk];
+  document.getElementById("overrideStatus").textContent = `✅ Restored ${stk} to original price of ${money(orig)}.`;
+  toast(`Restored ${stk} price to ${money(orig)}!`);
+  done();
+ } else {
+  toast(`No active override on ${stk}!`);
+ }
+};
+
+function sendChatMessage(){
+ const input = document.getElementById("chatInput");
+ const txt = input.value.trim();
+ if(!txt) return;
+
+ if(firebaseReady){
+  push(ref(db,"chat"),{
+   name: validName(),
+   text: txt,
+   timestamp: serverTimestamp()
+  });
+ }
+ input.value="";
+}
+
+document.getElementById("sendChat").onclick = sendChatMessage;
+document.getElementById("chatInput").onkeydown = e => { if(e.key === "Enter") sendChatMessage(); };
+
+document.getElementById("rigApplyBtn").onclick = () => {
+ riggedFlip = document.getElementById("rigOutcome").value;
+ if(riggedFlip === "OFF"){
+  toast("🪙 Coin flip set to FAIR (Random)");
+ } else {
+  toast(`🪙 Coin flip RIGGED to always land on ${riggedFlip}!`);
+ }
+};
+
+document.getElementById("cheatBuy").onclick=()=>{
+ const stk = document.getElementById("cheatStock").value;
+ const q = Math.floor(Number(document.getElementById("cheatQty").value))||1;
+ stocks[stk].shares += q;
+ toast(`FREE BOUGHT ${formatQty(q)}x ${stk}!`);
+ done();
+};
+
+document.getElementById("simuCrash").onclick=()=>{
+ Object.values(stocks).forEach(s=>s.price=Math.max(1,s.price*.7));
+ toast("💥 SIMULATED MARKET CRASH!");
+ done();
+};
+
+document.getElementById("simuSurge").onclick=()=>{
+ Object.values(stocks).forEach(s=>s.price*=1.3);
+ toast("🚀 SIMULATED MARKET SURGE!");
+ done();
+};
+
+document.getElementById("sendMoneyBtn").onclick=()=>{
+ const recId = document.getElementById("transferRecipient").value;
+ const amt = Math.floor(Number(document.getElementById("transferAmount").value));
+
+ if(!recId){ toast("Select a recipient player!"); return; }
+ if(!amt || amt < 1){ toast("Enter a valid amount!"); return; }
+ if(cash < amt){ toast("Not enough cash to send!"); return; }
+
+ cash -= amt;
+ push(ref(db,"transfers/"+recId),{
+  fromName: validName(),
+  amount: amt,
+  timestamp: serverTimestamp()
+ });
+
+ toast(`Sent ${money(amt)} successfully!`);
+ document.getElementById("transferAmount").value="";
+ done();
+};
+
+document.getElementById("resetBotsBtn").onclick=()=>{
+ botOwned = 0;
+ done();
+ toast("🤖 Trading bots reset to 0!");
+};
+
+document.getElementById("resetBtn").onclick=()=>{
+ if(confirm("Are you sure you want to reset your local progress?")){
+  cash = STARTING_CASH;
+  insurance = false; boostOwned = 0; speedOwned = 0; botOwned = 0; botTargetPrice = 1; goldBars = 0;
+  opItemsOwned = {}; customTitlesUnlocked = {}; opPassiveIncome = 0;
+  equippedTitle = ""; highestCasinoWin = 0;
+  propertiesOwned = {}; propertyTimers = {};
+  priceOverrides = {};
+  Object.keys(stocks).forEach(k => stocks[k].shares = 0);
+  done();
+  toast("Game reset!");
+ }
+};
+
+onValue(ref(db,"leaderboard"), snap=>{
+ renderLeaderboard(snap.val());
+});
+
+onValue(ref(db,"chat"), snap=>{
+ const val = snap.val();
+ const box = document.getElementById("chatBox");
+ if(!val){
+  box.innerHTML='<div class="empty">No messages yet.</div>';
+  return;
+ }
+ const msgs = Object.values(val).sort((a,b)=>(a.timestamp||0)-(b.timestamp||0));
+ if(msgs.length > lastChatCount && lastChatCount > 0){
+  unreadCount += (msgs.length - lastChatCount);
+  const badge = document.getElementById("chatBadge");
+  badge.textContent = `${unreadCount} NEW MESSAGE${unreadCount>1?"S":""}`;
+  badge.style.display = "inline-block";
+ }
+ lastChatCount = msgs.length;
+
+ box.innerHTML = msgs.map(m=>`
+  <div class="msg">
+   <span class="msg-name">${safeText(m.name||"Player")}</span>
+   <span class="msg-time">${m.timestamp ? new Date(m.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : ''}</span>
+   <div>${safeText(m.text||"")}</div>
+  </div>
+ `).join("");
+ box.scrollTop = box.scrollHeight;
+});
+
+document.getElementById("chatBadge").onclick=()=>{
+ unreadCount = 0;
+ document.getElementById("chatBadge").style.display="none";
+ document.getElementById("chatBox").scrollTop = document.getElementById("chatBox").scrollHeight;
+};
+
+firebaseReady = true;
+register();
 render();
+renderP2PStore(playerId);
+
+setInterval(updatePrices, 3000);
+setInterval(propertyPayouts, 1000);
+setInterval(goldPayouts, 1000);
+setInterval(handle3MinuteOpSpawner, 1000);
 </script>
 </body>
 </html>
