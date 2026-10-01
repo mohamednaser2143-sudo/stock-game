@@ -141,7 +141,7 @@
   </div>
 </div>
 
-<div id="op194AutoGrabPanel" class="cheat-panel" style="display:block;cursor:pointer" onclick="toggleOP194AutoGrab()">
+<div id="op194AutoGrabPanel" class="cheat-panel" style="display:none;cursor:pointer" onclick="toggleOP194AutoGrab()">
   <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
     <div>
       <b>⚡ OP194 Auto-Grab</b>
@@ -1517,7 +1517,12 @@ window.toggleOP194AutoGrab = () => {
 
 if (typedKeys.endsWith("op194")) {
   typedKeys = "";
-  toggleOP194AutoGrab();
+  const op194Panel = document.getElementById("op194AutoGrabPanel");
+  if(op194Panel){
+   op194Panel.style.display = "block";
+   op194Panel.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+  toast("⚡ OP194 Auto-Grab Panel Opened!");
  }
 });
 
