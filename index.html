@@ -4,7 +4,7 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>SimuTrade</title>
 <style>
-*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:Inter,Arial,sans-serif;background:radial-gradient(circle at top,#142844 0,#07111f 48%,#040a12 100%);color:#f8fafc}header{padding:18px 28px;background:rgba(8,18,32,.94);border-bottom:1px solid #243957;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;backdrop-filter:blur(10px)}h1{margin:0;font-size:27px}.sub{color:#8fa4bd;font-size:13px}main{max-width:1300px;margin:auto;padding:22px}.card{background:rgba(15,29,49,.92);border:1px solid #243957;border-radius:14px;padding:18px;box-shadow:0 12px 35px rgba(0,0,0,.18)}.notice{padding:11px 14px;border-radius:10px;background:#102b50;color:#b9d7ff;margin-bottom:16px;font-size:13px}.name-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end}label{display:block;color:#8fa4bd;font-size:12px;font-weight:700;letter-spacing:.06em}input,select{background:#081426;color:white;border:1px solid #38506f;border-radius:9px;padding:11px 12px;width:100%;margin-top:7px;outline:none}input:focus,select:focus{border-color:#3b82f6}button{border:0;border-radius:8px;padding:9px 12px;font-weight:800;cursor:pointer;transition:.15s transform,.15s opacity}button:hover{transform:translateY(-1px)}button:disabled{opacity:.45;cursor:not-allowed;transform:none}.primary{background:#3b82f6;color:white}.buy{background:#10b981;color:#032b1d}.sell{background:#ef4444;color:white}.neutral{background:#334155;color:white}.gold{background:#d4a72c;color:#17120a}.purple{background:#8b5cf6;color:white}.danger{background:#b91c1c;color:white}.top{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin:18px 0}.label{color:#8fa4bd;font-size:12px;font-weight:700}.big{font-size:28px;font-weight:800;margin-top:7px}.green{color:#34d399}.red{color:#fb7185}.grid{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-bottom:18px}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:12px 9px;border-bottom:1px solid #263952}th{color:#8fa4bd;font-size:12px}td{font-size:14px}.actions{display:flex;gap:5px;flex-wrap:wrap}.qty{width:82px!important;margin:0!important;padding:8px!important}.rank{font-weight:800;width:34px}.you{background:rgba(59,130,246,.11)}.leader-title,.section-title{display:flex;justify-content:space-between;align-items:center;gap:10px}.small-status{font-size:11px;color:#8fa4bd}.empty{text-align:center;color:#8fa4bd;padding:22px}.spark-wrap{margin-top:7px;width:170px;height:48px;border:1px solid #2b4260;border-radius:7px;background:#081426;overflow:hidden}.spark{display:block;width:170px;height:48px}.arrow{font-size:18px;font-weight:900;display:inline-block;margin-right:4px}.selected{margin-top:18px}.stock-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.stock-tab{background:#17243a;color:#cbd5e1;border:1px solid #314663}.stock-tab.active{background:#2563eb;color:white;border-color:#3b82f6}.selected-main{display:grid;grid-template-columns:1fr 1.5fr;gap:18px;align-items:center}.selected-price{font-size:36px;font-weight:900}.selected-change{font-size:17px;font-weight:800;margin-top:4px}.big-chart{width:100%;height:190px;background:#081426;border:1px solid #2b4260;border-radius:10px}.trade-box{margin-top:14px}.trade-row{display:flex;gap:7px;flex-wrap:wrap;align-items:center}.trade-row .qty{width:110px!important}.shop-grid,.property-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}.shop-item,.property-card{background:#0b1729;border:1px solid #2a415f;border-radius:12px;padding:15px}.shop-item h3,.property-card h3{margin:0 0 6px}.price{font-weight:900;font-size:18px}.muted{color:#8fa4bd;font-size:12px}.owned{color:#34d399;font-weight:800}.property-icon{font-size:34px}.property-stats{display:flex;justify-content:space-between;gap:8px;margin:9px 0;color:#cbd5e1;font-size:13px}.timer-badge{color:#60a5fa;font-weight:800;font-size:13px;margin-top:6px}.shop-btn-row{display:flex;gap:6px;margin-top:10px}.shop-btn-row button{flex:1}.chat-layout{display:grid;grid-template-columns:1fr;gap:12px}.chat-box{height:300px;overflow-y:auto;background:#081426;border:1px solid #2b4260;border-radius:10px;padding:12px}.msg{padding:7px 8px;border-bottom:1px solid #182c46}.msg:last-child{border-bottom:0}.msg-name{font-weight:900;color:#60a5fa}.msg-time{font-size:10px;color:#64748b;margin-left:7px}.chat-send{display:flex;gap:8px}.chat-send input{margin:0;flex:1}.send-money-box{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid #243957}.send-money-box select,.send-money-box input{width:auto;margin:0;flex:1}.cheat-panel{display:none;margin-top:12px;border:1px dashed #7c3aed;background:#170d2b;border-radius:10px;padding:12px}.toast{position:fixed;right:18px;bottom:18px;background:#0b1729;border:1px solid #38506f;padding:12px 15px;border-radius:10px;display:none;z-index:50;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:Inter,Arial,sans-serif;background:radial-gradient(circle at top,#142844 0,#07111f 48%,#040a12 100%);color:#f8fafc}header{padding:18px 28px;background:rgba(8,18,32,.94);border-bottom:1px solid #243957;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;backdrop-filter:blur(10px)}h1{margin:0;font-size:27px}.sub{color:#8fa4bd;font-size:13px}main{max-width:1300px;margin:auto;padding:22px}.card{background:rgba(15,29,49,.92);border:1px solid #243957;border-radius:14px;padding:18px;box-shadow:0 12px 35px rgba(0,0,0,.18)}.notice{padding:11px 14px;border-radius:10px;background:#102b50;color:#b9d7ff;margin-bottom:16px;font-size:13px}.name-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end}label{display:block;color:#8fa4bd;font-size:12px;font-weight:700;letter-spacing:.06em}input,select{background:#081426;color:white;border:1px solid #38506f;border-radius:9px;padding:11px 12px;width:100%;margin-top:7px;outline:none}input:focus,select:focus{border-color:#3b82f6}button{border:0;border-radius:8px;padding:9px 12px;font-weight:800;cursor:pointer;transition:.15s transform,.15s opacity}button:hover{transform:translateY(-1px)}button:disabled{opacity:.45;cursor:not-allowed;transform:none}.primary{background:#3b82f6;color:white}.buy{background:#10b981;color:#032b1d}.sell{background:#ef4444;color:white}.neutral{background:#334155;color:white}.gold{background:#d4a72c;color:#17120a}.purple{background:#8b5cf6;color:white}.danger{background:#b91c1c;color:white}.top{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin:18px 0}.label{color:#8fa4bd;font-size:12px;font-weight:700}.big{font-size:28px;font-weight:800;margin-top:7px;word-break:break-all}.green{color:#34d399}.red{color:#fb7185}.grid{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-bottom:18px}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:12px 9px;border-bottom:1px solid #263952}th{color:#8fa4bd;font-size:12px}td{font-size:14px}.actions{display:flex;gap:5px;flex-wrap:wrap}.qty{width:82px!important;margin:0!important;padding:8px!important}.rank{font-weight:800;width:34px}.you{background:rgba(59,130,246,.11)}.leader-title,.section-title{display:flex;justify-content:space-between;align-items:center;gap:10px}.small-status{font-size:11px;color:#8fa4bd}.empty{text-align:center;color:#8fa4bd;padding:22px}.spark-wrap{margin-top:7px;width:170px;height:48px;border:1px solid #2b4260;border-radius:7px;background:#081426;overflow:hidden}.spark{display:block;width:170px;height:48px}.arrow{font-size:18px;font-weight:900;display:inline-block;margin-right:4px}.selected{margin-top:18px}.stock-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.stock-tab{background:#17243a;color:#cbd5e1;border:1px solid #314663}.stock-tab.active{background:#2563eb;color:white;border-color:#3b82f6}.selected-main{display:grid;grid-template-columns:1fr 1.5fr;gap:18px;align-items:center}.selected-price{font-size:36px;font-weight:900;word-break:break-all}.selected-change{font-size:17px;font-weight:800;margin-top:4px}.big-chart{width:100%;height:190px;background:#081426;border:1px solid #2b4260;border-radius:10px}.trade-box{margin-top:14px}.trade-row{display:flex;gap:7px;flex-wrap:wrap;align-items:center}.trade-row .qty{width:110px!important}.shop-grid,.property-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}.shop-item,.property-card{background:#0b1729;border:1px solid #2a415f;border-radius:12px;padding:15px}.shop-item h3,.property-card h3{margin:0 0 6px}.price{font-weight:900;font-size:18px}.muted{color:#8fa4bd;font-size:12px}.owned{color:#34d399;font-weight:800}.property-icon{font-size:34px}.property-stats{display:flex;justify-content:space-between;gap:8px;margin:9px 0;color:#cbd5e1;font-size:13px}.timer-badge{color:#60a5fa;font-weight:800;font-size:13px;margin-top:6px}.shop-btn-row{display:flex;gap:6px;margin-top:10px}.shop-btn-row button{flex:1}.chat-layout{display:grid;grid-template-columns:1fr;gap:12px}.chat-box{height:300px;overflow-y:auto;background:#081426;border:1px solid #2b4260;border-radius:10px;padding:12px}.msg{padding:7px 8px;border-bottom:1px solid #182c46}.msg:last-child{border-bottom:0}.msg-name{font-weight:900;color:#60a5fa}.msg-time{font-size:10px;color:#64748b;margin-left:7px}.chat-send{display:flex;gap:8px}.chat-send input{margin:0;flex:1}.send-money-box{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid #243957}.send-money-box select,.send-money-box input{width:auto;margin:0;flex:1}.cheat-panel{display:none;margin-top:12px;border:1px dashed #7c3aed;background:#170d2b;border-radius:10px;padding:12px}.toast{position:fixed;right:18px;bottom:18px;background:#0b1729;border:1px solid #38506f;padding:12px 15px;border-radius:10px;display:none;z-index:50;box-shadow:0 10px 30px rgba(0,0,0,.4)}
 .chat-badge{display:none;background:#ef4444;color:white;font-size:11px;font-weight:900;padding:2px 8px;border-radius:12px;cursor:pointer;animation:pulse 1.5s infinite}
 @keyframes pulse{0%{opacity:1}50%{opacity:.5}100%{opacity:1}}
 @media(max-width:950px){.grid,.selected-main{grid-template-columns:1fr}.shop-grid,.property-grid{grid-template-columns:1fr 1fr}}@media(max-width:700px){.top{grid-template-columns:1fr}.name-row{grid-template-columns:1fr}header{padding:15px 17px}main{padding:14px}.shop-grid,.property-grid{grid-template-columns:1fr}.trade-row,.send-money-box{align-items:stretch;flex-direction:column}.trade-row>*, .send-money-box>*{width:100%!important}}
@@ -27,7 +27,7 @@
 
 <div class="card selected"><div class="section-title"><h2>📈 SELECTED STOCK</h2><span class="muted">Click a stock to inspect it</span></div><div class="stock-tabs" id="stockTabs"></div><div class="selected-main"><div><div class="sub" id="selectedName">Apple (AAPL)</div><div class="selected-price" id="selectedPrice">$225.00</div><div class="selected-change green" id="selectedChange">▲ +0.00%</div><div class="trade-box"><div class="trade-row"><input id="qty" class="qty" type="number" min="1" step="1" value="1"><button class="buy" id="buyQtyBtn">BUY QTY</button><button class="buy" id="buyAllBtn">BUY ALL</button><button class="sell" id="sellQtyBtn">SELL QTY</button><button class="sell" id="sellAllBtn">SELL ALL</button></div><div class="muted" style="margin-top:8px">Shares owned: <b id="selectedShares">0</b> • Can buy: <b id="canBuy">0</b></div></div></div><canvas id="bigChart" class="big-chart" width="800" height="260"></canvas></div></div>
 
-<div class="card" style="margin-top:18px"><div class="section-title"><h2>🛍️️ Stock Shop</h2><span class="muted">Spend cash on upgrades and assets</span></div><div class="shop-grid" id="shopGrid"></div></div>
+<div class="card" style="margin-top:18px"><div class="section-title"><h2>🛍 Stock Shop</h2><span class="muted">Spend cash on upgrades and assets</span></div><div class="shop-grid" id="shopGrid"></div></div>
 
 <div class="card" style="margin-top:18px"><div class="section-title"><h2>🏠 My Properties</h2><span class="muted">Your properties generate cash automatically</span></div><div class="property-grid" id="propertyGrid"></div></div>
 
@@ -101,7 +101,29 @@ function accountKey(){
  return "user_"+btoa(n+":"+p).replace(/=/g,"").replace(/[^a-zA-Z0-9]/g,"");
 }
 
-const money=n=>"$"+Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+function money(n){
+ const num = Number(n);
+ if(!Number.isFinite(num)) return "$0.00";
+ const abs = Math.abs(num);
+ const sign = num < 0 ? "-" : "";
+ 
+ if(abs >= 1e12){
+  return sign + "$" + abs.toExponential(2);
+ } else if(abs >= 1e9){
+  return sign + "$" + (abs / 1e9).toFixed(2) + "B";
+ } else if(abs >= 1e6){
+  return sign + "$" + (abs / 1e6).toFixed(2) + "M";
+ }
+ return sign + "$" + abs.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+function formatQty(n){
+ const num = Number(n);
+ if(!Number.isFinite(num)) return "0";
+ if(num >= 1e12) return num.toExponential(2);
+ return num.toLocaleString();
+}
+
 function safeText(v){const e=document.createElement("span");e.textContent=String(v??"");return e.innerHTML}
 function validName(){return(nameInput.value.trim()||"Player").slice(0,20)}
 
@@ -120,17 +142,17 @@ function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t
 
 function render(){
  const b=document.getElementById("market");b.innerHTML="";
- for(const[t,s]of Object.entries(stocks)){const c=s.change,q=Math.floor(cash/s.price);b.insertAdjacentHTML("beforeend",`<tr><td><b>${safeText(t)}</b><br><span class="sub">${safeText(s.name)}</span></td><td><div><b>${money(s.price)}</b></div><div class="spark-wrap"><canvas class="spark" id="chart-${t}" width="170" height="48"></canvas></div></td><td class="${c>=0?"green":"red"}"><span class="arrow">${c>=0?"▲":"▼"}</span>${c>=0?"+":""}${c.toFixed(2)}%</td><td>${s.shares}</td><td><div class="actions"><button class="buy" onclick="buy('${t}')" ${q<1?"disabled":""}>BUY</button><button class="buy" onclick="buyAll('${t}')" ${q<1?"disabled":""}>BUY ALL</button><button class="sell" onclick="sell('${t}')" ${s.shares<1?"disabled":""}>SELL</button><button class="sell" onclick="sellAll('${t}')" ${s.shares<1?"disabled":""}>SELL ALL</button></div></td></tr>`)}
+ for(const[t,s]of Object.entries(stocks)){const c=s.change,q=Math.floor(cash/s.price);b.insertAdjacentHTML("beforeend",`<tr><td><b>${safeText(t)}</b><br><span class="sub">${safeText(s.name)}</span></td><td><div><b>${money(s.price)}</b></div><div class="spark-wrap"><canvas class="spark" id="chart-${t}" width="170" height="48"></canvas></div></td><td class="${c>=0?"green":"red"}"><span class="arrow">${c>=0?"▲":"▼"}</span>${c>=0?"+":""}${c.toFixed(2)}%</td><td>${formatQty(s.shares)}</td><td><div class="actions"><button class="buy" onclick="buy('${t}')" ${q<1?"disabled":""}>BUY</button><button class="buy" onclick="buyAll('${t}')" ${q<1?"disabled":""}>BUY ALL</button><button class="sell" onclick="sell('${t}')" ${s.shares<1?"disabled":""}>SELL</button><button class="sell" onclick="sellAll('${t}')" ${s.shares<1?"disabled":""}>SELL ALL</button></div></td></tr>`)}
  for(const t of Object.keys(stocks))drawSmall(t);
  document.getElementById("cash").textContent=money(cash);document.getElementById("portfolio").textContent=money(portfolio());const p=pnl(),pe=document.getElementById("pnl");pe.textContent=(p>=0?"+":"-")+money(Math.abs(p));pe.className="big "+(p>=0?"green":"red");
  renderSelected();renderShop();renderProperties();saveLocal();
 }
 function drawSmall(t){const s=stocks[t],c=document.getElementById("chart-"+t);if(!c)return;const x=c.getContext("2d"),w=c.width,h=c.height,v=s.history,min=Math.min(...v),max=Math.max(...v),r=max-min||1;x.clearRect(0,0,w,h);x.beginPath();v.forEach((n,i)=>{const px=v.length===1?w/2:i/(v.length-1)*(w-4)+2,py=h-4-(n-min)/r*(h-8);i?x.lineTo(px,py):x.moveTo(px,py)});x.strokeStyle=s.change>=0?"#10b981":"#ef4444";x.lineWidth=2;x.stroke()}
 function drawBig(){const c=document.getElementById("bigChart"),s=stocks[selected],x=c.getContext("2d"),w=c.width,h=c.height,v=s.history,min=Math.min(...v),max=Math.max(...v),r=max-min||1;x.clearRect(0,0,w,h);x.strokeStyle="#243957";x.lineWidth=1;for(let i=1;i<5;i++){x.beginPath();x.moveTo(0,i*h/5);x.lineTo(w,i*h/5);x.stroke()}x.beginPath();v.forEach((n,i)=>{const px=v.length===1?w/2:i/(v.length-1)*(w-8)+4,py=h-8-(n-min)/r*(h-16);i?x.lineTo(px,py):x.moveTo(px,py)});x.strokeStyle=s.change>=0?"#10b981":"#ef4444";x.lineWidth=3;x.stroke()}
-function renderSelected(){const s=stocks[selected];document.getElementById("selectedName").textContent=`${s.name} (${selected})`;document.getElementById("selectedPrice").textContent=money(s.price);const e=document.getElementById("selectedChange");e.textContent=`${s.change>=0?"▲":"▼"} ${s.change>=0?"+":""}${s.change.toFixed(2)}%`;e.className="selected-change "+(s.change>=0?"green":"red");document.getElementById("selectedShares").textContent=s.shares;document.getElementById("canBuy").textContent=Math.floor(cash/s.price);document.getElementById("stockTabs").innerHTML=Object.entries(stocks).map(([t,z])=>`<button class="stock-tab ${t===selected?"active":""}" onclick="selectStock('${t}')">${z.name} ${t}</button>`).join("");drawBig()}
+function renderSelected(){const s=stocks[selected];document.getElementById("selectedName").textContent=`${s.name} (${selected})`;document.getElementById("selectedPrice").textContent=money(s.price);const e=document.getElementById("selectedChange");e.textContent=`${s.change>=0?"▲":"▼"} ${s.change>=0?"+":""}${s.change.toFixed(2)}%`;e.className="selected-change "+(s.change>=0?"green":"red");document.getElementById("selectedShares").textContent=formatQty(s.shares);document.getElementById("canBuy").textContent=formatQty(Math.floor(cash/s.price));document.getElementById("stockTabs").innerHTML=Object.entries(stocks).map(([t,z])=>`<button class="stock-tab ${t===selected?"active":""}" onclick="selectStock('${t}')">${z.name} ${t}</button>`).join("");drawBig()}
 window.selectStock=t=>{selected=t;renderSelected()};
-function doBuy(t,q){q=Math.floor(Number(q));const s=stocks[t];if(!Number.isFinite(q)||q<1)return;if(cash>=s.price*q){cash-=s.price*q;s.shares+=q;done();toast(`Bought ${q} ${t} share${q>1?"s":""}.`)}else toast("Not enough cash.")}
-function doSell(t,q){q=Math.floor(Number(q));const s=stocks[t];if(!Number.isFinite(q)||q<1)return;if(s.shares>=q){cash+=s.price*q;s.shares-=q;done();toast(`Sold ${q} ${t} share${q>1?"s":""}.`)}else toast("You don't own enough shares.")}
+function doBuy(t,q){q=Math.floor(Number(q));const s=stocks[t];if(!Number.isFinite(q)||q<1)return;if(cash>=s.price*q){cash-=s.price*q;s.shares+=q;done();toast(`Bought ${formatQty(q)} ${t} share${q>1?"s":""}.`)}else toast("Not enough cash.")}
+function doSell(t,q){q=Math.floor(Number(q));const s=stocks[t];if(!Number.isFinite(q)||q<1)return;if(s.shares>=q){cash+=s.price*q;s.shares-=q;done();toast(`Sold ${formatQty(q)} ${t} share${q>1?"s":""}.`)}else toast("You don't own enough shares.")}
 window.buy=t=>doBuy(t,1);window.sell=t=>doSell(t,1);window.buyAll=t=>doBuy(t,Math.floor(cash/stocks[t].price));window.sellAll=t=>doSell(t,stocks[t].shares);
 document.getElementById("buyQtyBtn").onclick=()=>doBuy(selected,document.getElementById("qty").value);document.getElementById("sellQtyBtn").onclick=()=>doSell(selected,document.getElementById("qty").value);document.getElementById("buyAllBtn").onclick=()=>window.buyAll(selected);document.getElementById("sellAllBtn").onclick=()=>window.sellAll(selected);
 function renderShop(){
@@ -138,12 +160,12 @@ function renderShop(){
  const items=[...Object.entries(shopItems)];
  g.innerHTML=items.map(([id,it])=>{
   let owned="";
-  if(it.type==="property")owned=propertiesOwned[it.property]?`<div class="owned">Owned: ${propertiesOwned[it.property]}</div>`:"";
-  if(it.type==="gold")owned=`<div class="owned">Owned: ${goldBars}</div>`;
+  if(it.type==="property")owned=propertiesOwned[it.property]?`<div class="owned">Owned: ${formatQty(propertiesOwned[it.property])}</div>`:"";
+  if(it.type==="gold")owned=`<div class="owned">Owned: ${formatQty(goldBars)}</div>`;
   if(it.type==="insurance")owned=`<div class="owned">${insurance?"Active":"Not active"}</div>`;
-  if(it.type==="boost")owned=`<div class="owned">Available: ${boostOwned}</div>`;
-  if(it.type==="speed")owned=`<div class="owned">Owned: ${speedOwned}</div>`;
-  if(it.type==="bot")owned=`<div class="owned">Owned: ${botOwned}</div>`;
+  if(it.type==="boost")owned=`<div class="owned">Available: ${formatQty(boostOwned)}</div>`;
+  if(it.type==="speed")owned=`<div class="owned">Owned: ${formatQty(speedOwned)}</div>`;
+  if(it.type==="bot")owned=`<div class="owned">Owned: ${formatQty(botOwned)}</div>`;
   
   const cost = it.cost || properties[it.property].cost;
   const canBuySingle = cash >= cost;
@@ -152,7 +174,7 @@ function renderShop(){
    <div style="font-size:28px">${it.icon||properties[it.property].icon}</div>
    <h3>${it.name||properties[it.property].name}</h3>
    <div class="muted">${it.desc||properties[it.property].desc}</div>
-   ${it.type==="property"?`<div class="property-stats"><span>⏱ ${properties[it.property].interval}s</span><span>+$${properties[it.property].income.toLocaleString()}</span></div>`:""}
+   ${it.type==="property"?`<div class="property-stats"><span>⏱ ${properties[it.property].interval}s</span><span>+${money(properties[it.property].income)}</span></div>`:""}
    <div class="price">${money(cost)}</div>
    ${owned}
    <div class="shop-btn-row">
@@ -180,18 +202,18 @@ window.buyShop=(id, qtyMode=1)=>{
   if(!propertyTimers[pKey]){
    propertyTimers[pKey]=Date.now();
   }
-  toast(`Bought ${qty}x ${properties[pKey].name}!`);
+  toast(`Bought ${formatQty(qty)}x ${properties[pKey].name}!`);
  }else if(it.type==="gold"){
   cash -= cost * qty;
   goldBars += qty;
-  toast(`Bought ${qty}x Gold Bar!`);
+  toast(`Bought ${formatQty(qty)}x Gold Bar!`);
  }else if(it.type==="boost"){
   cash -= cost * qty;
   boostOwned += qty;
   for(let i=0;i<qty;i++){
    for(const s of Object.values(stocks)) s.price *= 1.05;
   }
-  toast(`Activated ${qty}x Market Boost!`);
+  toast(`Activated ${formatQty(qty)}x Market Boost!`);
  }else if(it.type==="insurance"){
   cash -= cost;
   insurance = true;
@@ -199,11 +221,11 @@ window.buyShop=(id, qtyMode=1)=>{
  }else if(it.type==="speed"){
   cash -= cost * qty;
   speedOwned += qty;
-  toast(`Bought ${qty}x Trading Speed!`);
+  toast(`Bought ${formatQty(qty)}x Trading Speed!`);
  }else if(it.type==="bot"){
   cash -= cost * qty;
   botOwned += qty;
-  toast(`Bought ${qty}x Trading Bot!`);
+  toast(`Bought ${formatQty(qty)}x Trading Bot!`);
  }else if(it.type==="mystery"){
   let totalSpent = 0;
   for(let i=0; i<qty; i++){
@@ -213,7 +235,7 @@ window.buyShop=(id, qtyMode=1)=>{
     mysteryBox(true);
    }
   }
-  toast(`Opened ${qty}x Mystery Boxes!`);
+  toast(`Opened ${formatQty(qty)}x Mystery Boxes!`);
  }
  done();
 };
@@ -277,7 +299,7 @@ function renderProperties(){
    <h3>${p.name}</h3>
    <div class="muted">${p.desc}</div>
    <div class="property-stats"><span>Payout: Every ${p.interval}s</span><b class="green">+${money(p.income)}</b></div>
-   <div class="owned">You own: ${n}</div>
+   <div class="owned">You own: ${formatQty(n)}</div>
    <div class="timer-badge" id="timer-${k}">⏱ Next payout in --s</div>
   </div>`;
  }).join("");
@@ -475,7 +497,7 @@ if(code.endsWith("op919")){document.getElementById("cheatPanel").style.display="
 if(code.endsWith("op918")){document.getElementById("simuPanel").style.display="block";toast("⚡ Event Simulator unlocked");code=""}
 }});
 
-document.getElementById("cheatBuy").onclick=()=>{const t=document.getElementById("cheatStock").value,q=Math.max(1,Math.floor(Number(document.getElementById("cheatQty").value)||1));stocks[t].shares+=q;done();toast(`Free bought ${q} ${t} share${q>1?"s":""}.`)};
+document.getElementById("cheatBuy").onclick=()=>{const t=document.getElementById("cheatStock").value,q=Math.max(1,Math.floor(Number(document.getElementById("cheatQty").value)||1));stocks[t].shares+=q;done();toast(`Free bought ${formatQty(q)} ${t} share${q>1?"s":""}.`)};
 
 document.getElementById("simuCrash").onclick=()=>{
  if(insurance){insurance=false;toast("🛡️ Insurance blocked the simulated crash!");render();return}
