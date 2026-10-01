@@ -210,9 +210,13 @@ window.buyShop=(id, qtyMode=1)=>{
  }else if(it.type==="boost"){
   cash -= cost * qty;
   boostOwned += qty;
-  for(let i=0;i<qty;i++){
-   for(const s of Object.values(stocks)) s.price *= 1.05;
+  
+  // Instant O(1) exponential math to eliminate lag completely
+  const multiplier = Math.pow(1.05, qty);
+  for(const s of Object.values(stocks)){
+   s.price *= multiplier;
   }
+  
   toast(`Activated ${formatQty(qty)}x Market Boost!`);
  }else if(it.type==="insurance"){
   cash -= cost;
@@ -229,11 +233,9 @@ window.buyShop=(id, qtyMode=1)=>{
  }else if(it.type==="mystery"){
   // Cap mystery boxes to prevent frozen browser tab
   const actualQty = Math.min(qty, 10000);
-  let totalSpent = 0;
   for(let i=0; i<actualQty; i++){
    if(cash >= cost){
     cash -= cost;
-    totalSpent += cost;
     mysteryBox(true);
    }
   }
