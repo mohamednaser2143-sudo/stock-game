@@ -6,8 +6,12 @@
 <style>
 *{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:Inter,Arial,sans-serif;background:radial-gradient(circle at top,#142844 0,#07111f 48%,#040a12 100%);color:#f8fafc}header{padding:18px 28px;background:rgba(8,18,32,.94);border-bottom:1px solid #243957;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;backdrop-filter:blur(10px)}h1{margin:0;font-size:27px}.sub{color:#8fa4bd;font-size:13px}main{max-width:1300px;margin:auto;padding:22px}.card{background:rgba(15,29,49,.92);border:1px solid #243957;border-radius:14px;padding:18px;box-shadow:0 12px 35px rgba(0,0,0,.18)}.notice{padding:11px 14px;border-radius:10px;background:#102b50;color:#b9d7ff;margin-bottom:16px;font-size:13px}.name-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end}label{display:block;color:#8fa4bd;font-size:12px;font-weight:700;letter-spacing:.06em}input,select{background:#081426;color:white;border:1px solid #38506f;border-radius:9px;padding:11px 12px;width:100%;margin-top:7px;outline:none}input:focus,select:focus{border-color:#3b82f6}button{border:0;border-radius:8px;padding:9px 12px;font-weight:800;cursor:pointer;transition:.15s transform,.15s opacity}button:hover{transform:translateY(-1px)}button:disabled{opacity:.45;cursor:not-allowed;transform:none}.primary{background:#3b82f6;color:white}.buy{background:#10b981;color:#032b1d}.sell{background:#ef4444;color:white}.neutral{background:#334155;color:white}.gold{background:#d4a72c;color:#17120a}.purple{background:#8b5cf6;color:white}.danger{background:#b91c1c;color:white}.top{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin:18px 0}.label{color:#8fa4bd;font-size:12px;font-weight:700}.big{font-size:28px;font-weight:800;margin-top:7px;word-break:break-all}.green{color:#34d399}.red{color:#fb7185}.grid{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-bottom:18px}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:12px 9px;border-bottom:1px solid #263952}th{color:#8fa4bd;font-size:12px}td{font-size:14px}.actions{display:flex;gap:5px;flex-wrap:wrap}.qty{width:82px!important;margin:0!important;padding:8px!important}.rank{font-weight:800;width:34px}.you{background:rgba(59,130,246,.11)}.leader-title,.section-title{display:flex;justify-content:space-between;align-items:center;gap:10px}.small-status{font-size:11px;color:#8fa4bd}.empty{text-align:center;color:#8fa4bd;padding:22px}.spark-wrap{margin-top:7px;width:170px;height:48px;border:1px solid #2b4260;border-radius:7px;background:#081426;overflow:hidden}.spark{display:block;width:170px;height:48px}.arrow{font-size:18px;font-weight:900;display:inline-block;margin-right:4px}.selected{margin-top:18px}.stock-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.stock-tab{background:#17243a;color:#cbd5e1;border:1px solid #314663}.stock-tab.active{background:#2563eb;color:white;border-color:#3b82f6}.selected-main{display:grid;grid-template-columns:1fr 1.5fr;gap:18px;align-items:center}.selected-price{font-size:36px;font-weight:900;word-break:break-all}.selected-change{font-size:17px;font-weight:800;margin-top:4px}.big-chart{width:100%;height:190px;background:#081426;border:1px solid #2b4260;border-radius:10px}.trade-box{margin-top:14px}.trade-row{display:flex;gap:7px;flex-wrap:wrap;align-items:center}.trade-row .qty{width:110px!important}.shop-grid,.property-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}.shop-item,.property-card{background:#0b1729;border:1px solid #2a415f;border-radius:12px;padding:15px}.shop-item h3,.property-card h3{margin:0 0 6px}.price{font-weight:900;font-size:18px}.muted{color:#8fa4bd;font-size:12px}.owned{color:#34d399;font-weight:800}.property-icon{font-size:34px}.property-stats{display:flex;justify-content:space-between;gap:8px;margin:9px 0;color:#cbd5e1;font-size:13px}.timer-badge{color:#60a5fa;font-weight:800;font-size:13px;margin-top:6px}.shop-btn-row{display:flex;gap:6px;margin-top:10px}.shop-btn-row button{flex:1}.chat-layout{display:grid;grid-template-columns:1fr;gap:12px}.chat-box{height:300px;overflow-y:auto;background:#081426;border:1px solid #2b4260;border-radius:10px;padding:12px}.msg{padding:7px 8px;border-bottom:1px solid #182c46}.msg:last-child{border-bottom:0}.msg-name{font-weight:900;color:#60a5fa}.msg-time{font-size:10px;color:#64748b;margin-left:7px}.chat-send{display:flex;gap:8px}.chat-send input{margin:0;flex:1}.send-money-box{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid #243957}.send-money-box select,.send-money-box input{width:auto;margin:0;flex:1}.cheat-panel{display:none;margin-top:12px;border:1px dashed #7c3aed;background:#170d2b;border-radius:10px;padding:12px}.toast{position:fixed;right:18px;bottom:18px;background:#0b1729;border:1px solid #38506f;padding:12px 15px;border-radius:10px;display:none;z-index:50;box-shadow:0 10px 30px rgba(0,0,0,.4)}
 .chat-badge{display:none;background:#ef4444;color:white;font-size:11px;font-weight:900;padding:2px 8px;border-radius:12px;cursor:pointer;animation:pulse 1.5s infinite}
+.flip-box{display:flex;gap:15px;align-items:center;flex-wrap:wrap;margin-top:12px;background:#081426;padding:15px;border-radius:10px;border:1px solid #2b4260}
+.coin-display{font-size:42px;width:60px;height:60px;display:flex;align-items:center;justify-content:center;background:#10243e;border-radius:50%;border:2px solid #d4a72c;transition:transform 0.5s ease-out}
+.flipping{animation:spin 0.5s infinite linear}
+@keyframes spin{0%{transform:rotateY(0deg)}100%{transform:rotateY(360deg)}}
 @keyframes pulse{0%{opacity:1}50%{opacity:.5}100%{opacity:1}}
-@media(max-width:950px){.grid,.selected-main{grid-template-columns:1fr}.shop-grid,.property-grid{grid-template-columns:1fr 1fr}}@media(max-width:700px){.top{grid-template-columns:1fr}.name-row{grid-template-columns:1fr}header{padding:15px 17px}main{padding:14px}.shop-grid,.property-grid{grid-template-columns:1fr}.trade-row,.send-money-box{align-items:stretch;flex-direction:column}.trade-row>*, .send-money-box>*{width:100%!important}}
+@media(max-width:950px){.grid,.selected-main{grid-template-columns:1fr}.shop-grid,.property-grid{grid-template-columns:1fr 1fr}}@media(max-width:700px){.top{grid-template-columns:1fr}.name-row{grid-template-columns:1fr}header{padding:15px 17px}main{padding:14px}.shop-grid,.property-grid{grid-template-columns:1fr}.trade-row,.send-money-box,.flip-box{align-items:stretch;flex-direction:column}.trade-row>*, .send-money-box>*, .flip-box>*{width:100%!important}}
 </style></head>
 <body>
 <header><div><h1>📈 SimuTrade</h1><div class="sub">Stock Market Simulator</div></div><div class="sub">LIVE MARKET • LIVE CHAT</div></header>
@@ -38,6 +42,27 @@
   <input id="transferAmount" type="number" min="1" step="1" placeholder="Amount ($)">
   <button class="buy" id="sendMoneyBtn">SEND MONEY</button>
 </div></div>
+
+<!-- COIN FLIP CASINO -->
+<div class="card" style="margin-top:18px">
+  <div class="section-title"><h2>🪙 Coin Flip Gambling</h2><span class="muted">Double or Nothing</span></div>
+  <div class="flip-box">
+    <div class="coin-display" id="coinIcon">🪙</div>
+    <div style="flex:1">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <label style="margin:0">BET AMOUNT ($):</label>
+        <input id="flipBet" type="number" min="1" step="1" placeholder="Enter bet" style="width:140px;margin:0">
+        <button class="neutral" id="flipAllInBtn">ALL IN</button>
+        <select id="flipSide" style="width:110px;margin:0">
+          <option value="HEADS">Heads</option>
+          <option value="TAILS">Tails</option>
+        </select>
+        <button class="gold" id="flipBtn" style="padding:11px 20px">FLIP COIN 🪙</button>
+      </div>
+      <div id="flipResult" class="muted" style="margin-top:8px;font-weight:700">Pick your side and place a bet to start.</div>
+    </div>
+  </div>
+</div>
 
 <div id="cheatPanel" class="cheat-panel">
   <b>🔓 Hidden Free-Buy Panel</b>
@@ -84,7 +109,7 @@ let cash=Number(localStorage.getItem(STATE+"Cash"))||STARTING_CASH;
 let playerId=localStorage.getItem(PID),name=localStorage.getItem(PNAME)||"";
 let pass=localStorage.getItem(PPASS)||"";
 let firebaseReady=false,debounceTimer,lastUploadedValue=null,selected="AAPL",insurance=false,boostOwned=0,speedOwned=0,botOwned=0,goldBars=0,propertiesOwned={},propertyTimers={},allPlayers={};
-let lastChatCount = 0, unreadCount = 0;
+let lastChatCount = 0, unreadCount = 0, isFlipping = false;
 
 try{const saved=JSON.parse(localStorage.getItem(STATE+"Data")||"{}");if(saved.stocks)Object.keys(stocks).forEach(k=>{stocks[k].shares=Number(saved.stocks[k]?.shares)||0});insurance=!!saved.insurance;boostOwned=Number(saved.boostOwned)||0;speedOwned=Number(saved.speedOwned)||0;botOwned=Number(saved.botOwned)||0;goldBars=Number(saved.goldBars)||0}catch(e){}
 try{propertiesOwned=JSON.parse(localStorage.getItem(PROPS)||"{}")}catch(e){propertiesOwned={}}
@@ -170,8 +195,6 @@ function renderShop(){
   
   const cost = it.cost || properties[it.property].cost;
   const canBuySingle = cash >= cost;
-  
-  // Market Boost button is single-click only to prevent performance lag
   const isBoost = it.type === "boost";
   
   return `<div class="shop-item">
@@ -212,7 +235,6 @@ window.buyShop=(id, qtyMode=1)=>{
   goldBars += qty;
   toast(`Bought ${formatQty(qty)}x Gold Bar!`);
  }else if(it.type==="boost"){
-  // Single manual click boost to eliminate lag
   cash -= cost;
   boostOwned += 1;
   for(const s of Object.values(stocks)){
@@ -375,7 +397,7 @@ function done(){render();upload(true)}
 nameInput.addEventListener("input",()=>{clearTimeout(debounceTimer);document.getElementById("saveHint").textContent="Syncing…";debounceTimer=setTimeout(register,600)});
 passInput.addEventListener("input",()=>{clearTimeout(debounceTimer);document.getElementById("saveHint").textContent="Syncing…";debounceTimer=setTimeout(register,600)});
 
-function updatePrices(){for(const s of Object.values(stocks)){let movement=3+Math.random()*4;if(Math.random()<.5)movement=-movement;s.price=Math.max(1,s.price+movement);s.change=(movement/(s.price-movement))*100;s.history.push(s.price);if(s.history.length>40)s.history.shift()}if(Math.random()<.025){if(insurance){insurance=false;toast("🛡️ Insurance blocked a market crash!")}else{Object.values(stocks).forEach(s=>s.price=Math.max(1,s.price*.72));toast("💥 MARKET CRASH! Prices dropped hard!")}}else if(Math.random()<.025){Object.values(stocks).forEach(s=>s.price*=1.15);toast("🚀 MARKET SURGE! Prices jumped!")}if(botOwned>0){const keys=Object.keys(stocks);for(let i=0;i<botOwned;i++){const t=selected||keys[i%3];if(cash>=stocks[t].price){cash-=stocks[t].price;stocks[t].shares++}}}render();upload()}
+function updatePrices(){for(const s of Object.values(stocks)){let movement=3+Math.random()*4;if(Math.random()<.5)movement=-movement;s.price=Math.max(1,s.price+movement);s.change=(movement/(s.price-movement))*100;s.history.push(s.price);if(s.history.length>40)s.history.shift()}if(Math.random()<.025){if(insurance){insurance=false;toast("🛡️️ Insurance blocked a market crash!")}else{Object.values(stocks).forEach(s=>s.price=Math.max(1,s.price*.72));toast("💥 MARKET CRASH! Prices dropped hard!")}}else if(Math.random()<.025){Object.values(stocks).forEach(s=>s.price*=1.15);toast("🚀 MARKET SURGE! Prices jumped!")}if(botOwned>0){const keys=Object.keys(stocks);for(let i=0;i<botOwned;i++){const t=selected||keys[i%3];if(cash>=stocks[t].price){cash-=stocks[t].price;stocks[t].shares++}}}render();upload()}
 
 function renderLeaderboard(data){
  allPlayers = data || {};
@@ -496,6 +518,55 @@ function listenForTransfers(){
  });
 }
 
+// COIN FLIP MINIGAME LOGIC
+document.getElementById("flipAllInBtn").onclick=()=>{
+ document.getElementById("flipBet").value = Math.max(0, Math.floor(cash));
+};
+
+document.getElementById("flipBtn").onclick=()=>{
+ if(isFlipping) return;
+ const betInput = document.getElementById("flipBet");
+ const bet = Math.floor(Number(betInput.value)||0);
+ const chosenSide = document.getElementById("flipSide").value;
+ const resEl = document.getElementById("flipResult");
+ const coinIcon = document.getElementById("coinIcon");
+
+ if(bet <= 0){ toast("Enter a valid bet amount."); return; }
+ if(cash < bet){ toast("You don't have enough cash for that bet!"); return; }
+
+ isFlipping = true;
+ cash -= bet;
+ done();
+ 
+ coinIcon.classList.add("flipping");
+ resEl.innerHTML = `<span style="color:#60a5fa">Flipping coin for ${money(bet)}...</span>`;
+
+ setTimeout(()=>{
+  coinIcon.classList.remove("flipping");
+  const outcomes = ["HEADS", "TAILS"];
+  const winSide = outcomes[Math.floor(Math.random() * 2)];
+  
+  if(winSide === "HEADS"){
+   coinIcon.textContent = "👑";
+  } else {
+   coinIcon.textContent = "⚡";
+  }
+
+  if(chosenSide === winSide){
+   const reward = bet * 2;
+   cash += reward;
+   resEl.innerHTML = `<span class="green">🎉 WINNER! It was ${winSide}! You won +${money(bet)}!</span>`;
+   toast(`🎉 Coin Flip WON! +${money(bet)}`);
+  } else {
+   resEl.innerHTML = `<span class="red">❌ LOST! It was ${winSide}. You lost ${money(bet)}.</span>`;
+   toast(`❌ Coin Flip LOST! -${money(bet)}`);
+  }
+  
+  isFlipping = false;
+  done();
+ }, 1000);
+};
+
 let code="";document.addEventListener("keydown",e=>{if(e.key.length===1){code=(code+e.key.toLowerCase()).slice(-5);
 if(code.endsWith("op919")){document.getElementById("cheatPanel").style.display="block";toast("🔓 Free Buy Panel unlocked");code=""}
 if(code.endsWith("op918")){document.getElementById("simuPanel").style.display="block";toast("⚡ Event Simulator unlocked");code=""}
@@ -504,7 +575,7 @@ if(code.endsWith("op918")){document.getElementById("simuPanel").style.display="b
 document.getElementById("cheatBuy").onclick=()=>{const t=document.getElementById("cheatStock").value,q=Math.max(1,Math.floor(Number(document.getElementById("cheatQty").value)||1));stocks[t].shares+=q;done();toast(`Free bought ${formatQty(q)} ${t} share${q>1?"s":""}.`)};
 
 document.getElementById("simuCrash").onclick=()=>{
- if(insurance){insurance=false;toast("🛡️ Insurance blocked the simulated crash!");render();return}
+ if(insurance){insurance=false;toast("🛡️️ Insurance blocked the simulated crash!");render();return}
  Object.values(stocks).forEach(s=>{
   s.price=Math.max(1,s.price*0.72);
   s.change=-28;
