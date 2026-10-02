@@ -1509,7 +1509,9 @@ window.buyP2PListing = async (sellerId,listKey) => {
   done();
 
   const claim=await runTransaction(itemRef,current=>{
-   if(!current || current.status!=="active") return;
+   // Older listings may not have a status field. The marketplace treats
+   // missing status as ACTIVE, so the purchase transaction must do the same.
+   if(!current || (current.status||"active")!=="active") return;
    return {...current,status:"sold",buyerId:playerId,buyerName:validName(),soldAt:serverTimestamp()};
   });
 
