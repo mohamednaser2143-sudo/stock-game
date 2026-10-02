@@ -296,7 +296,8 @@ import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.5/firebase-ap
 import{getDatabase,ref,update,onValue,get,onDisconnect,serverTimestamp,push,set,remove,onChildAdded,runTransaction}from"https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
 const firebaseConfig={apiKey:"AIzaSyASPNSXdFs2B3X8mbU-qBYlgAIR7BSx6E",authDomain:"fortuna-64c00.firebaseapp.com",databaseURL:"https://fortuna-64c00-default-rtdb.firebaseio.com",projectId:"fortuna-64c00",storageBucket:"fortuna-64c00.firebasestorage.app",messagingSenderId:"329218105683",appId:"1:329218105683:web:6b16fd2b1091531e4481a6"};
 const app=initializeApp(firebaseConfig),db=getDatabase(app),STARTING_CASH=10000,PID="simutradePlayerId",PNAME="simutradeName",PPASS="simutradePass",STATE="simutradeState",PROPS="simutradeProperties";
-const stocks={AAPL:{name:"Apple",price:225,shares:0,change:0,history:[225]},TSLA:{name:"Tesla",price:425,shares:0,change:0,history:[425]},KO:{name:"Coca-Cola",price:68,shares:0,change:0,history:[68]}};
+const STOCK_BASE_PRICES={AAPL:225,TSLA:425,KO:68};
+const stocks={AAPL:{name:"Apple",price:STOCK_BASE_PRICES.AAPL,shares:0,change:0,history:[STOCK_BASE_PRICES.AAPL]},TSLA:{name:"Tesla",price:STOCK_BASE_PRICES.TSLA,shares:0,change:0,history:[STOCK_BASE_PRICES.TSLA]},KO:{name:"Coca-Cola",price:STOCK_BASE_PRICES.KO,shares:0,change:0,history:[STOCK_BASE_PRICES.KO]}};
 const properties={
  tiny:{name:"Tiny House",icon:"🏡",cost:5000,interval:30,income:500,desc:"A small starter property."},
  condo:{name:"City Condo",icon:"🏢",cost:12000,interval:25,income:800,desc:"A modern city condo."},
@@ -307,7 +308,6 @@ const properties={
 const shopItems={
  property_tiny:{type:"property",property:"tiny"},property_condo:{type:"property",property:"condo"},property_villa:{type:"property",property:"villa"},property_mansion:{type:"property",property:"mansion"},property_estate:{type:"property",property:"estate"},
  gold:{type:"gold",name:"Gold Bar",icon:"🥇",cost:5000,desc:"Generates +$50/min passive cash dividend per bar owned! Also unlocks prestige titles."},
- boost:{type:"boost",name:"Market Boost",icon:"🚀",cost:15000,desc:"Boosts all stock prices by 5% once."},
  insurance:{type:"insurance",name:"Insurance",icon:"🛡️",cost:12000,desc:"Protects you from the next market crash."},
  speed:{type:"speed",name:"Trading Speed",icon:"⚡",cost:8000,desc:"Market refreshes every 1.5 seconds instead of 3."},
  bot:{type:"bot",name:"Trading Bot",icon:"🤖",cost:25000,desc:"Auto-buys 40 shares of selected stock when price is at or below target price."},
@@ -528,7 +528,6 @@ const ALL_TITLES = [
  {id:"t_13", text:"🥇 Gold Owner", bg:"#eab308", color:"#1c1917", desc:"Own at least 5 Gold Bars.", req:()=>goldBars>=5},
  {id:"t_12", text:"🤖 Bot Beginner", bg:"#8b5cf6", color:"#fff", desc:"Own 5 Trading Bots.", req:()=>botOwned>=5},
  {id:"t_11", text:"⚡ High Frequency Trader", bg:"#f97316", color:"#fff", desc:"Own Trading Speed upgrade.", req:()=>speedOwned>=1},
- {id:"t_10", text:"🚀 Market Mover", bg:"#805ad5", color:"#fff", desc:"Use Market Boost at least 5 times.", req:()=>boostOwned>=5},
  {id:"t_09", text:"🎲 Lucky Flipper", bg:"#ef4444", color:"#fff", desc:"Win a Coin Flip bet over $10,000.", req:()=>highestCasinoWin>=10000},
  {id:"t_08", text:"🛡 Safe Haven", bg:"#059669", color:"#fff", desc:"Activate Market Insurance.", req:()=>insurance},
  {id:"t_07", text:"🏠 Homeowner", bg:"#14b8a6", color:"#fff", desc:"Own at least 5 total properties.", req:()=>Object.values(propertiesOwned).reduce((a,b)=>a+b,0)>=5},
@@ -543,7 +542,7 @@ const ALL_TITLES = [
 let cash=Number(localStorage.getItem(STATE+"Cash"))||STARTING_CASH;
 let playerId=localStorage.getItem(PID),name=localStorage.getItem(PNAME)||"";
 let pass=localStorage.getItem(PPASS)||"";
-let firebaseReady=!!db,stateReady=false,loadedKey=null,registerSeq=0,listenersStarted=false,timersStarted=false,opDropSynced=false,retryTimer,debounceTimer,lastUploadedValue=null,selected="AAPL",insurance=false,boostOwned=0,speedOwned=0,botOwned=0,botTargetPrice=1,goldBars=0,propertiesOwned={},propertyTimers={},allPlayers={};
+let firebaseReady=!!db,stateReady=false,loadedKey=null,registerSeq=0,listenersStarted=false,timersStarted=false,opDropSynced=false,retryTimer,debounceTimer,lastUploadedValue=null,selected="AAPL",insurance=false,speedOwned=0,botOwned=0,botTargetPrice=1,goldBars=0,propertiesOwned={},propertyTimers={},allPlayers={};
 let opItemsOwned = {};      // OP items in your inventory (NOT used yet: sell them or activate them)
 let opActivated = {};       // OP income generators you have already activated (these produce the passive income)
 let activeTradeId = null, activeTrade = null, tradeUnsub = null, tradePtrUnsub = null, tradeNotified = null;
@@ -586,7 +585,7 @@ function withTimeout(promise, ms){
 }
 function setLoading(on){ document.body.classList.toggle("loading", !!on); }
 
-try{const saved=JSON.parse(localStorage.getItem(STATE+"Data")||"{}");if(saved.stocks)Object.keys(stocks).forEach(k=>{stocks[k].shares=Number(saved.stocks[k]?.shares)||0});insurance=!!saved.insurance;boostOwned=Number(saved.boostOwned)||0;speedOwned=Number(saved.speedOwned)||0;botOwned=Number(saved.botOwned)||0;botTargetPrice=Number(saved.botTargetPrice)||1;goldBars=Number(saved.goldBars)||0;opItemsOwned=saved.opItemsOwned||{};opActivated=saved.opActivated||{};opItemsLegacy=saved.opItemsLegacy||{};if(!saved.opV3){const m=normalizeOpData({inv:opItemsOwned,act:opActivated,legacy:opItemsLegacy,v2:!!saved.opV2});opItemsOwned=m.inv;opActivated=m.act;opItemsLegacy=m.legacy;}customTitlesUnlocked=saved.customTitlesUnlocked||{};recalcOpPassiveIncome();}catch(e){}
+try{const saved=JSON.parse(localStorage.getItem(STATE+"Data")||"{}");if(saved.stocks)Object.keys(stocks).forEach(k=>{stocks[k].shares=Number(saved.stocks[k]?.shares)||0});insurance=!!saved.insurance;speedOwned=Number(saved.speedOwned)||0;botOwned=Number(saved.botOwned)||0;botTargetPrice=Number(saved.botTargetPrice)||1;goldBars=Number(saved.goldBars)||0;opItemsOwned=saved.opItemsOwned||{};opActivated=saved.opActivated||{};opItemsLegacy=saved.opItemsLegacy||{};if(!saved.opV3){const m=normalizeOpData({inv:opItemsOwned,act:opActivated,legacy:opItemsLegacy,v2:!!saved.opV2});opItemsOwned=m.inv;opActivated=m.act;opItemsLegacy=m.legacy;}customTitlesUnlocked=saved.customTitlesUnlocked||{};recalcOpPassiveIncome();}catch(e){}
 try{propertiesOwned=JSON.parse(localStorage.getItem(PROPS)||"{}")}catch(e){propertiesOwned={}}
 try{propertyTimers=JSON.parse(localStorage.getItem("simuPropTimers")||"{}")}catch(e){propertyTimers={}}
 if(!playerId){playerId=crypto.randomUUID?crypto.randomUUID().replaceAll("-",""):"p_"+Date.now()+Math.random().toString(36).slice(2);localStorage.setItem(PID,playerId)}
@@ -683,7 +682,7 @@ function capNum(v){
 function capEconomy(){
  cash = capNum(cash);
  goldBars = capNum(goldBars); botOwned = capNum(botOwned);
- boostOwned = capNum(boostOwned); speedOwned = capNum(speedOwned);
+ speedOwned = capNum(speedOwned);
  opPassiveIncome = capNum(opPassiveIncome); highestCasinoWin = capNum(highestCasinoWin);
  for(const s of Object.values(stocks)){ s.shares = capNum(s.shares); s.price = capNum(s.price); }
  for(const k of Object.keys(propertiesOwned)) propertiesOwned[k] = capNum(propertiesOwned[k]);
@@ -699,7 +698,7 @@ function portfolio(){
 function pnl(){return portfolio()-STARTING_CASH}
 function saveLocal(){
  localStorage.setItem(STATE+"Cash",String(cash));
- localStorage.setItem(STATE+"Data",JSON.stringify({stocks:Object.fromEntries(Object.entries(stocks).map(([k,s])=>[k,{shares:s.shares}])),insurance,boostOwned,speedOwned,botOwned,botTargetPrice,goldBars,opItemsOwned,opActivated,opItemsLegacy,opV2:true,opV3:true,customTitlesUnlocked}));
+ localStorage.setItem(STATE+"Data",JSON.stringify({stocks:Object.fromEntries(Object.entries(stocks).map(([k,s])=>[k,{shares:s.shares}])),insurance,speedOwned,botOwned,botTargetPrice,goldBars,opItemsOwned,opActivated,opItemsLegacy,opV2:true,opV3:true,customTitlesUnlocked}));
  localStorage.setItem(PROPS,JSON.stringify(propertiesOwned));
  localStorage.setItem("simuPropTimers",JSON.stringify(propertyTimers));
  localStorage.setItem("simuEquippedTitle",equippedTitle);
@@ -732,14 +731,11 @@ function renderShop(){
   if(it.type==="property")owned=propertiesOwned[it.property]?`<div class="owned">Owned: ${formatQty(propertiesOwned[it.property])}</div>`:"";
   if(it.type==="gold")owned=`<div class="owned">Owned: ${formatQty(goldBars)} (Payout: +${money(goldBars*50)}/min)</div>`;
   if(it.type==="insurance")owned=`<div class="owned">${insurance?"Active":"Not active"}</div>`;
-  if(it.type==="boost")owned=`<div class="owned">Times Boosted: ${formatQty(boostOwned)}</div>`;
   if(it.type==="speed")owned=`<div class="owned">Owned: ${formatQty(speedOwned)}</div>`;
   if(it.type==="bot")owned=`<div class="owned">Owned: ${formatQty(botOwned)}</div>`;
   
   const cost = it.cost || properties[it.property].cost;
   const canBuySingle = cash >= cost;
-  const isBoost = it.type === "boost";
-  
   return `<div class="shop-item">
    <div style="font-size:28px">${it.icon||properties[it.property].icon}</div>
    <h3>${it.name||properties[it.property].name}</h3>
@@ -748,8 +744,8 @@ function renderShop(){
    <div class="price">${money(cost)}</div>
    ${owned}
    <div class="shop-btn-row">
-    <button class="primary" onclick="buyShop('${id}', 1)" ${!canBuySingle?"disabled":""}>${isBoost?"BUY BOOST (1x)":"BUY 1"}</button>
-    ${!isBoost?`<button class="buy" onclick="buyShop('${id}', 'max')" ${!canBuySingle?"disabled":""}>BUY MAX</button>`:""}
+    <button class="primary" onclick="buyShop('${id}', 1)" ${!canBuySingle?"disabled":""}>BUY 1</button>
+    <button class="buy" onclick="buyShop('${id}', 'max')" ${!canBuySingle?"disabled":""}>BUY MAX</button>
    </div>
   </div>`;
  }).join("");
@@ -933,7 +929,7 @@ window.buyShop=(id, qtyMode=1)=>{
  if(cash<cost) return;
  
  let qty = 1;
- if(qtyMode === "max" && it.type !== "boost"){
+ if(qtyMode === "max"){
   qty = Math.floor(cash / cost);
  }
  if(qty < 1) return;
@@ -950,13 +946,6 @@ window.buyShop=(id, qtyMode=1)=>{
   cash -= cost * qty;
   goldBars += qty;
   toast(`Bought ${formatQty(qty)}x Gold Bar! Yield: +${money(goldBars*50)}/min`);
- }else if(it.type==="boost"){
-  cash -= cost;
-  boostOwned += 1;
-  for(const s of Object.values(stocks)){
-   s.price *= 1.05;
-  }
-  toast("Activated 1x Market Boost!");
  }else if(it.type==="insurance"){
   cash -= cost;
   insurance = true;
@@ -986,7 +975,7 @@ function mysteryBox(silent=false){const pool=[
  ["+$500 cash",()=>cash+=500,.12],["+$1,000 cash",()=>cash+=1000,.10],["+$2,500 cash",()=>cash+=2500,.06],["+$5,000 cash",()=>cash+=5000,.02],
  ["+1 AAPL",()=>stocks.AAPL.shares+=1,.08],["+3 AAPL",()=>stocks.AAPL.shares+=3,.04],["+1 TSLA",()=>stocks.TSLA.shares+=1,.06],["+2 TSLA",()=>stocks.TSLA.shares+=2,.03],["+5 KO",()=>stocks.KO.shares+=5,.07],["+10 KO",()=>stocks.KO.shares+=10,.03],
  ["Lose $500",()=>cash=Math.max(0,cash-500),.08],["Lose $1,000",()=>cash=Math.max(0,cash-1000),.05],["Lose $2,500",()=>cash=Math.max(0,cash-2500),.025],["Lose 5% cash",()=>cash=Math.max(0,cash*.95),.03],["Lose 1 random stock share",()=>{const ks=Object.keys(stocks).filter(k=>stocks[k].shares>0);if(ks.length)stocks[ks[Math.floor(Math.random()*ks.length)]].shares--},.05],
- ["Free Market Boost",()=>{boostOwned++;for(const s of Object.values(stocks))s.price*=1.05},.025],["Free Insurance",()=>insurance=true,.025],["Free Trading Speed",()=>speedOwned++,.025],["Free Tiny House",()=>{propertiesOwned.tiny=(propertiesOwned.tiny||0)+1;if(!propertyTimers.tiny)propertyTimers.tiny=Date.now();},.008],["Double next stock movement",()=>stocks.AAPL.history.push(stocks.AAPL.price),.02],
+ ["Free Insurance",()=>insurance=true,.025],["Free Trading Speed",()=>speedOwned++,.025],["Free Tiny House",()=>{propertiesOwned.tiny=(propertiesOwned.tiny||0)+1;if(!propertyTimers.tiny)propertyTimers.tiny=Date.now();},.008],["Double next stock movement",()=>stocks.AAPL.history.push(stocks.AAPL.price),.02],
  ["Random stock 1–10 shares",()=>stocks[Object.keys(stocks)[Math.floor(Math.random()*3)]].shares+=1+Math.floor(Math.random()*10),.06],["Stock swap",()=>{const a=stocks.AAPL.shares,b=stocks.TSLA.shares;stocks.AAPL.shares=b;stocks.TSLA.shares=a},.025],["Market Surge",()=>Object.values(stocks).forEach(s=>s.price*=1.12),.015],["Market Crash",()=>Object.values(stocks).forEach(s=>s.price*=.88),.015],["Nothing",()=>{},.15]
  ];let totalWeight=pool.reduce((a,x)=>a+x[2],0),r=Math.random()*totalWeight,chosen=pool[pool.length-1];for(const item of pool){r-=item[2];if(r<=0){chosen=item;break}}chosen[1]();if(!silent)toast(`🎁 Mystery Box: ${chosen[0]}`)}
 
@@ -1454,7 +1443,7 @@ function upload(force=false){
    set(ref(db,"accounts/"+key),{
     cash,
     stocks: Object.fromEntries(Object.entries(stocks).map(([k,s])=>[k,{shares:s.shares, price:s.price}])),
-    insurance, boostOwned, speedOwned, botOwned, botTargetPrice, goldBars,
+    insurance, speedOwned, botOwned, botTargetPrice, goldBars,
     propertiesOwned, propertyTimers, equippedTitle, highestCasinoWin, opItemsOwned, opActivated, opItemsLegacy, opV2: true, opV3: true, customTitlesUnlocked,
     name: validName(),
     updatedAt: serverTimestamp()
@@ -1466,7 +1455,6 @@ function upload(force=false){
 function applyAccountData(data){
  cash = Number(data.cash)||STARTING_CASH;
  insurance = !!data.insurance;
- boostOwned = Number(data.boostOwned)||0;
  speedOwned = Number(data.speedOwned)||0;
  botOwned = Number(data.botOwned)||0;
  botTargetPrice = Number(data.botTargetPrice)||1;
@@ -2152,12 +2140,17 @@ document.getElementById("resetBotsBtn").onclick=()=>{
 document.getElementById("resetBtn").onclick=()=>{
  if(confirm("Are you sure you want to reset your local progress?")){
   cash = STARTING_CASH;
-  insurance = false; boostOwned = 0; speedOwned = 0; botOwned = 0; botTargetPrice = 1; goldBars = 0;
+  insurance = false; speedOwned = 0; botOwned = 0; botTargetPrice = 1; goldBars = 0;
   opItemsOwned = {}; opActivated = {}; customTitlesUnlocked = {}; opPassiveIncome = 0;
   equippedTitle = ""; highestCasinoWin = 0;
   propertiesOwned = {}; propertyTimers = {};
   priceOverrides = {};
-  Object.keys(stocks).forEach(k => stocks[k].shares = 0);
+  Object.keys(stocks).forEach(k => {
+   stocks[k].shares = 0;
+   stocks[k].price = STOCK_BASE_PRICES[k];
+   stocks[k].change = 0;
+   stocks[k].history = [STOCK_BASE_PRICES[k]];
+  });
   done();
   toast("Game reset!");
  }
