@@ -561,6 +561,7 @@ let lastOpIncomePayoutTime = Date.now();
 let currentOpDrop = null;
 let op194AutoGrab = false;
 let currentSelectedP2PPlayer = "";
+let p2pStoreUnsub = null;
 
 let priceOverrides = {};
 
@@ -1267,7 +1268,12 @@ function renderP2PStore(targetId){
  const targetPlayerObj = allPlayers[currentSelectedP2PPlayer];
  storeTitle.textContent = isSelf ? "Viewing: Your Listings" : `Viewing Store of: ${targetPlayerObj ? targetPlayerObj.name : "Player"}`;
 
- onValue(ref(db, "marketListings/" + currentSelectedP2PPlayer), snap => {
+  if(p2pStoreUnsub){
+   p2pStoreUnsub();
+   p2pStoreUnsub = null;
+  }
+
+  p2pStoreUnsub = onValue(ref(db, "marketListings/" + currentSelectedP2PPlayer), snap => {
   const data = snap.val();
   if(!data){
    grid.innerHTML = '<div class="empty" style="grid-column:1/-1">No items listed in this store.</div>';
@@ -1286,50 +1292,83 @@ function renderP2PStore(targetId){
     </div>
     <div style="margin-top:8px">
      ${isSelf 
-       ? `<button class="danger" onclick="cancelP2PListing('${listKey}', '${item.itemType}', '${item.itemKey}', ${amount})" style="width:100%">CANCEL LISTING</button>`
+        ? `<button class="danger" onclick="cancelP2PListing('${listKey}')" style="width:100%">CANCEL LISTING</button>`
        : `<button class="buy" onclick="buyP2PListing('${currentSelectedP2PPlayer}', '${listKey}', ${item.price}, '${item.itemType}', '${item.itemKey}', ${amount})" style="width:100%" ${!canBuy?"disabled":""}>BUY ITEM</button>`
      }
     </div>
    </div>`;
   }).join("");
- }, {onlyOnce: true});
+  });
 }
 
-window.cancelP2PListing = (listKey, itemType, itemKey, amount=1) => {
- remove(ref(db, "marketListings/" + playerId + "/" + listKey));
- amount = Math.max(1, Math.floor(Number(amount) || 1));
- if(itemType === "property"){
-  propertiesOwned[itemKey] = (propertiesOwned[itemKey]||0) + amount;
- } else if(itemType === "op"){
-  opItemsOwned[itemKey] = (opItemsOwned[itemKey]||0) + amount;
-  recalcOpPassiveIncome();
- }
- toast("Cancelled listing and returned item!");
- done();
- renderP2PStore(playerId);
+window.cancelP2PListing = async (listKey) => {
+  const itemRef = ref(db, "marketListings/" + playerId + "/" + listKey);
+  let cancelledListing = null;
+  try{
+   const result = await runTransaction(itemRef, current => {
+    if(!current) return;
+    cancelledListing = current;
+    return null;
+   }, {applyLocally:false});
+
+   // A stale seller screen must never refund an item after a buyer removed the listing.
+   if(!result.committed || !cancelledListing){
+    toast("This listing was already sold or cancelled.");
+    renderP2PStore(playerId);
+    return;
+   }
+
+   const amount = Math.max(1, Math.floor(Number(cancelledListing.amount) || 1));
+   if(cancelledListing.itemType === "property"){
+    propertiesOwned[cancelledListing.itemKey] = (propertiesOwned[cancelledListing.itemKey]||0) + amount;
+   } else if(cancelledListing.itemType === "op"){
+    opItemsOwned[cancelledListing.itemKey] = (opItemsOwned[cancelledListing.itemKey]||0) + amount;
+    recalcOpPassiveIncome();
+   }
+   toast("Cancelled listing and returned item!");
+   done();
+   renderP2PStore(playerId);
+  }catch(e){
+   console.error(e);
+   toast("Could not cancel this listing. Please try again.");
+  }
 };
 
 window.buyP2PListing = async (sellerId, listKey, price, itemType, itemKey, amount=1) => {
- if(cash < price){ toast("Not enough cash!"); return; }
-
  const itemRef = ref(db, `marketListings/${sellerId}/${listKey}`);
  try {
-  const snap = await get(itemRef);
-  if(!snap.exists()){
-   toast("Item was already sold or removed!");
-   renderP2PStore(sellerId);
-   return;
-  }
+   let purchasedListing = null;
+   let insufficientFunds = false;
+   const result = await runTransaction(itemRef, current => {
+    if(!current) return;
+    const currentPrice = Number(current.price);
+    if(!Number.isFinite(currentPrice) || currentPrice < 1 || cash < currentPrice){
+     insufficientFunds = true;
+     return;
+    }
+    purchasedListing = current;
+    return null;
+   }, {applyLocally:false});
 
-  const listing = snap.val();
-  amount = Math.max(1, Math.floor(Number(listing.amount) || Number(amount) || 1));
-  price = Number(listing.price) || Number(price) || 0;
-  if(cash < price){ toast("Not enough cash!"); return; }
+   if(!result.committed || !purchasedListing){
+    if(insufficientFunds){
+     toast("Not enough cash!");
+    } else {
+     toast("Item was already sold or removed!");
+    }
+    renderP2PStore(sellerId);
+    return;
+   }
+
+   const listing = purchasedListing;
+   amount = Math.max(1, Math.floor(Number(listing.amount) || Number(amount) || 1));
+   price = Number(listing.price);
+   itemType = listing.itemType;
+   itemKey = listing.itemKey;
 
   cash -= price;
-  await remove(itemRef);
 
-  push(ref(db, "transfers/" + sellerId), {
+   await push(ref(db, "transfers/" + sellerId), {
    fromName: validName(),
    amount: price,
    timestamp: serverTimestamp()
@@ -1347,8 +1386,9 @@ window.buyP2PListing = async (sellerId, listKey, price, itemType, itemKey, amoun
   toast(`🎉 Bought ${formatQty(amount)}x ${listing.itemName} for ${money(price)}!`);
   done();
   renderP2PStore(sellerId);
- } catch(e){
+  } catch(e){
   console.error(e);
+   toast("Purchase could not be completed. Please refresh and try again.");
  }
 };
 
