@@ -675,10 +675,8 @@ function validName(){return(nameInput.value.trim()||"Player").slice(0,20)}
 const ECON_CAP = 1e307, PORTFOLIO_CAP = 1.7e308;
 function capNum(v){
  v = Number(v);
- if(Number.isNaN(v)) return 0;                // Invalid arithmetic must never become a giant balance
- if(v === Infinity) return ECON_CAP;
- if(v === -Infinity) return -ECON_CAP;
- if(v > ECON_CAP) return ECON_CAP;
+ if(v !== v) return ECON_CAP;                 // NaN (caused by Infinity maths) -> max
+ if(v > ECON_CAP) return ECON_CAP;            // includes Infinity
  if(v < -ECON_CAP) return -ECON_CAP;
  return v;
 }
@@ -694,17 +692,8 @@ function capEconomy(){
 }
 
 function portfolio(){
- let total = capNum(cash);
- for(const s of Object.values(stocks)){
-  const price = capNum(s.price);
-  const shares = capNum(s.shares);
-  if(price <= 0 || shares <= 0) continue;
-
-  // Compare before multiplying so huge finite values cannot overflow to Infinity.
-  if(shares > (PORTFOLIO_CAP - total) / price) return PORTFOLIO_CAP;
-  total += price * shares;
- }
- return Number.isFinite(total) ? Math.max(0, total) : PORTFOLIO_CAP;
+ const v = cash + Object.values(stocks).reduce((a,s)=>a + (s.price * s.shares), 0);
+ return (v !== v || v > PORTFOLIO_CAP) ? PORTFOLIO_CAP : v;
 }
 
 function pnl(){return portfolio()-STARTING_CASH}
@@ -1183,36 +1172,33 @@ window.toggleTitle = (id) => {
 };
 
 function isRichestPlayer(){
- const sorted = getLeaderboardPlayers(allPlayers);
+ const sorted = getUniqueLeaderboardPlayers(allPlayers);
  return sorted.length > 0 && sorted[0].id === playerId;
 }
 
-function getLeaderboardPlayers(data){
+function getUniqueLeaderboardPlayers(data){
  const newestByName = new Map();
  for(const [id, p] of Object.entries(data || {})){
   if(!p || typeof p !== "object") continue;
-  const name = String(p.name || "").trim().replace(/\s+/g, " ");
-  if(!name) continue;
-
-  const portfolioValue = Number(p.portfolioValue);
-  // PORTFOLIO_CAP is an overflow sentinel, not a legitimate score.
-  if(!Number.isFinite(portfolioValue) || portfolioValue < 0 || portfolioValue >= PORTFOLIO_CAP) continue;
-
+  const name = String(p.name || "Player").trim().replace(/\s+/g, " ") || "Player";
   const key = name.toLocaleLowerCase();
   const updatedAt = Number(p.updatedAt) || 0;
-  const candidate = {id, ...p, name, portfolioValue, _leaderboardUpdatedAt: updatedAt};
+  const score = Number(p.portfolioValue) || 0;
+  const candidate = {id, ...p, name, _leaderboardUpdatedAt: updatedAt};
   const previous = newestByName.get(key);
+
+  // Keep the latest save for a displayed name; use score only when timestamps tie.
   if(!previous ||
      candidate._leaderboardUpdatedAt > previous._leaderboardUpdatedAt ||
      (candidate._leaderboardUpdatedAt === previous._leaderboardUpdatedAt &&
-      candidate.portfolioValue > previous.portfolioValue)){
+      score > (Number(previous.portfolioValue) || 0))){
    newestByName.set(key, candidate);
   }
  }
 
  return Array.from(newestByName.values())
   .map(({_leaderboardUpdatedAt, ...player}) => player)
-  .sort((a, b) => b.portfolioValue - a.portfolioValue);
+  .sort((a, b) => (Number(b.portfolioValue) || 0) - (Number(a.portfolioValue) || 0));
 }
 
 function updateP2PListDropdown(){
@@ -1631,7 +1617,7 @@ function updatePrices(){
 
 function renderLeaderboard(data){
  allPlayers = data || {};
- const list = getLeaderboardPlayers(allPlayers);
+ const list = getUniqueLeaderboardPlayers(allPlayers);
  const b=document.getElementById("leaderboard");
  
  b.innerHTML=list.slice(0,10).map((p,i)=>{
