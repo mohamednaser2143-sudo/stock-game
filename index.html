@@ -31,7 +31,7 @@ body.loading main>*:not(.notice):not(#loginCard){pointer-events:none;opacity:.55
 @media(max-width:700px){.trade-cols{grid-template-columns:1fr}}
 @keyframes spin{0%{transform:rotateY(0deg)}100%{transform:rotateY(360deg)}}
 @keyframes pulse{0%{opacity:1}50%{opacity:.5}100%{opacity:1}}
-@media(max-width:950px){.grid,.selected-main{grid-template-columns:1fr}.shop-grid,.property-grid{grid-template-columns:1fr 1fr}}@media(max-width:700px){#p2pListBtn{width:100%}#p2pItemSelect,#p2pAmountInput,#p2pCashPriceInput,#p2pPropPriceQty,#p2pPropPriceSelect,#p2pOpPriceQty,#p2pOpPriceSelect{width:100%!important}}@media(max-width:700px){.top{grid-template-columns:1fr}.name-row{grid-template-columns:1fr}header{padding:15px 17px}main{padding:14px}.shop-grid,.property-grid,.title-grid{grid-template-columns:1fr}.trade-row,.send-money-box,.flip-box{align-items:stretch;flex-direction:column}.trade-row>*, .send-money-box>*, .flip-box>*{width:100%!important}}
+@media(max-width:950px){.grid,.selected-main{grid-template-columns:1fr}.shop-grid,.property-grid{grid-template-columns:1fr 1fr}}@media(max-width:700px){.top{grid-template-columns:1fr}.name-row{grid-template-columns:1fr}header{padding:15px 17px}main{padding:14px}.shop-grid,.property-grid,.title-grid{grid-template-columns:1fr}.trade-row,.send-money-box,.flip-box{align-items:stretch;flex-direction:column}.trade-row>*, .send-money-box>*, .flip-box>*{width:100%!important}}
 </style></head>
 <body>
 <header><div><h1>📈 SimuTrade</h1><div class="sub">Stock Market Simulator</div></div><div class="sub">LIVE MARKET • LIVE CHAT</div></header>
@@ -85,39 +85,21 @@ body.loading main>*:not(.notice):not(#loginCard){pointer-events:none;opacity:.55
     <!-- LIST AN ITEM FORM -->
     <div style="margin-top:10px;padding-top:10px;border-top:1px solid #1e2d42">
       <div class="sub" style="margin-bottom:6px">List Your Asset or OP Item for Sale:</div>
-      <div style="display:grid;grid-template-columns:1.5fr .8fr 1.2fr .7fr 1.2fr .7fr auto;gap:6px;align-items:end">
-        <div>
-          <label>ITEM</label>
-          <select id="p2pItemSelect" style="margin:0"></select>
-        </div>
-        <div>
-          <label>ITEM QTY</label>
-          <input id="p2pAmountInput" type="number" min="1" step="1" placeholder="Qty" style="margin:0">
-        </div>
-        <div>
-          <label>CASH PRICE</label>
-          <input id="p2pCashPriceInput" type="number" min="0" step="1" placeholder="0 = none" style="margin:0">
-        </div>
-        <div>
-          <label>PROPERTY QTY</label>
-          <input id="p2pPropPriceQty" type="number" min="0" step="1" value="0" style="margin:0">
-        </div>
-        <div>
-          <label>PROPERTY PAYMENT</label>
-          <select id="p2pPropPriceSelect" style="margin:0"></select>
-        </div>
-        <div>
-          <label>OP QTY</label>
-          <input id="p2pOpPriceQty" type="number" min="0" step="1" value="0" style="margin:0">
-        </div>
-        <div>
-          <label>OP PAYMENT</label>
-          <select id="p2pOpPriceSelect" style="margin:0"></select>
-        </div>
-        <button class="gold" id="p2pListBtn" style="white-space:nowrap">LIST ITEM</button>
-      </div>
-      <div class="muted" style="margin-top:7px">
-        Set one or more payment types. Example: <b>1 OP item for 2 properties</b>, <b>1 OP item for $50,000</b>, or a mixed cash + property + OP offer.
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+        <select id="p2pItemSelect" style="flex:1;margin:0"></select>
+        <input id="p2pAmountInput" type="number" min="1" step="1" placeholder="Amount to Sell" style="width:130px;margin:0">
+        
+        <select id="p2pPriceType" style="width:140px;margin:0">
+          <option value="cash">Price in Cash ($)</option>
+          <option value="property">Price in Properties</option>
+          <option value="combo">Price in Cash + Prop</option>
+        </select>
+        
+        <input id="p2pPriceInput" type="number" min="0" placeholder="Cash Price ($)" style="width:130px;margin:0">
+        <select id="p2pPropTypeSelect" style="width:140px;margin:0;display:none;"></select>
+        <input id="p2pPropQtyInput" type="number" min="1" step="1" value="1" placeholder="Prop Qty" style="width:100px;margin:0;display:none;">
+
+        <button class="gold" id="p2pListBtn">LIST ITEM</button>
       </div>
     </div>
 
@@ -376,9 +358,9 @@ const OVERPOWERED_ITEMS = [
   {id:"op_title_25", name:"Title: 🪐 Cosmic Monopoly Master", icon:"🪐", cost:500000000, desc:"Unlocks and equips the custom title '🪐 Cosmic Monopoly Master'.", effect:{type:"title", titleId:"t_title_25", titleText:"🪐 Cosmic Monopoly Master", bg:"linear-gradient(45deg,#06b6d4,#3b82f6)", color:"#fff"}},
   {id:"op_title_26", name:"Title: 💎 Diamond Hands Emperor", icon:"💎", cost:2500000000, desc:"Unlocks and equips the custom title '💎 Diamond Hands Emperor'.", effect:{type:"title", titleId:"t_title_26", titleText:"💎 Diamond Hands Emperor", bg:"linear-gradient(45deg,#38bdf8,#818cf8)", color:"#fff"}},
   {id:"op_title_27", name:"Title: 🔥 Transcendent Tycoon", icon:"🔥", cost:10000000000, desc:"Unlocks and equips the custom title '🔥 Transcendent Tycoon'.", effect:{type:"title", titleId:"t_title_27", titleText:"🔥 Transcendent Tycoon", bg:"linear-gradient(45deg,#f97316,#dc2626)", color:"#fff"}},
-  {id:"op_title_28", name:"Title: 👁️ Omnipotent Market Lord", icon:"👁️️", cost:50000000000, desc:"Unlocks and equips the custom title '👁️️ Omnipotent Market Lord'.", effect:{type:"title", titleId:"t_title_28", titleText:"👁️ Omnipotent Market Lord", bg:"linear-gradient(45deg,#10b981,#059669)", color:"#fff"}},
+  {id:"op_title_28", name:"Title: 👁️ Omnipotent Market Lord", icon:"👁", cost:50000000000, desc:"Unlocks and equips the custom title '👁 Omnipotent Market Lord'.", effect:{type:"title", titleId:"t_title_28", titleText:"👁️ Omnipotent Market Lord", bg:"linear-gradient(45deg,#10b981,#059669)", color:"#fff"}},
   {id:"op_title_29", name:"Title: 🌀 Void Wealth Titan", icon:"🌀", cost:250000000000, desc:"Unlocks and equips the custom title '🌀 Void Wealth Titan'.", effect:{type:"title", titleId:"t_title_29", titleText:"🌀 Void Wealth Titan", bg:"linear-gradient(45deg,#6366f1,#4f46e5)", color:"#fff"}},
-  {id:"op_title_30", name:"Title: ♾️ Eternal Market Deity", icon:"♾️", cost:1000000000000, desc:"Unlocks and equips the ultimate title '♾️ Eternal Market Deity'.", effect:{type:"title", titleId:"t_title_30", titleText:"♾️ Eternal Market Deity", bg:"linear-gradient(45deg,#f59e0b,#eab308)", color:"#000"}},
+  {id:"op_title_30", name:"Title: ♾️ Eternal Market Deity", icon:"♾️", cost:1000000000000, desc:"Unlocks and equips the ultimate title '♾️️ Eternal Market Deity'.", effect:{type:"title", titleId:"t_title_30", titleText:"♾️ Eternal Market Deity", bg:"linear-gradient(45deg,#f59e0b,#eab308)", color:"#000"}},
 
   // 31-40: STOCK SHARE MULTIPLIER PACKETS
   {id:"op_stock_31", name:"Apple Stock Takeover (10,000 AAPL)", icon:"🍏", cost:100000, desc:"Instantly adds +10,000 AAPL shares directly to your portfolio!", effect:{type:"shares", stock:"AAPL", amount:10000}},
@@ -459,7 +441,7 @@ const ALL_TITLES = [
  {id:"t_100", text:"🌌 Sovereign of Reality", bg:"#ec4899", color:"#fff", desc:"Reach $10^120 Portfolio Value.", req:()=>big(portfolio())>=big("1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")},
  {id:"t_99", text:"🪐 Multiverse Master", bg:"#8b5cf6", color:"#fff", desc:"Reach $10^115 Portfolio Value.", req:()=>big(portfolio())>=big("100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")},
  {id:"t_98", text:"✨ Omnipotent Trader", bg:"#6366f1", color:"#fff", desc:"Reach $10^110 Portfolio Value.", req:()=>big(portfolio())>=big("10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")},
- {id:"t_97", text:"♾️ Googolplexian Mogul", bg:"#3b82f6", color:"#fff", desc:"Reach $10^105 Portfolio Value.", req:()=>big(portfolio())>=big("1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")},
+ {id:"t_97", text:"♾️️ Googolplexian Mogul", bg:"#3b82f6", color:"#fff", desc:"Reach $10^105 Portfolio Value.", req:()=>big(portfolio())>=big("1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")},
  {id:"t_96", text:"👁️ The Prime Creator", bg:"#10b981", color:"#000", desc:"Reach $10^100 Portfolio Value.", req:()=>big(portfolio())>=big("100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")},
  {id:"t_95", text:"⚡ Celestial Overlord", bg:"#f59e0b", color:"#000", desc:"Reach $10^95 Portfolio Value.", req:()=>big(portfolio())>=big("10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")},
  {id:"t_94", text:"🌀 Void Architect", bg:"#ef4444", color:"#fff", desc:"Reach $10^90 Portfolio Value.", req:()=>big(portfolio())>=big("1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")},
@@ -502,7 +484,7 @@ const ALL_TITLES = [
  {id:"t_61", text:"🏛 Multi-Trillion Apex", bg:"#059669", color:"#fff", desc:"Reach $500,000,000,000.", req:()=>portfolio()>=500000000000},
  {id:"t_60", text:"🏆 Gold Treasury Titan", bg:"#d97706", color:"#fff", desc:"Own 5,000 Gold Bars.", req:()=>goldBars>=5000},
  {id:"t_59", text:"🎲 Casino Leviathan", bg:"#b91c1c", color:"#fff", desc:"Win a Coin Flip bet over $1,000,000,000.", req:()=>highestCasinoWin>=1000000000},
- {id:"t_58", text:"🏯 Real Estate Monarch", bg:"#0f766e", color:"#fff", desc:"Own 2,500 Total Properties.", req:()=>Object.values(propertiesOwned).reduce((a,b)=>a+b,0)>=2500},
+ {id:"t_58", text:"exe Real Estate Monarch", bg:"#0f766e", color:"#fff", desc:"Own 2,500 Total Properties.", req:()=>Object.values(propertiesOwned).reduce((a,b)=>a+b,0)>=2500},
  {id:"t_57", text:"🚀 Centi-Billionaire", bg:"#3b82f6", color:"#fff", desc:"Reach $100,000,000,000.", req:()=>portfolio()>=100000000000},
  {id:"t_56", text:"🤖 Algorithmic Fleet", bg:"#8b5cf6", color:"#fff", desc:"Own 1,000 Trading Bots.", req:()=>botOwned>=1000},
  {id:"t_55", text:"🥇 Gold Reserve Boss", bg:"#eab308", color:"#1c1917", desc:"Own 2,500 Gold Bars.", req:()=>goldBars>=2500},
@@ -738,132 +720,464 @@ function render(){
  capEconomy();
  const b=document.getElementById("market");b.innerHTML="";
  for(const[t,s]of Object.entries(stocks)){const c=s.change,q=Math.floor(cash/s.price);b.insertAdjacentHTML("beforeend",`<tr><td><b>${safeText(t)}</b><br><span class="sub">${safeText(s.name)}</span></td><td><div><b>${money(s.price)}</b></div><div class="spark-wrap"><canvas class="spark" id="chart-${t}" width="170" height="48"></canvas></div></td><td class="${c>=0?"green":"red"}"><span class="arrow">${c>=0?"▲":"▼"}</span>${c>=0?"+":""}${c.toFixed(2)}%</td><td>${formatQty(s.shares)}</td><td><div class="actions"><button class="buy" onclick="buy('${t}')" ${q<1?"disabled":""}>BUY</button><button class="buy" onclick="buyAll('${t}')" ${q<1?"disabled":""}>BUY ALL</button><button class="sell" onclick="sell('${t}')" ${s.shares<1?"disabled":""}>SELL</button><button class="sell" onclick="sellAll('${t}')" ${s.shares<1?"disabled":""}>SELL ALL</button></div></td></tr>`)}
- for(const t of Object.keys(stocks))drawSmall(t);
- document.getElementById("cash").textContent=money(cash);document.getElementById("portfolio").textContent=money(portfolio());const p=pnl(),pe=document.getElementById("pnl");pe.textContent=(p>=0?"+":"-")+money(Math.abs(p));pe.className="big "+(p>=0?"green":"red");
- renderSelected();renderShop();renderProperties();renderTitles();updateP2PListDropdown();safeRun("trade selects",updateTradeSelects);saveLocal();
+ document.getElementById("cash").textContent=money(cash);
+ document.getElementById("portfolio").textContent=money(portfolio());
+ const p=pnl(),e=document.getElementById("pnl");e.textContent=(p>=0?"+":"")+money(p);e.className="big "+(p>=0?"green":"red");
+ document.getElementById("saveHint").textContent=passInput.value.trim()?"Cloud Syncing: "+validName():"Enter password to enable cloud save";
+ drawSparklines();renderSelected();renderShop();renderProperties();renderTitles();populateItemSelect();
 }
-function drawSmall(t){const s=stocks[t],c=document.getElementById("chart-"+t);if(!c)return;const x=c.getContext("2d"),w=c.width,h=c.height,v=s.history,min=Math.min(...v),max=Math.max(...v),r=max-min||1;x.clearRect(0,0,w,h);x.beginPath();v.forEach((n,i)=>{const px=v.length===1?w/2:i/(v.length-1)*(w-4)+2,py=h-4-(n-min)/r*(h-8);i?x.lineTo(px,py):x.moveTo(px,py)});x.strokeStyle=s.change>=0?"#10b981":"#ef4444";x.lineWidth=2;x.stroke()}
-function drawBig(){const c=document.getElementById("bigChart"),s=stocks[selected],x=c.getContext("2d"),w=c.width,h=c.height,v=s.history,min=Math.min(...v),max=Math.max(...v),r=max-min||1;x.clearRect(0,0,w,h);x.strokeStyle="#243957";x.lineWidth=1;for(let i=1;i<5;i++){x.beginPath();x.moveTo(0,i*h/5);x.lineTo(w,i*h/5);x.stroke()}x.beginPath();v.forEach((n,i)=>{const px=v.length===1?w/2:i/(v.length-1)*(w-8)+4,py=h-8-(n-min)/r*(h-16);i?x.lineTo(px,py):x.moveTo(px,py)});x.strokeStyle=s.change>=0?"#10b981":"#ef4444";x.lineWidth=3;x.stroke()}
-function renderSelected(){const s=stocks[selected];document.getElementById("selectedName").textContent=`${s.name} (${selected})`;document.getElementById("selectedPrice").textContent=money(s.price);const e=document.getElementById("selectedChange");e.textContent=`${s.change>=0?"▲":"▼"} ${s.change>=0?"+":""}${s.change.toFixed(2)}%`;e.className="selected-change "+(s.change>=0?"green":"red");document.getElementById("selectedShares").textContent=formatQty(s.shares);document.getElementById("canBuy").textContent=formatQty(Math.floor(cash/s.price));document.getElementById("stockTabs").innerHTML=Object.entries(stocks).map(([t,z])=>`<button class="stock-tab ${t===selected?"active":""}" onclick="selectStock('${t}')">${z.name} ${t}</button>`).join("");drawBig()}
-window.selectStock=t=>{selected=t;renderSelected()};
-function doBuy(t,q){q=Math.floor(Number(q));const s=stocks[t];if(!Number.isFinite(q)||q<1)return;if(cash>=s.price*q){cash-=s.price*q;s.shares+=q;done();toast(`Bought ${formatQty(q)} ${t} share${q>1?"s":""}.`)}else toast("Not enough cash.")}
-function doSell(t,q){q=Math.floor(Number(q));const s=stocks[t];if(!Number.isFinite(q)||q<1)return;if(s.shares>=q){cash+=s.price*q;s.shares-=q;done();toast(`Sold ${formatQty(q)} ${t} share${q>1?"s":""}.`)}else toast("You don't own enough shares.")}
-window.buy=t=>doBuy(t,1);window.sell=t=>doSell(t,1);window.buyAll=t=>doBuy(t,Math.floor(cash/stocks[t].price));window.sellAll=t=>doSell(t,stocks[t].shares);
-document.getElementById("buyQtyBtn").onclick=()=>doBuy(selected,document.getElementById("qty").value);document.getElementById("sellQtyBtn").onclick=()=>doSell(selected,document.getElementById("qty").value);document.getElementById("buyAllBtn").onclick=()=>window.buyAll(selected);document.getElementById("sellAllBtn").onclick=()=>window.sellAll(selected);
+
+function drawSparklines(){
+ for(const[t,s]of Object.entries(stocks)){
+  const c=document.getElementById("chart-"+t);if(!c)continue;
+  const ctx=c.getContext("2d"),h=s.history,w=170,ch=48;ctx.clearRect(0,0,w,ch);
+  if(h.length<2)continue;
+  const min=Math.min(...h),max=Math.max(...h),r=(max-min)||1;
+  ctx.strokeStyle=s.change>=0?"#34d399":"#fb7185";ctx.lineWidth=2;ctx.beginPath();
+  h.forEach((v,i)=>{const x=(i/(h.length-1))*w,y=ch-((v-min)/r)*(ch-8)-4;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)});
+  ctx.stroke();
+ }
+}
+
+function renderTabs(){
+ const t=document.getElementById("stockTabs");t.innerHTML="";
+ Object.keys(stocks).forEach(k=>{
+  const b=document.createElement("button");
+  b.className="stock-tab"+(k===selected?" active":"");
+  b.textContent=k;
+  b.onclick=()=>{selected=k;renderTabs();renderSelected()};
+  t.appendChild(b);
+ });
+}
+
+function renderSelected(){
+ const s=stocks[selected],q=Math.floor(cash/s.price);
+ document.getElementById("selectedName").textContent=`${s.name} (${selected})`;
+ document.getElementById("selectedPrice").textContent=money(s.price);
+ const e=document.getElementById("selectedChange");
+ e.textContent=`${s.change>=0?"▲ +":"▼ "}${s.change.toFixed(2)}%`;
+ e.className="selected-change "+(s.change>=0?"green":"red");
+ document.getElementById("selectedShares").textContent=formatQty(s.shares);
+ document.getElementById("canBuy").textContent=formatQty(q);
+ document.getElementById("qty").value=Math.max(1,Math.min(Number(document.getElementById("qty").value)||1,q||1));
+ drawBigChart();
+}
+
+function drawBigChart(){
+ const c=document.getElementById("bigChart"),ctx=c.getContext("2d"),s=stocks[selected],h=s.history,w=c.width,ch=c.height;
+ ctx.clearRect(0,0,w,ch);if(h.length<2)return;
+ const min=Math.min(...h),max=Math.max(...h),r=(max-min)||1;
+ ctx.strokeStyle=s.change>=0?"#34d399":"#fb7185";ctx.lineWidth=3;ctx.beginPath();
+ h.forEach((v,i)=>{const x=(i/(h.length-1))*w,y=ch-((v-min)/r)*(ch-24)-12;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)});
+ ctx.stroke();
+}
 
 function renderShop(){
- const g=document.getElementById("shopGrid");
- const items=[...Object.entries(shopItems)];
- g.innerHTML=items.map(([id,it])=>{
-  let owned="";
-  if(it.type==="property")owned=propertiesOwned[it.property]?`<div class="owned">Owned: ${formatQty(propertiesOwned[it.property])}</div>`:"";
-  if(it.type==="gold")owned=`<div class="owned">Owned: ${formatQty(goldBars)} (Payout: +${money(goldBars*50)}/min)</div>`;
-  if(it.type==="insurance")owned=`<div class="owned">${insurance?"Active":"Not active"}</div>`;
-  if(it.type==="boost")owned=`<div class="owned">Times Boosted: ${formatQty(boostOwned)}</div>`;
-  if(it.type==="speed")owned=`<div class="owned">Owned: ${formatQty(speedOwned)}</div>`;
-  if(it.type==="bot")owned=`<div class="owned">Owned: ${formatQty(botOwned)}</div>`;
-  
-  const cost = it.cost || properties[it.property].cost;
-  const canBuySingle = cash >= cost;
-  const isBoost = it.type === "boost";
-  
-  return `<div class="shop-item">
-   <div style="font-size:28px">${it.icon||properties[it.property].icon}</div>
-   <h3>${it.name||properties[it.property].name}</h3>
-   <div class="muted">${it.desc||properties[it.property].desc}</div>
-   ${it.type==="property"?`<div class="property-stats"><span>⏱ ${properties[it.property].interval}s</span><span>+${money(properties[it.property].income)}</span></div>`:""}
-   <div class="price">${money(cost)}</div>
-   ${owned}
-   <div class="shop-btn-row">
-    <button class="primary" onclick="buyShop('${id}', 1)" ${!canBuySingle?"disabled":""}>${isBoost?"BUY BOOST (1x)":"BUY 1"}</button>
-    ${!isBoost?`<button class="buy" onclick="buyShop('${id}', 'max')" ${!canBuySingle?"disabled":""}>BUY MAX</button>`:""}
+ const g=document.getElementById("shopGrid");g.innerHTML="";
+ for(const[k,i]of Object.entries(shopItems)){
+  let title="",desc="",cost=0,ownedText="",btnText="BUY",canBuy=false,clickFn=null;
+  if(i.type==="property"){
+   const p=properties[i.property];title=`${p.icon} ${p.name}`;cost=p.cost;
+   desc=`Produces +${money(p.income)} every ${p.interval}s.`;
+   ownedText=`Owned: ${propertiesOwned[i.property]||0}`;
+   canBuy=cash>=cost;clickFn=()=>buyProperty(i.property);
+  }else if(i.type==="gold"){
+   title=`${i.icon} ${i.name}`;cost=i.cost;desc=i.desc;
+   ownedText=`Owned: ${goldBars}`;canBuy=cash>=cost;clickFn=()=>buyGoldBar();
+  }else if(i.type==="boost"){
+   title=`${i.icon} ${i.name}`;cost=i.cost;desc=i.desc;
+   ownedText=`Used: ${boostOwned}`;canBuy=cash>=cost;clickFn=()=>buyBoost();
+  }else if(i.type==="insurance"){
+   title=`${i.icon} ${i.name}`;cost=i.cost;desc=i.desc;
+   ownedText=insurance?"ACTIVE":"INACTIVE";btnText=insurance?"ACTIVE":"BUY";
+   canBuy=cash>=cost&&!insurance;clickFn=()=>buyInsurance();
+  }else if(i.type==="speed"){
+   title=`${i.icon} ${i.name}`;cost=i.cost;desc=i.desc;
+   ownedText=speedOwned?"MAX SPEED (1.5s)":"DEFAULT SPEED (3.0s)";btnText=speedOwned?"MAXED":"BUY";
+   canBuy=cash>=cost&&!speedOwned;clickFn=()=>buySpeed();
+  }else if(i.type==="bot"){
+   title=`${i.icon} ${i.name}`;cost=i.cost;desc=i.desc;
+   ownedText=`Bots Owned: ${botOwned}`;canBuy=cash>=cost;clickFn=()=>buyBot();
+  }else if(i.type==="mystery"){
+   title=`${i.icon} ${i.name}`;cost=i.cost;desc=i.desc;
+   ownedText="Feeling Lucky?";canBuy=cash>=cost;clickFn=()=>buyMysteryBox();
+  }
+  g.insertAdjacentHTML("beforeend",`
+   <div class="shop-item">
+    <h3>${safeText(title)}</h3>
+    <div class="price">${money(cost)}</div>
+    <div class="muted" style="margin:6px 0">${safeText(desc)}</div>
+    <div class="owned">${safeText(ownedText)}</div>
+    <div class="shop-btn-row">
+      <button class="buy" ${canBuy?"":"disabled"} id="shop-btn-${k}">${btnText}</button>
+    </div>
    </div>
-  </div>`;
- }).join("");
-
- renderOPDropBanner();
+  `);
+  document.getElementById(`shop-btn-${k}`).onclick=clickFn;
+ }
 }
 
-function renderOPDropBanner(){
+function buyProperty(key){
+ const p=properties[key];if(cash<p.cost)return toast("Not enough cash!");
+ cash-=p.cost;propertiesOwned[key]=(propertiesOwned[key]||0)+1;
+ if(!propertyTimers[key])propertyTimers[key]=Date.now();
+ toast(`Bought 1 ${p.name}!`);saveLocal();saveCloud();render();
+}
+function buyGoldBar(){
+ if(cash<5000)return toast("Not enough cash!");
+ cash-=5000;goldBars++;toast("Bought 1 Gold Bar!");saveLocal();saveCloud();render();
+}
+function buyBoost(){
+ if(cash<15000)return toast("Not enough cash!");
+ cash-=15000;boostOwned++;
+ Object.values(stocks).forEach(s=>{s.price=capNum(s.price*1.05);s.history.push(s.price);if(s.history.length>30)s.history.shift()});
+ toast("🚀 Market Boost Applied! All stocks up 5%!");saveLocal();saveCloud();render();
+}
+function buyInsurance(){
+ if(insurance)return toast("Insurance already active!");
+ if(cash<12000)return toast("Not enough cash!");
+ cash-=12000;insurance=true;toast("🛡️ Crash Insurance Activated!");saveLocal();saveCloud();render();
+}
+function buySpeed(){
+ if(speedOwned)return toast("Speed already maxed out!");
+ if(cash<8000)return toast("Not enough cash!");
+ cash-=8000;speedOwned=1;toast("⚡ Market refresh speed doubled to 1.5s!");
+ saveLocal();saveCloud();render();restartMarketTimer();
+}
+function buyBot(){
+ if(cash<25000)return toast("Not enough cash!");
+ cash-=25000;botOwned++;
+ const target=prompt("Enter target price for bot auto-buy ($):",String(stocks[selected].price));
+ if(target&&!isNaN(target))botTargetPrice=Math.max(0.01,Number(target));
+ toast(`🤖 Trading Bot #${botOwned} purchased!`);saveLocal();saveCloud();render();
+}
+function buyMysteryBox(){
+ if(cash<2000)return toast("Not enough cash!");
+ cash-=2000;
+ const rolls=[
+  ()=>{const win=Math.floor(Math.random()*8000)+1000;cash+=win;toast(`🎁 Mystery Box: Won ${money(win)} Cash!`)},
+  ()=>{const loss=Math.min(cash,Math.floor(Math.random()*1500)+500);cash-=loss;toast(`🎁 Mystery Box: Lost ${money(loss)} Cash!`)},
+  ()=>{const stockKeys=Object.keys(stocks),sk=stockKeys[Math.floor(Math.random()*stockKeys.length)];stocks[sk].shares+=5;toast(`🎁 Mystery Box: Won 5 shares of ${sk}!`)},
+  ()=>{goldBars++;toast("🎁 Mystery Box: Won 1 Gold Bar! 🥇")},
+  ()=>{propertiesOwned.tiny=(propertiesOwned.tiny||0)+1;toast("🎁 Mystery Box: Won a Tiny House! 🏡")}
+ ];
+ rolls[Math.floor(Math.random()*rolls.length)]();
+ saveLocal();saveCloud();render();
+}
+
+function renderProperties(){
+ const g=document.getElementById("propertyGrid");g.innerHTML="";
+ let totalProps=0;
+ 
+ // 1. RENDER STANDARD PROPERTIES
+ Object.entries(properties).forEach(([k,p])=>{
+  const count=propertiesOwned[k]||0;
+  if(count>0){
+   totalProps+=count;
+   const last=propertyTimers[k]||Date.now(),now=Date.now(),elapsed=Math.floor((now-last)/1000),remaining=Math.max(0,p.interval-elapsed);
+   g.insertAdjacentHTML("beforeend",`
+    <div class="property-card">
+     <h3>${p.icon} ${safeText(p.name)} <span class="owned">x${count}</span></h3>
+     <div class="property-stats"><span>Payout: <b>${money(p.income*count)}</b></span><span>Interval: <b>${p.interval}s</b></span></div>
+     <div class="timer-badge">⏳ Next Payout: ${remaining}s</div>
+    </div>
+   `);
+  }
+ });
+
+ // 2. RENDER INVENTORY OP ITEMS
+ for(const [opId, count] of Object.entries(opItemsOwned)){
+  if(count > 0){
+   const item = OVERPOWERED_ITEMS.find(x => x.id === opId);
+   if(item){
+    totalProps += count;
+    const isIncomeGen = item.effect && item.effect.type === "income";
+    const actCount = opActivated[opId] || 0;
+    
+    let btnHtml = "";
+    if(isIncomeGen){
+     btnHtml = `<button class="buy" style="margin-top:8px;width:100%" onclick="activateOpItem('${opId}')">ACTIVATE (+${money(item.effect.amount)}/s)</button>`;
+    }
+
+    g.insertAdjacentHTML("beforeend",`
+     <div class="property-card op-card">
+      <h3>${item.icon} ${safeText(item.name)} <span class="owned">x${count}</span></h3>
+      <div class="property-stats"><span>Type: <b>OP Asset</b></span></div>
+      <div class="muted" style="margin-top:4px">${safeText(item.desc)}</div>
+      ${actCount > 0 ? `<div class="owned" style="margin-top:6px;font-size:12px">⚡ Active &amp; Printing: <b>x${actCount}</b></div>` : ""}
+      ${btnHtml}
+     </div>
+    `);
+   }
+  }
+ }
+
+ if(totalProps===0){
+  g.innerHTML='<div class="empty" style="grid-column:1/-1">You don\'t own any properties or OP items yet. Buy some in the Shop or win OP drops!</div>';
+ }
+}
+
+window.activateOpItem = function(opId){
+ const count = opItemsOwned[opId] || 0;
+ if(count <= 0) return toast("You don't have any in your inventory!");
+ 
+ const item = OVERPOWERED_ITEMS.find(x => x.id === opId);
+ if(!item || !item.effect || item.effect.type !== "income") return toast("This item cannot be activated.");
+
+ opItemsOwned[opId] = count - 1;
+ if(opItemsOwned[opId] <= 0) delete opItemsOwned[opId];
+
+ opActivated[opId] = (opActivated[opId] || 0) + 1;
+ recalcOpPassiveIncome();
+
+ toast(`⚡ Activated 1x ${item.name}! Income increased by +${money(item.effect.amount)}/s!`);
+ saveLocal(); saveCloud(); render();
+};
+
+function tickProperties(){
+ const now=Date.now();
+ Object.entries(properties).forEach(([k,p])=>{
+  const count=propertiesOwned[k]||0;
+  if(count>0){
+   if(!propertyTimers[k])propertyTimers[k]=now;
+   const elapsed=Math.floor((now-propertyTimers[k])/1000);
+   if(elapsed>=p.interval){
+    const payout=p.income*count;cash+=payout;
+    propertyTimers[k]=now;
+    toast(`🏠 ${p.name} paid out ${money(payout)}!`);
+    saveLocal();saveCloud();render();
+   }
+  }
+ });
+
+ if(goldBars > 0){
+  const elapsedGold = Math.floor((now - lastGoldPayoutTime) / 1000);
+  if(elapsedGold >= 60){
+   const goldDividend = goldBars * 50;
+   cash += goldDividend;
+   lastGoldPayoutTime = now;
+   toast(`🥇 Gold Dividend: Received ${money(goldDividend)} from ${goldBars} Gold Bars!`);
+   saveLocal(); saveCloud(); render();
+  }
+ }
+
+ if(opPassiveIncome > 0){
+  const elapsedOp = (now - lastOpIncomePayoutTime) / 1000;
+  if(elapsedOp >= 1){
+   const payout = opPassiveIncome * elapsedOp;
+   cash += payout;
+   lastOpIncomePayoutTime = now;
+   saveLocal(); saveCloud();
+   document.getElementById("cash").textContent = money(cash);
+   document.getElementById("portfolio").textContent = money(portfolio());
+  }
+ }
+
+ renderProperties();
+}
+
+function renderTitles(){
+ const g=document.getElementById("titleGrid");g.innerHTML="";
+ let topPlayerId=null,topVal=-1;
+ Object.entries(allPlayers).forEach(([pid,p])=>{
+  if(p.value>topVal){topVal=p.value;topPlayerId=pid;}
+ });
+ const isRichest = topPlayerId && topPlayerId===playerId && topVal>STARTING_CASH;
+ const activeText=document.getElementById("equippedTitleText");
+ 
+ let foundActive=false;
+ ALL_TITLES.forEach(t=>{
+  let unlocked=false;
+  if(t.dynamic){
+   if(t.id==="richest"&&isRichest) unlocked=true;
+  } else {
+   unlocked = customTitlesUnlocked[t.id] || t.req();
+  }
+
+  const isEquipped = equippedTitle===t.id;
+  if(isEquipped) { foundActive=true; activeText.textContent="Active Title: "+t.text; }
+
+  g.insertAdjacentHTML("beforeend",`
+   <div class="title-card ${isEquipped?"equipped":""} ${unlocked?"":"locked"}">
+    <div>
+     <div style="font-weight:900;font-size:14px;color:${t.color};background:${t.bg};display:inline-block;padding:3px 8px;border-radius:6px;margin-bottom:4px">${safeText(t.text)}</div>
+     <div class="muted" style="font-size:11px">${safeText(t.desc)}</div>
+    </div>
+    <div>
+     ${unlocked ? `<button class="${isEquipped?"neutral":"gold"}" style="padding:5px 10px;font-size:11px" onclick="equipTitle('${t.id}')">${isEquipped?"EQUIPPED":"EQUIP"}</button>` : `<span class="muted" style="font-size:11px;font-weight:800">LOCKED</span>`}
+    </div>
+   </div>
+  `);
+ });
+ if(!foundActive) activeText.textContent="Active Title: None";
+}
+
+window.equipTitle=function(id){
+ if(equippedTitle===id) equippedTitle="";
+ else equippedTitle=id;
+ localStorage.setItem("simuEquippedTitle",equippedTitle);
+ toast(equippedTitle?"Title equipped!":"Title unequipped!");
+ saveLocal();saveCloud();render();
+};
+
+window.buy=function(t){
+ const s=stocks[t],q=Math.max(1,Number(document.getElementById("qty").value)||1);
+ if(cash<s.price*q)return toast("Not enough cash!");
+ cash-=s.price*q;s.shares+=q;toast(`Bought ${q} share(s) of ${t}!`);
+ saveLocal();saveCloud();render();
+};
+window.buyAll=function(t){
+ const s=stocks[t],q=Math.floor(cash/s.price);
+ if(q<1)return toast("Not enough cash!");
+ cash-=s.price*q;s.shares+=q;toast(`Bought ${q} share(s) of ${t}!`);
+ saveLocal();saveCloud();render();
+};
+window.sell=function(t){
+ const s=stocks[t],q=Math.max(1,Number(document.getElementById("qty").value)||1);
+ if(s.shares<q)return toast("Not enough shares!");
+ cash+=s.price*q;s.shares-=q;toast(`Sold ${q} share(s) of ${t}!`);
+ saveLocal();saveCloud();render();
+};
+window.sellAll=function(t){
+ const s=stocks[t];if(s.shares<1)return toast("No shares to sell!");
+ const q=s.shares;cash+=s.price*q;s.shares=0;toast(`Sold all ${q} share(s) of ${t}!`);
+ saveLocal();saveCloud();render();
+};
+
+function tickMarket(){
+ Object.entries(stocks).forEach(([t,s])=>{
+  if(priceOverrides[t] !== undefined){
+   s.price = priceOverrides[t];
+  } else {
+   const changePercent=(Math.random()*6-2.9)/100;
+   s.price=capNum(Math.max(1,s.price*(1+changePercent)));
+   s.change=changePercent*100;
+  }
+  s.history.push(s.price);if(s.history.length>30)s.history.shift();
+
+  if(botOwned>0 && t===selected && s.price<=botTargetPrice){
+   const botShares = 40 * botOwned;
+   const cost = s.price * botShares;
+   if(cash>=cost){
+    cash-=cost; s.shares+=botShares;
+    toast(`🤖 ${botOwned} Trading Bot(s) auto-bought ${botShares} shares of ${t}!`);
+   }
+  }
+ });
+ render();
+}
+
+function restartMarketTimer(){
+ if(window.marketInterval)clearInterval(window.marketInterval);
+ const speed = speedOwned ? 1500 : 3000;
+ window.marketInterval=setInterval(tickMarket, speed);
+}
+
+// ---------------- OP SPAWNER & AUTO-GRAB ----------------
+function setupOpSpawner(){
+ if(!db) return;
+ const refTimer = ref(db, "globalOpDrop");
+ onValue(refTimer, (snapshot)=>{
+  const data = snapshot.val();
+  if(data){
+   currentOpDrop = data;
+   renderOpDropBanner(data);
+   opDropSynced = true;
+   
+   if(op194AutoGrab && data.active && data.item){
+    claimOpDrop();
+   }
+  }
+ });
+
+ if(!window.opCountdownInterval){
+  window.opCountdownInterval = setInterval(updateOpTimerDisplay, 1000);
+ }
+}
+
+function updateOpTimerDisplay(){
+ if(!currentOpDrop) return;
+ const now = Date.now();
+ const nextDropTime = currentOpDrop.nextSpawnTime || (now + 180000);
+ const diff = Math.max(0, Math.floor((nextDropTime - now) / 1000));
+ 
+ const m = Math.floor(diff / 60).toString().padStart(2, '0');
+ const s = (diff % 60).toString().padStart(2, '0');
+ document.getElementById("opTimerBadge").textContent = `⚡ Next OP Drop in: ${m}:${s}`;
+
+ if(diff <= 0 && (!currentOpDrop.active || now > currentOpDrop.expiresAt)){
+  triggerClientOpSpawn();
+ }
+}
+
+function triggerClientOpSpawn(){
+ if(!db) return;
+ const now = Date.now();
+ const randomOp = OVERPOWERED_ITEMS[Math.floor(Math.random() * OVERPOWERED_ITEMS.length)];
+ 
+ const dropRef = ref(db, "globalOpDrop");
+ runTransaction(dropRef, (current) => {
+  if(!current || now >= current.nextSpawnTime || now > current.expiresAt){
+   return {
+    active: true,
+    item: randomOp,
+    spawnedAt: now,
+    expiresAt: now + 45000,
+    nextSpawnTime: now + 180000,
+    claimedBy: null
+   };
+  }
+  return current;
+ });
+}
+
+function renderOpDropBanner(data){
  const container = document.getElementById("opDropContainer");
- if(!currentOpDrop || currentOpDrop.stock <= 0){
+ if(!data || !data.active || data.claimedBy || Date.now() > data.expiresAt){
   container.style.display = "none";
   return;
  }
 
- const item = currentOpDrop.item;
- const canAfford = cash >= item.cost;
-
+ const item = data.item;
  container.style.display = "block";
- container.innerHTML = `<div class="shop-item op-card">
-  <div style="display:flex;justify-content:space-between;align-items:center">
-   <span class="title-badge" style="background:#a855f7;color:#fff;font-size:12px">⚡ RARE 3-MIN OP DROP (1 IN STOCK)</span>
-   <span class="red" style="font-weight:800;font-size:12px">🔥 STOCK: ${currentOpDrop.stock}/1</span>
-  </div>
-  <div style="display:flex;gap:12px;margin-top:10px;align-items:center">
-   <div style="font-size:42px">${item.icon}</div>
+ container.innerHTML = `
+  <div style="background:linear-gradient(135deg,#3b0764 0%,#1e1b4b 100%);border:2px solid #a855f7;border-radius:12px;padding:15px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;box-shadow:0 0 25px rgba(168,85,247,0.4)">
    <div>
-    <h2 style="margin:0;color:#f472b6">${safeText(item.name)}</h2>
+    <div style="font-weight:900;color:#c084fc;font-size:16px">🔥 LIMITED 1-IN-STOCK OP ITEM DROPPED!</div>
+    <div style="font-size:20px;font-weight:900;margin:4px 0">${item.icon} ${safeText(item.name)}</div>
     <div class="muted">${safeText(item.desc)}</div>
-    <div class="price green" style="margin-top:4px">${money(item.cost)}</div>
+    <div style="font-size:18px;font-weight:900;color:#f59e0b;margin-top:4px">PRICE: ${money(item.cost)}</div>
    </div>
+   <button class="gold" style="padding:12px 24px;font-size:16px;box-shadow:0 0 15px #d4a72c" onclick="claimOpDrop()">CLAIM / BUY OP ITEM ⚡</button>
   </div>
-  <button class="gold" onclick="claimOpDrop()" style="width:100%;margin-top:10px;padding:12px;font-size:15px;box-shadow:0 0 15px rgba(234,179,8,0.4)" ${!canAfford?"disabled":""}>
-   BUY OP ITEM NOW (${money(item.cost)})
-  </button>
- </div>`;
+ `;
 }
 
-window.claimOpDrop = async () => {
- if(!firebaseReady || !currentOpDrop || currentOpDrop.stock <= 0) return;
+window.claimOpDrop = function(){
+ if(!currentOpDrop || !currentOpDrop.active || !db) return toast("No active OP drop!");
  const item = currentOpDrop.item;
- if(cash < item.cost){
-  toast("Not enough cash!");
-  return;
- }
+ if(cash < item.cost) return toast("Not enough cash to buy this OP drop!");
 
- const dropRef = ref(db, "currentOpDrop");
- try {
-  const result = await runTransaction(dropRef, (currentData) => {
-   if (currentData && currentData.stock > 0) {
-    currentData.stock = 0;
-    currentData.claimedBy = validName();
-    return currentData;
-   } else {
-    return; // Abort transaction if already claimed
-   }
-  });
-
-  if (result.committed) {
-   cash -= item.cost;
-   addOpItemToInventory(item);
-   toast(`🎉 YOU BOUGHT THE OP ITEM: ${item.name}! It is in My Properties – activate it or sell it in the shop.`);
-   done();
-  } else {
-   toast("❌ Someone else bought it first!");
+ const dropRef = ref(db, "globalOpDrop");
+ runTransaction(dropRef, (current) => {
+  if(current && current.active && !current.claimedBy && Date.now() <= current.expiresAt){
+   current.active = false;
+   current.claimedBy = validName();
+   return current;
   }
- } catch (e) {
-  console.error(e);
-  toast("Transaction failed, try again!");
- }
-};
-
-function addOpItemToInventory(item, n=1){
- opItemsOwned[item.id] = (Number(opItemsOwned[item.id]) || 0) + n;
-}
-
-// Using ONE item: removes it from the inventory (4 -> 3) and applies its effect.
-window.activateOpItem = (opId, all=false) => {
- const item = OVERPOWERED_ITEMS.find(x => x.id === opId);
- const have = Number(opItemsOwned[opId]) || 0;
- if(!item || have < 1){ toast("You don't have this item!"); return; }
- const times = all ? have : 1;
- for(let i = 0; i < times; i++){
-  opItemsOwned[opId] -= 1;
-  applyOpItemEffect(item);
- }
- if(opItemsOwned[opId] <= 0) delete opItemsOwned[opId];
- done();
+  return;
+ }).then((result) => {
+  if(result.committed){
+   cash -= item.cost;
+   applyOpItemEffect(item);
+   toast(`🎉 SUCCESS! You claimed ${item.name}!`);
+   saveLocal(); saveCloud(); render();
+  } else {
+   toast("❌ Someone else claimed it first!");
+  }
+ }).catch(err => {
+  toast("Failed to claim OP drop.");
+ });
 };
 
 function applyOpItemEffect(item){
@@ -872,1882 +1186,1176 @@ function applyOpItemEffect(item){
 
  if(eff.type === "cash"){
   cash += eff.amount;
-  toast(`💰 Received +${money(eff.amount)} Cash!`);
+  toast(`💵 Granted +${money(eff.amount)} Cash!`);
  } else if(eff.type === "income"){
-  opActivated[item.id] = (Number(opActivated[item.id]) || 0) + 1;
-  recalcOpPassiveIncome();
-  toast(`⚡ Passive Income increased by +${money(eff.amount)}/sec!`);
- } else if(eff.type === "shares"){
-  if(stocks[eff.stock]) stocks[eff.stock].shares += eff.amount;
-  toast(`📈 Added +${formatQty(eff.amount)} ${eff.stock} shares!`);
- } else if(eff.type === "all_shares"){
-  Object.values(stocks).forEach(s => s.shares += eff.amount);
-  toast(`📦 Added +${formatQty(eff.amount)} shares to ALL stocks!`);
+  opItemsOwned[item.id] = (opItemsOwned[item.id] || 0) + 1;
+  toast(`📦 Added 1x ${item.name} to your Properties & Assets inventory! Activate it there to start receiving passive income!`);
  } else if(eff.type === "title"){
-  customTitlesUnlocked[eff.titleId] = eff;
+  customTitlesUnlocked[eff.titleId] = true;
   equippedTitle = eff.titleId;
-  toast(`🏆 Unlocked & Equipped title: ${eff.titleText}!`);
+  localStorage.setItem("simuEquippedTitle", equippedTitle);
+  toast(`👑 Unlocked and equipped title: ${eff.titleText}!`);
+ } else if(eff.type === "shares"){
+  stocks[eff.stock].shares += eff.amount;
+  toast(`🍏 Added +${formatQty(eff.amount)} ${eff.stock} shares!`);
+ } else if(eff.type === "all_shares"){
+  Object.keys(stocks).forEach(k => stocks[k].shares += eff.amount);
+  toast(`📦 Added +${formatQty(eff.amount)} shares to ALL stocks!`);
  } else if(eff.type === "bots"){
   botOwned += eff.amount;
-  toast(`🤖 Received +${formatQty(eff.amount)} Trading Bots!`);
+  toast(`🤖 Added +${formatQty(eff.amount)} Trading Bots!`);
  } else if(eff.type === "gold"){
   goldBars += eff.amount;
-  toast(`🥇 Received +${formatQty(eff.amount)} Gold Bars!`);
+  toast(`🥇 Added +${formatQty(eff.amount)} Gold Bars!`);
  } else if(eff.type === "op_mystery"){
-  triggerOpMysteryBox(eff.tier);
+  rollOpMysteryCrate(eff.tier || 1);
  }
 }
 
-function triggerOpMysteryBox(tier){
- // Higher tier = more rolls AND bigger rewards on every roll.
- const p = Math.pow(10, tier);
- const rolls = 1 + Math.floor((tier - 1) / 4);
- const rnd = (a, b) => a + Math.random() * (b - a);
- const results = [];
- const stockKeys = Object.keys(stocks);
- const propKeys = Object.keys(properties);
- const opPool = OVERPOWERED_ITEMS.filter(x => x.effect && x.effect.type !== "op_mystery" && x.cost <= 1e5 * p).sort((a, b) => a.cost - b.cost);
-
- for(let r = 0; r < rolls; r++){
-  const roll = Math.random() * 100;
-  if(roll < 30){
-   const amt = Math.floor(p * 100000 * rnd(1, 3));
-   cash += amt;
-   results.push(`💰 ${money(amt)} cash`);
-  } else if(roll < 55){
-   const amt = Math.floor(p * 1000 * rnd(0.5, 2));
-   if(Math.random() < 0.25){
-    stockKeys.forEach(k => stocks[k].shares += amt);
-    results.push(`📦 ${formatQty(amt)} shares of ALL stocks`);
-   } else {
-    const k = stockKeys[Math.floor(Math.random() * stockKeys.length)];
-    stocks[k].shares += amt;
-    results.push(`📈 ${formatQty(amt)} ${k} shares`);
-   }
-  } else if(roll < 75){
-   const k = propKeys[Math.floor(Math.random() * propKeys.length)];
-   const qty = Math.max(1, Math.floor(p * 10 * rnd(0.5, 2)));
-   propertiesOwned[k] = (Number(propertiesOwned[k]) || 0) + qty;
-   if(!propertyTimers[k]) propertyTimers[k] = Date.now();
-   results.push(`🏠 ${formatQty(qty)}x ${properties[k].name}`);
-  } else if(roll < 83){
-   const amt = Math.floor(p * 100 * rnd(0.5, 2));
-   goldBars += amt;
-   results.push(`🥇 ${formatQty(amt)} Gold Bars`);
-  } else if(roll < 90){
-   const amt = Math.floor(p * 10 * rnd(0.5, 2));
-   botOwned += amt;
-   results.push(`🤖 ${formatQty(amt)} Trading Bots`);
-  } else if(opPool.length){
-   // leans toward the pricier items in the pool
-   const idx = Math.floor(Math.max(Math.random(), Math.random()) * opPool.length);
-   const it = opPool[idx];
-   const qty = 1 + Math.floor(Math.random() * 3);
-   addOpItemToInventory(it, qty);
-   results.push(`${it.icon} ${qty}x ${it.name}`);
+function rollOpMysteryCrate(tier){
+ const rollsCount = tier >= 17 ? 5 : tier >= 9 ? 3 : tier >= 5 ? 2 : 1;
+ const multiplier = Math.pow(2.2, tier - 1);
+ 
+ for(let i = 0; i < rollsCount; i++){
+  const rand = Math.random();
+  if(rand < 0.35){
+   const cashWin = Math.floor((Math.random() * 500000 + 50000) * multiplier);
+   cash += cashWin;
+   toast(`🎁 Crate Roll ${i+1}: Won +${money(cashWin)} Cash!`);
+  } else if(rand < 0.60){
+   const goldWin = Math.max(1, Math.floor((Math.random() * 20 + 2) * (tier * 0.8)));
+   goldBars += goldWin;
+   toast(`🥇 Crate Roll ${i+1}: Won +${formatQty(goldWin)} Gold Bars!`);
+  } else if(rand < 0.80){
+   const botWin = Math.max(1, Math.floor((Math.random() * 15 + 1) * (tier * 0.8)));
+   botOwned += botWin;
+   toast(`🤖 Crate Roll ${i+1}: Won +${formatQty(botWin)} Trading Bots!`);
   } else {
-   const amt = Math.floor(p * 100000 * rnd(1, 3));
-   cash += amt;
-   results.push(`💰 ${money(amt)} cash`);
-  }
- }
- recalcOpPassiveIncome();
- toast(`🎁 Crate Tier ${tier} dropped: ${results.join(" • ")}`);
-}
-
-window.buyShop=(id, qtyMode=1)=>{
- const it=shopItems[id], cost=it.cost||properties[it.property].cost;
- if(cash<cost) return;
- 
- let qty = 1;
- if(qtyMode === "max" && it.type !== "boost"){
-  qty = Math.floor(cash / cost);
- }
- if(qty < 1) return;
-
- if(it.type==="property"){
-  const pKey=it.property;
-  cash -= cost * qty;
-  propertiesOwned[pKey]=(propertiesOwned[pKey]||0)+qty;
-  if(!propertyTimers[pKey]){
-   propertyTimers[pKey]=Date.now();
-  }
-  toast(`Bought ${formatQty(qty)}x ${properties[pKey].name}!`);
- }else if(it.type==="gold"){
-  cash -= cost * qty;
-  goldBars += qty;
-  toast(`Bought ${formatQty(qty)}x Gold Bar! Yield: +${money(goldBars*50)}/min`);
- }else if(it.type==="boost"){
-  cash -= cost;
-  boostOwned += 1;
-  for(const s of Object.values(stocks)){
-   s.price *= 1.05;
-  }
-  toast("Activated 1x Market Boost!");
- }else if(it.type==="insurance"){
-  cash -= cost;
-  insurance = true;
-  toast("Insurance activated!");
- }else if(it.type==="speed"){
-  cash -= cost * qty;
-  speedOwned += qty;
-  toast(`Bought ${formatQty(qty)}x Trading Speed!`);
- }else if(it.type==="bot"){
-  cash -= cost * qty;
-  botOwned += qty;
-  toast(`Bought ${formatQty(qty)}x Trading Bot!`);
- }else if(it.type==="mystery"){
-  const actualQty = Math.min(qty, 10000);
-  for(let i=0; i<actualQty; i++){
-   if(cash >= cost){
-    cash -= cost;
-    mysteryBox(true);
-   }
-  }
-  toast(`Opened ${formatQty(actualQty)}x Mystery Boxes!`);
- }
- done();
-};
-
-function mysteryBox(silent=false){const pool=[
- ["+$500 cash",()=>cash+=500,.12],["+$1,000 cash",()=>cash+=1000,.10],["+$2,500 cash",()=>cash+=2500,.06],["+$5,000 cash",()=>cash+=5000,.02],
- ["+1 AAPL",()=>stocks.AAPL.shares+=1,.08],["+3 AAPL",()=>stocks.AAPL.shares+=3,.04],["+1 TSLA",()=>stocks.TSLA.shares+=1,.06],["+2 TSLA",()=>stocks.TSLA.shares+=2,.03],["+5 KO",()=>stocks.KO.shares+=5,.07],["+10 KO",()=>stocks.KO.shares+=10,.03],
- ["Lose $500",()=>cash=Math.max(0,cash-500),.08],["Lose $1,000",()=>cash=Math.max(0,cash-1000),.05],["Lose $2,500",()=>cash=Math.max(0,cash-2500),.025],["Lose 5% cash",()=>cash=Math.max(0,cash*.95),.03],["Lose 1 random stock share",()=>{const ks=Object.keys(stocks).filter(k=>stocks[k].shares>0);if(ks.length)stocks[ks[Math.floor(Math.random()*ks.length)]].shares--},.05],
- ["Free Market Boost",()=>{boostOwned++;for(const s of Object.values(stocks))s.price*=1.05},.025],["Free Insurance",()=>insurance=true,.025],["Free Trading Speed",()=>speedOwned++,.025],["Free Tiny House",()=>{propertiesOwned.tiny=(propertiesOwned.tiny||0)+1;if(!propertyTimers.tiny)propertyTimers.tiny=Date.now();},.008],["Double next stock movement",()=>stocks.AAPL.history.push(stocks.AAPL.price),.02],
- ["Random stock 1–10 shares",()=>stocks[Object.keys(stocks)[Math.floor(Math.random()*3)]].shares+=1+Math.floor(Math.random()*10),.06],["Stock swap",()=>{const a=stocks.AAPL.shares,b=stocks.TSLA.shares;stocks.AAPL.shares=b;stocks.TSLA.shares=a},.025],["Market Surge",()=>Object.values(stocks).forEach(s=>s.price*=1.12),.015],["Market Crash",()=>Object.values(stocks).forEach(s=>s.price*=.88),.015],["Nothing",()=>{},.15]
- ];let totalWeight=pool.reduce((a,x)=>a+x[2],0),r=Math.random()*totalWeight,chosen=pool[pool.length-1];for(const item of pool){r-=item[2];if(r<=0){chosen=item;break}}chosen[1]();if(!silent)toast(`🎁 Mystery Box: ${chosen[0]}`)}
-
-function propertyPayouts(){
- let total=0;
- const now=Date.now();
- for(const [k,p] of Object.entries(properties)){
-  const count=Number(propertiesOwned[k])||0;
-  if(!count)continue;
-  let last=propertyTimers[k]||now;
-  const intervalMs = p.interval * 1000;
-  const elapsed = now - last;
-  if(elapsed >= intervalMs){
-   const cycles = Math.floor(elapsed / intervalMs);
-   const payout = cycles * count * p.income;
-   cash += payout;
-   total += payout;
-   propertyTimers[k] = last + (cycles * intervalMs);
-  }
- }
- if(total>0){
-  toast(`🏠 Properties paid you ${money(total)}!`);
-  done();
- }
- updatePropertyTimersUI();
-}
-
-function goldPayouts(){
- const now = Date.now();
- 
- // Gold Dividends
- if(goldBars > 0){
-  const elapsedSec = (now - lastGoldPayoutTime) / 1000;
-  if(elapsedSec >= 5){
-   const goldPayout = Math.floor((50 / 60) * elapsedSec * goldBars);
-   if(goldPayout > 0){
-    cash += goldPayout;
-    lastGoldPayoutTime = now;
-    done();
-   }
-  }
- }
-
- // OP Passive Income Generators
- if(opPassiveIncome > 0){
-  const elapsedSecOp = (now - lastOpIncomePayoutTime) / 1000;
-  if(elapsedSecOp >= 1){
-   cash += Math.floor(opPassiveIncome * elapsedSecOp);
-   lastOpIncomePayoutTime = now;
-   done();
+   const randOp = OVERPOWERED_ITEMS[Math.floor(Math.random() * OVERPOWERED_ITEMS.length)];
+   applyOpItemEffect(randOp);
   }
  }
 }
 
-function updatePropertyTimersUI(){
- const now=Date.now();
- for(const [k,p] of Object.entries(properties)){
-  const el=document.getElementById("timer-"+k);
-  if(!el)continue;
-  const count=Number(propertiesOwned[k])||0;
-  if(!count){
-   el.textContent="Not owned";
-   continue;
-  }
-  const last=propertyTimers[k]||now;
-  const intervalMs=p.interval*1000;
-  const elapsed=now-last;
-  const remaining=Math.max(0,Math.ceil((intervalMs-elapsed)/1000));
-  el.textContent=`⏱ Next payout in ${remaining}s`;
- }
-}
-
-function renderProperties(){
- const g=document.getElementById("propertyGrid");
- let html=Object.entries(properties).map(([k,p])=>{
-  const n=Number(propertiesOwned[k])||0;
-  return `<div class="property-card">
-   <div class="property-icon">${p.icon}</div>
-   <h3>${p.name}</h3>
-   <div class="muted">${p.desc}</div>
-   <div class="property-stats"><span>Payout: Every ${p.interval}s</span><b class="green">+${money(p.income)}</b></div>
-   <div class="owned">You own: ${formatQty(n)}</div>
-   <div class="timer-badge" id="timer-${k}">⏱ Next payout in --s</div>
-  </div>`;
- }).join("");
-
- // RENDER OP ITEMS: inventory (not used yet) + already-activated generators
- const opIds = new Set([...Object.keys(opItemsOwned), ...Object.keys(opActivated)]);
- for(const opId of opIds){
-  const have = Number(opItemsOwned[opId]) || 0;
-  const active = Number(opActivated[opId]) || 0;
-  if(have <= 0 && active <= 0) continue;
-  const item = OVERPOWERED_ITEMS.find(x => x.id === opId);
-  if(!item) continue;
-  html += `<div class="property-card" style="border-color:#a855f7">
-   <div class="property-icon">${item.icon}</div>
-   <h3 style="color:#c084fc">${safeText(item.name)}</h3>
-   <div class="muted">${safeText(item.desc)}</div>
-   <div class="owned" style="margin-top:6px;color:#a855f7">In inventory (unused): ${formatQty(have)}</div>
-   ${active > 0 ? `<div class="owned" style="color:#34d399">Active: ${formatQty(active)}</div>` : ""}
-   ${have > 0 ? `<div style="display:flex;gap:6px;margin-top:8px">
-     <button class="buy" onclick="activateOpItem('${opId}')" style="flex:1">ACTIVATE</button>
-     ${have > 1 ? `<button class="buy" onclick="activateOpItem('${opId}', true)" style="flex:1">ACTIVATE ALL</button>` : ""}
-    </div>` : ""}
-  </div>`;
- }
-
- html += `<div class="property-card" style="border-color:#8b5cf6">
-   <div class="property-icon">🤖</div>
-   <h3>Trading Bot Config</h3>
-   <div class="muted">Buys up to 40 shares of selected stock automatically when price drops at or below target price.</div>
-   <div class="owned" style="margin-top:6px">Bots Owned: ${formatQty(botOwned)}</div>
-   <div style="margin-top:10px">
-    <label style="margin:0;font-size:11px">BUY WHEN PRICE IS AT OR BELOW ($):</label>
-    <input id="botTargetInput" type="number" min="0.01" step="0.01" value="${botTargetPrice}" style="margin-top:4px;padding:8px">
-   </div>
- </div>`;
-
- g.innerHTML = html;
-
- const botInp = document.getElementById("botTargetInput");
- if(botInp){
-  botInp.oninput = () => {
-   const val = Number(botInp.value);
-   if(Number.isFinite(val) && val >= 0){
-    botTargetPrice = val;
-    saveLocal();
-   }
-  };
- }
- updatePropertyTimersUI();
-}
-
-function renderTitles(){
- const g = document.getElementById("titleGrid");
- const currentTitleObj = ALL_TITLES.find(t => t.id === equippedTitle) || customTitlesUnlocked[equippedTitle];
- document.getElementById("equippedTitleText").innerHTML = currentTitleObj 
-  ? `Active Title: <span class="title-badge" style="background:${currentTitleObj.bg};color:${currentTitleObj.color}">${currentTitleObj.text || currentTitleObj.titleText}</span>`
-  : "Active Title: None";
-
- // Combine base titles + custom unlocked OP titles
- let displayList = [...ALL_TITLES];
- for(const [tId, tObj] of Object.entries(customTitlesUnlocked)){
-  displayList.unshift({id: tId, text: tObj.titleText, bg: tObj.bg, color: tObj.color, desc: "Unlocked via OP Shop Drop!", req:()=>true});
- }
-
- g.innerHTML = displayList.map(t => {
-  let isUnlocked = false;
-  if(customTitlesUnlocked[t.id]){
-   isUnlocked = true;
-  } else if(t.dynamic && t.id === "richest"){
-   isUnlocked = isRichestPlayer();
-  } else if(t.req) {
-   isUnlocked = t.req();
-  }
-
-  const isEquipped = equippedTitle === t.id;
-
-  return `<div class="title-card ${isEquipped ? 'equipped' : ''} ${!isUnlocked ? 'locked' : ''}">
-   <div>
-    <div><span class="title-badge" style="background:${t.bg};color:${t.color}">${t.text}</span></div>
-    <div class="muted" style="margin-top:5px">${t.desc}</div>
-   </div>
-   <div>
-    ${isUnlocked 
-      ? `<button class="${isEquipped ? 'neutral' : 'primary'}" onclick="toggleTitle('${t.id}')">${isEquipped ? 'UNEQUIP' : 'EQUIP'}</button>` 
-      : `<span class="muted" style="font-size:11px;font-weight:700">LOCKED</span>`
-    }
-   </div>
-  </div>`;
- }).join("");
-}
-
-window.toggleTitle = (id) => {
- if(equippedTitle === id){
-  equippedTitle = "";
-  toast("Unequipped title.");
- } else {
-  equippedTitle = id;
-  toast("Equipped new title!");
- }
- done();
-};
-
-function isRichestPlayer(){
- const sorted = Object.entries(allPlayers).map(([id,p])=>({id,...p})).sort((a,b)=>(b.portfolioValue||0)-(a.portfolioValue||0));
- return sorted.length > 0 && sorted[0].id === playerId;
-}
-
-function updateP2PPaymentDropdowns(){
- const propSel = document.getElementById("p2pPropPriceSelect");
- const opSel = document.getElementById("p2pOpPriceSelect");
- if(!propSel || !opSel) return;
-
- const propPrev = propSel.value;
- let propOpts = '<option value="">No property</option>';
- for(const [k,p] of Object.entries(properties)){
-  propOpts += `<option value="${k}">${safeText(p.name)} (You have: ${formatQty(Number(propertiesOwned[k])||0)})</option>`;
- }
- propSel.innerHTML = propOpts;
- if(propPrev && Array.prototype.some.call(propSel.options,o=>o.value===propPrev)) propSel.value=propPrev;
-
- const opPrev = opSel.value;
- let opOpts = '<option value="">No OP item</option>';
- for(const [id,c0] of Object.entries(opItemsOwned)){
-  const c=Number(c0)||0;
-  const it=OVERPOWERED_ITEMS.find(x=>x.id===id);
-  if(it) opOpts += `<option value="${id}">${safeText(it.name)} (You have: ${formatQty(c)})</option>`;
- }
- opSel.innerHTML=opOpts;
- if(opPrev && Array.prototype.some.call(opSel.options,o=>o.value===opPrev)) opSel.value=opPrev;
-}
-
-function updateP2PListDropdown(){
+// ---------------- P2P STORE & LISTINGS MANAGEMENT ----------------
+function populateItemSelect(){
  const sel = document.getElementById("p2pItemSelect");
- if(!sel) return;
- let opts = '<option value="">Select an item to list…</option>';
-
- for(const [k,p] of Object.entries(properties)){
-  const count=Number(propertiesOwned[k])||0;
-  if(count>0) opts += `<option value="property_${k}">Property: ${safeText(p.name)} (Owned: ${formatQty(count)})</option>`;
- }
- for(const [opId,count0] of Object.entries(opItemsOwned)){
-  const count=Number(count0)||0;
-  const item=OVERPOWERED_ITEMS.find(x=>x.id===opId);
-  if(item && count>0) opts += `<option value="op_${opId}">OP Item: ${safeText(item.name)} (Owned: ${formatQty(count)})</option>`;
- }
-
- if(sel.dataset.sig !== opts){
-  const prev=sel.value;
-  sel.innerHTML=opts;
-  sel.dataset.sig=opts;
-  if(prev && Array.prototype.some.call(sel.options,o=>o.value===prev)) sel.value=prev;
- }
- updateP2PPaymentDropdowns();
-}
-
-function getP2PPaymentFromInputs(){
- const cashPrice=Math.max(0,Math.floor(Number(document.getElementById("p2pCashPriceInput").value)||0));
- const propQty=Math.max(0,Math.floor(Number(document.getElementById("p2pPropPriceQty").value)||0));
- const propKey=document.getElementById("p2pPropPriceSelect").value;
- const opQty=Math.max(0,Math.floor(Number(document.getElementById("p2pOpPriceQty").value)||0));
- const opKey=document.getElementById("p2pOpPriceSelect").value;
-
- if(cashPrice===0 && propQty===0 && opQty===0) return null;
- if(propQty>0 && !propKey) return {error:"Choose the property the buyer must pay."};
- if(opQty>0 && !opKey) return {error:"Choose the OP item the buyer must pay."};
-
- return {
-  cash:cashPrice,
-  props:propQty>0?{[propKey]:propQty}:{},
-  ops:opQty>0?{[opKey]:opQty}:{}
- };
-}
-
-function describeP2PPayment(payment){
- const p=payment||{};
- const parts=[];
- const cashAmount=Math.floor(Number(p.cash)||0);
- if(cashAmount>0) parts.push(money(cashAmount));
- for(const [k,n0] of Object.entries(p.props||{})){
-  const n=Math.floor(Number(n0)||0);
-  if(n>0 && properties[k]) parts.push(`${formatQty(n)}x ${properties[k].name}`);
- }
- for(const [k,n0] of Object.entries(p.ops||{})){
-  const n=Math.floor(Number(n0)||0);
-  const it=OVERPOWERED_ITEMS.find(x=>x.id===k);
-  if(n>0 && it) parts.push(`${formatQty(n)}x ${it.name}`);
- }
- return parts.join(" + ") || "Nothing";
-}
-
-function paymentHasOnlyCash(p){
- return p && !Object.values(p.props||{}).some(n=>Number(n)>0) && !Object.values(p.ops||{}).some(n=>Number(n)>0);
-}
-
-function paymentHasAny(p){
- return !!p && ((Number(p.cash)||0)>0 || Object.values(p.props||{}).some(n=>Number(n)>0) || Object.values(p.ops||{}).some(n=>Number(n)>0));
-}
-
-function canAffordP2PPayment(payment){
- if(!paymentHasAny(payment)) return false;
- if((Number(payment.cash)||0)>cash) return false;
- for(const [k,n0] of Object.entries(payment.props||{})){
-  const n=Math.floor(Number(n0)||0);
-  if(n>0 && (Number(propertiesOwned[k])||0)<n) return false;
- }
- for(const [k,n0] of Object.entries(payment.ops||{})){
-  const n=Math.floor(Number(n0)||0);
-  if(n>0 && (Number(opItemsOwned[k])||0)<n) return false;
- }
- return true;
-}
-
-function takeP2PPayment(payment){
- const p=payment||{};
- const cashAmount=Math.floor(Number(p.cash)||0);
- if(cashAmount>0) cash-=cashAmount;
- for(const [k,n0] of Object.entries(p.props||{})){
-  const n=Math.floor(Number(n0)||0);
-  if(n>0) propertiesOwned[k]=(Number(propertiesOwned[k])||0)-n;
- }
- for(const [k,n0] of Object.entries(p.ops||{})){
-  const n=Math.floor(Number(n0)||0);
-  if(n>0){
-   const next=(Number(opItemsOwned[k])||0)-n;
-   if(next>0) opItemsOwned[k]=next; else delete opItemsOwned[k];
-  }
- }
- recalcOpPassiveIncome();
-}
-
-function returnP2PPayment(payment){
- const p=payment||{};
- cash+=Math.floor(Number(p.cash)||0);
- for(const [k,n0] of Object.entries(p.props||{})){
-  const n=Math.floor(Number(n0)||0);
-  if(n>0){
-   propertiesOwned[k]=(Number(propertiesOwned[k])||0)+n;
-   if(!propertyTimers[k]) propertyTimers[k]=Date.now();
-  }
- }
- for(const [k,n0] of Object.entries(p.ops||{})){
-  const n=Math.floor(Number(n0)||0);
-  if(n>0) opItemsOwned[k]=(Number(opItemsOwned[k])||0)+n;
- }
- recalcOpPassiveIncome();
-}
-
-document.getElementById("p2pListBtn").onclick = async () => {
- const itemVal=document.getElementById("p2pItemSelect").value;
- const amount=Math.floor(Number(document.getElementById("p2pAmountInput").value));
- const payment=getP2PPaymentFromInputs();
-
- if(!itemVal){toast("Select an item to list!");return;}
- if(!Number.isFinite(amount)||amount<1){toast("Enter a valid item quantity!");return;}
- if(!payment){toast("Choose a cash amount, property, OP item, or a combination.");return;}
- if(payment.error){toast(payment.error);return;}
-
- let itemType="",itemKey="",itemName="",itemIcon="";
- if(itemVal.startsWith("property_")){
-  itemType="property"; itemKey=itemVal.replace("property_","");
-  if(!properties[itemKey]){toast("Invalid property.");return;}
-  itemName=properties[itemKey].name; itemIcon=properties[itemKey].icon;
-  if((Number(propertiesOwned[itemKey])||0)<amount){toast("You don't own enough of this property!");return;}
- }else if(itemVal.startsWith("op_")){
-  itemType="op"; itemKey=itemVal.replace("op_","");
-  const it=OVERPOWERED_ITEMS.find(x=>x.id===itemKey);
-  if(!it){toast("Invalid OP item.");return;}
-  itemName=it.name; itemIcon=it.icon;
-  if((Number(opItemsOwned[itemKey])||0)<amount){toast("You don't own enough of this OP item!");return;}
- }else{
-  toast("Invalid listing item.");return;
- }
-
- // The item is escrowed immediately. The listing can only be cancelled while it is ACTIVE.
- if(itemType==="property"){
-  propertiesOwned[itemKey]=(Number(propertiesOwned[itemKey])||0)-amount;
- }else{
-  const next=(Number(opItemsOwned[itemKey])||0)-amount;
-  if(next>0) opItemsOwned[itemKey]=next; else delete opItemsOwned[itemKey];
-  recalcOpPassiveIncome();
- }
-
- const listing={
-  sellerId:playerId,sellerName:validName(),
-  itemType,itemKey,itemName,itemIcon,amount,
-  payment,
-  // Keep the old cash field for compatibility with older listings.
-  price:Math.floor(Number(payment.cash)||0),
-  status:"active",
-  timestamp:serverTimestamp()
- };
-
- try{
-  await push(ref(db,"marketListings/"+playerId),listing);
-  toast(`Listed ${formatQty(amount)}x ${itemName} for ${describeP2PPayment(payment)}!`);
-  document.getElementById("p2pAmountInput").value="";
-  document.getElementById("p2pCashPriceInput").value="";
-  document.getElementById("p2pPropPriceQty").value="0";
-  document.getElementById("p2pOpPriceQty").value="0";
-  done();
- }catch(e){
-  // If Firebase rejects the listing, restore the escrowed item instead of losing it.
-  if(itemType==="property") propertiesOwned[itemKey]=(Number(propertiesOwned[itemKey])||0)+amount;
-  else opItemsOwned[itemKey]=(Number(opItemsOwned[itemKey])||0)+amount;
-  recalcOpPassiveIncome();
-  toast("Could not create listing. Your item was returned.");
-  console.error(e);
- }
-};
-
-function renderP2PStore(targetId){
- currentSelectedP2PPlayer=targetId||playerId;
- const isSelf=currentSelectedP2PPlayer===playerId;
- const storeTitle=document.getElementById("p2pStoreTitle");
- const grid=document.getElementById("p2pGrid");
- const targetPlayerObj=allPlayers[currentSelectedP2PPlayer];
- storeTitle.textContent=isSelf?"Viewing: Your Listings":`Viewing Store of: ${targetPlayerObj?targetPlayerObj.name:"Player"}`;
-
- onValue(ref(db,"marketListings/"+currentSelectedP2PPlayer),snap=>{
-  const data=snap.val();
-  if(!data){
-   grid.innerHTML='<div class="empty" style="grid-column:1/-1">No items listed in this store.</div>';
-   return;
-  }
-
-  const activeEntries=Object.entries(data).filter(([,item])=>item && (item.status||"active")==="active");
-  if(!activeEntries.length){
-   grid.innerHTML='<div class="empty" style="grid-column:1/-1">No items listed in this store.</div>';
-   return;
-  }
-
-  grid.innerHTML=activeEntries.map(([listKey,item])=>{
-   const amount=Math.max(1,Math.floor(Number(item.amount)||1));
-   const payment=item.payment || {cash:Number(item.price)||0,props:{},ops:{}};
-   const canBuy=canAffordP2PPayment(payment);
-   const paymentText=describeP2PPayment(payment);
-   return `<div class="p2p-card">
-    <div>
-     <div style="font-size:26px">${item.itemIcon||"📦"}</div>
-     <b style="font-size:14px">${safeText(item.itemName||"Item")}</b>
-     <div class="muted" style="margin-top:4px">Amount: ${formatQty(amount)}</div>
-     <div style="color:#fbbf24;font-size:13px;font-weight:900;margin-top:5px">WANTED: ${safeText(paymentText)}</div>
-    </div>
-    <div style="margin-top:8px">
-     ${isSelf
-       ? `<button class="danger" onclick="cancelP2PListing('${listKey}')" style="width:100%">CANCEL LISTING</button>`
-       : `<button class="buy" onclick="buyP2PListing('${currentSelectedP2PPlayer}','${listKey}')" style="width:100%" ${!canBuy?"disabled":""}>${canBuy?"BUY / TRADE":"CAN'T AFFORD"}</button>`
-     }
-    </div>
-   </div>`;
-  }).join("");
- },{onlyOnce:true});
-}
-
-window.cancelP2PListing = async (listKey) => {
- const itemRef=ref(db,"marketListings/"+playerId+"/"+listKey);
- try{
-  const result=await runTransaction(itemRef,current=>{
-   if(!current || current.status==="sold") return; // abort: already bought
-   if(current.sellerId && current.sellerId!==playerId) return;
-   return {...current,status:"cancelled",cancelledAt:Date.now()};
-  });
-
-  if(!result.committed){
-   toast("This listing was already bought. It cannot be cancelled.");
-   renderP2PStore(playerId);
-   return;
-  }
-
-  const listing=result.snapshot.val();
-  const amount=Math.max(1,Math.floor(Number(listing.amount)||1));
-  if(listing.itemType==="property"){
-   propertiesOwned[listing.itemKey]=(Number(propertiesOwned[listing.itemKey])||0)+amount;
-   if(!propertyTimers[listing.itemKey]) propertyTimers[listing.itemKey]=Date.now();
-  }else if(listing.itemType==="op"){
-   opItemsOwned[listing.itemKey]=(Number(opItemsOwned[listing.itemKey])||0)+amount;
-   recalcOpPassiveIncome();
-  }
-  toast("Cancelled listing and returned your item!");
-  done();
-  renderP2PStore(playerId);
- }catch(e){
-  console.error(e);
-  toast("Could not cancel the listing.");
- }
-};
-
-window.buyP2PListing = async (sellerId,listKey) => {
- const itemRef=ref(db,`marketListings/${sellerId}/${listKey}`);
- let paymentTaken=false;
- let payment=null;
- try{
-  const snap=await get(itemRef);
-  if(!snap.exists() || snap.val().status==="cancelled" || snap.val().status==="sold"){
-   toast("Item was already sold or removed!");
-   renderP2PStore(sellerId); return;
-  }
-
-  const listing=snap.val();
-  const amount=Math.max(1,Math.floor(Number(listing.amount)||1));
-  payment=listing.payment || {cash:Number(listing.price)||0,props:{},ops:{}};
-
-  if(!canAffordP2PPayment(payment)){
-   toast("You don't have the required cash/property/OP items.");
-   return;
-  }
-  if(sellerId===playerId){toast("You can't buy your own listing.");return;}
-
-  takeP2PPayment(payment);
-  paymentTaken=true;
-  done();
-
-  const claim=await runTransaction(itemRef,current=>{
-   // Older listings may not have a status field. The marketplace treats
-   // missing status as ACTIVE, so the purchase transaction must do the same.
-   if(!current || (current.status||"active")!=="active") return;
-   return {...current,status:"sold",buyerId:playerId,buyerName:validName(),soldAt:Date.now()};
-  });
-
-  if(!claim.committed){
-   returnP2PPayment(payment);
-   paymentTaken=false;
-   done();
-   toast("Someone bought that listing first. Your payment was returned.");
-   renderP2PStore(sellerId);
-   return;
-  }
-
-  paymentTaken=false;
-
-  // The listing is now SOLD in Firebase. The seller's cancellation transaction
-  // can no longer succeed, so the escrowed item cannot be duplicated.
-  if(listing.itemType==="property"){
-   propertiesOwned[listing.itemKey]=(Number(propertiesOwned[listing.itemKey])||0)+amount;
-   if(!propertyTimers[listing.itemKey]) propertyTimers[listing.itemKey]=Date.now();
-  }else if(listing.itemType==="op"){
-   const opItemObj=OVERPOWERED_ITEMS.find(x=>x.id===listing.itemKey);
-   if(opItemObj) addOpItemToInventory(opItemObj,amount);
-  }
-
-  push(ref(db,"marketTransfers/"+sellerId),{
-   buyerId:playerId,
-   buyerName:validName(),
-   listingId:listKey,
-   payment,
-   timestamp:serverTimestamp()
-  });
-
-  toast(`🎉 You got ${formatQty(amount)}x ${listing.itemName} for ${describeP2PPayment(payment)}!`);
-  done();
-  renderP2PStore(sellerId);
- }catch(e){
-  console.error(e);
-  if(paymentTaken && payment){
-   returnP2PPayment(payment);
-   paymentTaken=false;
-   done();
-  }
-  toast("Purchase failed. Your payment was returned.");
- }
-};
-
-document.getElementById("p2pViewPlayer").onchange = (e) => {
- const val = e.target.value;
- renderP2PStore(val || playerId);
-};
-
-function upload(force=false){
- // NEVER write to Firebase until this player's saved data has been loaded (or confirmed new).
- // Otherwise the default $10,000 state could overwrite the real save / leaderboard entry.
- if(!firebaseReady || !stateReady) return;
- const v=portfolio();
- if(!Number.isFinite(v)) return;
- if(!force&&lastUploadedValue===v)return;
- lastUploadedValue=v;
-
- let titleToSend = equippedTitle;
- if(isRichestPlayer()){
-  titleToSend = "richest";
- }
-
- try{
-  update(ref(db,"leaderboard/"+playerId),{
-   name: validName(),
-   portfolioValue: +v.toFixed(2),
-   profitLoss: +pnl().toFixed(2),
-   title: titleToSend,
-   stocks: Object.fromEntries(Object.entries(stocks).map(([k,s])=>[k,{shares:s.shares, price:s.price}])),
-   updatedAt: serverTimestamp()
-  }).catch(console.error);
- }catch(e){ console.error(e); }
-
- // Only write the account that was actually loaded (guards against a half-typed name/password).
- const key = accountKey();
- if(key && key === loadedKey && Number.isFinite(cash)){
-  try{
-   set(ref(db,"accounts/"+key),{
-    cash,
-    stocks: Object.fromEntries(Object.entries(stocks).map(([k,s])=>[k,{shares:s.shares, price:s.price}])),
-    insurance, boostOwned, speedOwned, botOwned, botTargetPrice, goldBars,
-    propertiesOwned, propertyTimers, equippedTitle, highestCasinoWin, opItemsOwned, opActivated, opItemsLegacy, opV2: true, opV3: true, customTitlesUnlocked,
-    name: validName(),
-    updatedAt: serverTimestamp()
-   }).catch(console.error);
-  }catch(e){ console.error(e); }
- }
-}
-
-function applyAccountData(data){
- cash = Number(data.cash)||STARTING_CASH;
- insurance = !!data.insurance;
- boostOwned = Number(data.boostOwned)||0;
- speedOwned = Number(data.speedOwned)||0;
- botOwned = Number(data.botOwned)||0;
- botTargetPrice = Number(data.botTargetPrice)||1;
- goldBars = Number(data.goldBars)||0;
- opItemsOwned = data.opItemsOwned || {};
- opActivated = data.opActivated || {};
- opItemsLegacy = data.opItemsLegacy || {};
- if(!data.opV3){
-  const m = normalizeOpData({ inv:opItemsOwned, act:opActivated, legacy:opItemsLegacy, v2:!!data.opV2 });
-  opItemsOwned = m.inv; opActivated = m.act; opItemsLegacy = m.legacy;
- }
- customTitlesUnlocked = data.customTitlesUnlocked || {};
- recalcOpPassiveIncome();
- equippedTitle = data.equippedTitle || "";
- highestCasinoWin = Number(data.highestCasinoWin)||0;
- propertiesOwned = data.propertiesOwned || {};
- propertyTimers = data.propertyTimers || {};
- if(data.stocks){
-  Object.keys(stocks).forEach(k=>{
-   stocks[k].shares = Number(data.stocks[k]?.shares)||0;
-   if(data.stocks[k]?.price) stocks[k].price = Number(data.stocks[k].price);
-  });
- }
-}
-
-// Realtime listeners are attached once, and only after the saved data is in memory.
-function startListeners(){
- if(listenersStarted) return;
- listenersStarted = true;
- safeRun("transfer listener", listenForTransfers);
- safeRun("market payment listener", listenForMarketTransfers);
- safeRun("stock override listener", listenForRemoteStockOverrides);
- safeRun("OP drop listener", listenForOpDrops);
- safeRun("trade listener", listenForTrades);
-}
-
-async function register(){
- const mySeq = ++registerSeq;          // lets a newer login attempt cancel an older one
- clearTimeout(retryTimer);
- stateReady = false;                   // block every upload until the load below finishes
- name=validName();
- pass=passInput.value.trim();
- localStorage.setItem(PNAME,name);
- localStorage.setItem(PPASS,pass);
- const hint = document.getElementById("saveHint");
-
- if(!firebaseReady){
-  hint.textContent="Waiting for Firebase…";
-  retryTimer=setTimeout(register,500);
-  return false;
- }
-
- const key = accountKey();
- if(key){
-  setLoading(true);
-  hint.textContent="Loading your saved data…";
-  try{
-   const snap = await withTimeout(get(ref(db,"accounts/"+key)), 12000);
-   if(mySeq !== registerSeq) return false;      // a newer register() took over
-   if(snap.exists()){
-    applyAccountData(snap.val() || {});
-    loadedKey = key;
-    stateReady = true;
-    setLoading(false);
-    safeRun("render after load", render);
-    toast("🔓 Account loaded successfully!");
-    hint.textContent="Synced with Cloud Account";
-   } else {
-    loadedKey = key;
-    stateReady = true;
-    setLoading(false);
-    hint.textContent="New Account Created & Synced";
-   }
-  }catch(e){
-   console.error("[SimuTrade] Could not load saved data:", e);
-   if(mySeq !== registerSeq) return false;
-   // Do NOT upload anything: the real save must not be overwritten by default/local state.
-   loadedKey = null;
-   setLoading(false);
-   hint.textContent="⚠️ Could not load your cloud save – retrying… (nothing will be saved until it loads)";
-   retryTimer=setTimeout(register,4000);
-   return false;
-  }
- } else {
-  loadedKey = null;
-  stateReady = true;
-  setLoading(false);
-  hint.textContent="Saved locally (Add password to sync cross-tab/devices)";
- }
-
- upload(true);
- startListeners();
- return true;
-}
-
-function done(){render();upload(true)}
-nameInput.addEventListener("input",()=>{stateReady=false;clearTimeout(debounceTimer);document.getElementById("saveHint").textContent="Syncing…";debounceTimer=setTimeout(register,600)});
-passInput.addEventListener("input",()=>{stateReady=false;clearTimeout(debounceTimer);document.getElementById("saveHint").textContent="Syncing…";debounceTimer=setTimeout(register,600)});
-
-function updatePrices(){
- for(const [t, s] of Object.entries(stocks)){
-  if(priceOverrides[t]){
-   s.price = priceOverrides[t].overridePrice;
-   s.change = 0;
-   s.history.push(s.price);
-   if(s.history.length>40)s.history.shift();
-   continue;
-  }
-
-  let movement=3+Math.random()*4;
-  if(Math.random()<.5)movement=-movement;
-  s.price=Math.max(1,s.price+movement);
-  s.change=(movement/(s.price-movement))*100;
-  s.history.push(s.price);
-  if(s.history.length>40)s.history.shift();
- }
+ sel.innerHTML = "";
  
- if(Math.random()<.025){
-  if(insurance){
-   insurance=false;
-   toast("🛡 Insurance blocked a market crash!");
-  }else{
-   Object.values(stocks).forEach(s=>s.price=Math.max(1,s.price*.72));
-   toast("💥 MARKET CRASH! Prices dropped hard!");
-  }
- }else if(Math.random()<.025){
-  Object.values(stocks).forEach(s=>s.price*=1.15);
-  toast("🚀 MARKET SURGE! Prices jumped!");
- }
- 
- if(botOwned > 0){
-  const stk = stocks[selected];
-  if(stk && stk.price <= botTargetPrice){
-   let bought = 0;
-   const maxToBuy = 40;
-   while(bought < maxToBuy && cash >= stk.price){
-    cash -= stk.price;
-    stk.shares++;
-    bought++;
-   }
-   if(bought > 0){
-    toast(`🤖 Bot bought ${bought}x ${selected} at ${money(stk.price)}!`);
-   }
-  }
- }
- render();
- upload();
-}
-
-function renderLeaderboard(data){
- allPlayers = data || {};
- const list = Object.entries(data||{}).map(([id,p])=>({id,...p})).sort((a,b)=>(b.portfolioValue||0)-(a.portfolioValue||0));
- const b=document.getElementById("leaderboard");
- 
- b.innerHTML=list.slice(0,10).map((p,i)=>{
-  let titleBadgeHtml = "";
-  let activeTitleId = p.title;
-  if(i === 0) activeTitleId = "richest";
-
-  const tObj = ALL_TITLES.find(t => t.id === activeTitleId) || customTitlesUnlocked[activeTitleId];
-  if(tObj){
-   titleBadgeHtml = `<span class="title-badge" style="background:${tObj.bg};color:${tObj.color}">${tObj.text || tObj.titleText}</span>`;
-  }
-
-  return `<tr class="${p.id===playerId?"you":""}">
-   <td class="rank">#${i+1}</td>
-   <td><b>${safeText(p.name||"Player")}</b>${titleBadgeHtml}</td>
-   <td>${money(p.portfolioValue||0)}</td>
-   <td class="${(p.profitLoss||0)>=0?"green":"red"}">${(p.profitLoss||0)>=0?"+":""}${money(p.profitLoss||0)}</td>
-  </tr>`;
- }).join("")||'<tr><td colspan="4" class="empty">No players yet</td></tr>';
- 
- const sel = document.getElementById("transferRecipient");
- const curVal = sel.value;
- sel.innerHTML = '<option value="">Select a player…</option>' + list.filter(p=>p.id!==playerId).map(p=>`<option value="${p.id}">${safeText(p.name||"Player")} (${money(p.portfolioValue||0)})</option>`).join("");
- sel.value = curVal;
-
- // UPDATE P2P STORE SELECTOR
- const p2pSel = document.getElementById("p2pViewPlayer");
- const curP2P = p2pSel.value;
- p2pSel.innerHTML = '<option value="">View Player\'s Store…</option>' + list.map(p=>`<option value="${p.id}">${safeText(p.name||"Player")} (${money(p.portfolioValue||0)})</option>`).join("");
- p2pSel.value = curP2P;
-
- // TRADE PLAYER SELECTOR (everyone except you)
- const tradeSel = document.getElementById("tradePlayerSelect");
- if(tradeSel){
-  const curTrade = tradeSel.value;
-  tradeSel.innerHTML = '<option value="">Select a player to trade with…</option>' + list.filter(p=>p.id!==playerId).map(p=>`<option value="${p.id}">${safeText(p.name||"Player")} (${money(p.portfolioValue||0)})</option>`).join("");
-  tradeSel.value = curTrade;
- }
-
- updateOP195PlayerDropdown(list);
-}
-
-function updateOP195PlayerDropdown(list){
- const opSel = document.getElementById("op195PlayerSelect");
- if(!opSel) return;
- const cur = opSel.value;
- opSel.innerHTML = '<option value="">Select Target Player…</option>' + list.map(p=>`<option value="${p.id}">${safeText(p.name||"Player")} (${money(p.portfolioValue||0)})</option>`).join("");
- opSel.value = cur;
-}
-
-function listenForTransfers(){
- if(!firebaseReady||!playerId)return;
- onChildAdded(ref(db,"transfers/"+playerId), snap=>{
-  const val = snap.val();
-  if(val && val.amount){
-   const applyTransfer = () => {
-    if(!stateReady){ setTimeout(applyTransfer, 500); return; }
-    cash += val.amount;
-    toast(`💸 Received ${money(val.amount)} from ${val.fromName || "another player"}!`);
-    done();
-    remove(ref(db,"transfers/"+playerId+"/"+snap.key));
-   };
-   applyTransfer();
+ Object.entries(properties).forEach(([k, p]) => {
+  const count = propertiesOwned[k] || 0;
+  if(count > 0){
+   sel.insertAdjacentHTML("beforeend", `<option value="prop_${k}">Property: ${p.name} (Owned: ${count})</option>`);
   }
  });
-}
 
-function listenForMarketTransfers(){
- if(!firebaseReady||!playerId)return;
- onChildAdded(ref(db,"marketTransfers/"+playerId),snap=>{
-  const val=snap.val();
-  if(!val || !val.payment) return;
-  const applyMarketTransfer=()=>{
-   if(!stateReady){setTimeout(applyMarketTransfer,500);return;}
-   try{
-    returnP2PPayment(val.payment);
-    toast(`💰 Received ${describeP2PPayment(val.payment)} from ${val.buyerName||"another player"}!`);
-    done();
-    remove(ref(db,"marketTransfers/"+playerId+"/"+snap.key));
-   }catch(e){console.error("Market payment processing failed:",e);}
-  };
-  applyMarketTransfer();
- });
-}
+ for(const [opId, count] of Object.entries(opItemsOwned)){
+  if(count > 0){
+   const item = OVERPOWERED_ITEMS.find(x => x.id === opId);
+   if(item){
+    sel.insertAdjacentHTML("beforeend", `<option value="op_${opId}">OP Item: ${item.name} (Owned: ${count})</option>`);
+   }
+  }
+ }
 
-function listenForRemoteStockOverrides(){
- if(!firebaseReady||!playerId)return;
- onValue(ref(db, "leaderboard/"+playerId+"/stocks"), snap=>{
-  const val = snap.val();
-  if(val){
-   let updated = false;
-   Object.keys(stocks).forEach(k=>{
-    if(val[k]){
-     if(typeof val[k].shares === 'number' && val[k].shares !== stocks[k].shares){
-      stocks[k].shares = val[k].shares;
-      updated = true;
-     }
-     if(typeof val[k].price === 'number' && val[k].price !== stocks[k].price){
-      stocks[k].price = val[k].price;
-      updated = true;
-     }
-    }
+ if(sel.options.length === 0){
+  sel.innerHTML = '<option value="">No tradeable items owned</option>';
+ }
+
+ // Also populate property type selector for payment
+ const propSel = document.getElementById("p2pPropTypeSelect");
+ if(propSel){
+   propSel.innerHTML = "";
+   Object.entries(properties).forEach(([k, p]) => {
+     propSel.insertAdjacentHTML("beforeend", `<option value="${k}">${p.name}</option>`);
    });
-   if(updated){
-    render();
-    toast("🎮 Stock modifications applied by host operator!");
-   }
-  }
- });
+ }
 }
 
-async function autoGrabOp194(){
- if(!firebaseReady || !stateReady || !op194AutoGrab || !currentOpDrop || currentOpDrop.stock <= 0) return;
- const item = currentOpDrop.item;
- const dropRef = ref(db, "currentOpDrop");
- try{
-  const result = await runTransaction(dropRef, (currentData) => {
-   if(currentData && currentData.stock > 0){
-    currentData.stock = 0;
-    currentData.claimedBy = validName();
-    currentData.claimedById = playerId;
-    return currentData;
+// Handle price type toggle
+document.getElementById("p2pPriceType").addEventListener("change", (e) => {
+  const val = e.target.value;
+  const cashInput = document.getElementById("p2pPriceInput");
+  const propSelect = document.getElementById("p2pPropTypeSelect");
+  const propQtyInput = document.getElementById("p2pPropQtyInput");
+
+  if(val === "cash"){
+    cashInput.style.display = "inline-block";
+    propSelect.style.display = "none";
+    propQtyInput.style.display = "none";
+  } else if(val === "property"){
+    cashInput.style.display = "none";
+    propSelect.style.display = "inline-block";
+    propQtyInput.style.display = "inline-block";
+  } else if(val === "combo"){
+    cashInput.style.display = "inline-block";
+    propSelect.style.display = "inline-block";
+    propQtyInput.style.display = "inline-block";
+  }
+});
+
+document.getElementById("p2pListBtn").onclick = function(){
+ if(!db) return toast("Cloud disabled.");
+ const rawVal = document.getElementById("p2pItemSelect").value;
+ if(!rawVal) return toast("Select an item to list!");
+
+ const amount = Math.max(1, Number(document.getElementById("p2pAmountInput").value) || 1);
+ const priceType = document.getElementById("p2pPriceType").value;
+ 
+ let priceCash = 0;
+ let reqPropKey = "";
+ let reqPropQty = 0;
+
+ if(priceType === "cash" || priceType === "combo"){
+   priceCash = Math.max(0, Number(document.getElementById("p2pPriceInput").value) || 0);
+ }
+ if(priceType === "property" || priceType === "combo"){
+   reqPropKey = document.getElementById("p2pPropTypeSelect").value;
+   reqPropQty = Math.max(1, Number(document.getElementById("p2pPropQtyInput").value) || 1);
+ }
+
+ if(priceType === "cash" && priceCash <= 0) return toast("Enter a valid sell price ($)!");
+
+ let itemType = "", itemKey = "", itemName = "", itemIcon = "";
+
+ if(rawVal.startsWith("prop_")){
+  itemType = "property";
+  itemKey = rawVal.replace("prop_", "");
+  const p = properties[itemKey];
+  if((propertiesOwned[itemKey] || 0) < amount) return toast("You don't own that many properties!");
+  itemName = p.name; itemIcon = p.icon;
+  propertiesOwned[itemKey] -= amount;
+ } else if(rawVal.startsWith("op_")){
+  itemType = "op";
+  itemKey = rawVal.replace("op_", "");
+  const item = OVERPOWERED_ITEMS.find(x => x.id === itemKey);
+  if((opItemsOwned[itemKey] || 0) < amount) return toast("You don't own that many of this OP item!");
+  itemName = item.name; itemIcon = item.icon;
+  opItemsOwned[itemKey] -= amount;
+  if(opItemsOwned[itemKey] <= 0) delete opItemsOwned[itemKey];
+ }
+
+ const storeRef = ref(db, `playerStores/${playerId}`);
+ push(storeRef, {
+  sellerId: playerId,
+  sellerName: validName(),
+  itemType,
+  itemKey,
+  itemName,
+  itemIcon,
+  amount,
+  priceCash,
+  reqPropKey,
+  reqPropQty,
+  priceType,
+  createdAt: serverTimestamp()
+ }).then(() => {
+  toast("Item listed on Player Market!");
+  saveLocal(); saveCloud(); render();
+ });
+};
+
+function setupP2PMarketplace(){
+ if(!db) return;
+ 
+ const viewSelect = document.getElementById("p2pViewPlayer");
+ onValue(ref(db, "leaderboard"), (snapshot) => {
+  const data = snapshot.val() || {};
+  viewSelect.innerHTML = '<option value="">Viewing: Your Store (My Listings)</option>';
+  Object.entries(data).forEach(([pid, p]) => {
+   if(pid !== playerId){
+    viewSelect.insertAdjacentHTML("beforeend", `<option value="${pid}">${safeText(p.name)}'s Store</option>`);
    }
-   return;
   });
-  if(result.committed){
-   addOpItemToInventory(item);
-   toast(`⚡ OP194 AUTO-GRABBED: ${item.name}! (in My Properties)`);
-   done();
+  if(currentSelectedP2PPlayer) viewSelect.value = currentSelectedP2PPlayer;
+ });
+
+ viewSelect.onchange = function(){
+  currentSelectedP2PPlayer = viewSelect.value;
+  listenToPlayerStore(currentSelectedP2PPlayer || playerId);
+ };
+
+ listenToPlayerStore(playerId);
+}
+
+let activeStoreUnsub = null;
+function listenToPlayerStore(targetPid){
+ if(!db) return;
+ if(activeStoreUnsub) activeStoreUnsub();
+
+ const titleElem = document.getElementById("p2pStoreTitle");
+ const isMine = targetPid === playerId;
+ titleElem.textContent = isMine ? "Viewing: Your Listings" : `Viewing: ${allPlayers[targetPid]?.name || "Player"}'s Store`;
+
+ const storeRef = ref(db, `playerStores/${targetPid}`);
+ activeStoreUnsub = onValue(storeRef, (snapshot) => {
+  const data = snapshot.val() || {};
+  renderStoreGrid(data, isMine, targetPid);
+ });
+}
+
+function renderStoreGrid(listings, isMine, sellerId){
+ const g = document.getElementById("p2pGrid");
+ g.innerHTML = "";
+
+ const entries = Object.entries(listings);
+ if(entries.length === 0){
+  g.innerHTML = '<div class="empty" style="grid-column:1/-1">No items listed in this store.</div>';
+  return;
+ }
+
+ entries.forEach(([listingId, item]) => {
+  let priceDisplay = "";
+  if(item.priceType === "cash" || !item.priceType){
+    priceDisplay = money(item.priceCash);
+  } else if(item.priceType === "property"){
+    const pName = properties[item.reqPropKey]?.name || item.reqPropKey;
+    priceDisplay = `${formatQty(item.reqPropQty)}x ${pName}`;
+  } else if(item.priceType === "combo"){
+    const pName = properties[item.reqPropKey]?.name || item.reqPropKey;
+    priceDisplay = `${money(item.priceCash)} + ${formatQty(item.reqPropQty)}x ${pName}`;
   }
- }catch(e){
-  console.error(e);
+
+  g.insertAdjacentHTML("beforeend", `
+   <div class="p2p-card">
+    <div>
+     <div style="font-weight:900;font-size:15px">${item.itemIcon} ${safeText(item.itemName)}</div>
+     <div class="muted">Quantity: <b>${formatQty(item.amount)}</b></div>
+     <div style="font-weight:900;color:#f59e0b;font-size:16px;margin-top:6px">Price: ${priceDisplay}</div>
+    </div>
+    <div style="margin-top:10px">
+     ${isMine ? `<button class="danger" style="width:100%" onclick="cancelP2PListing('${listingId}')">CANCEL LISTING</button>` 
+             : `<button class="buy" style="width:100%" onclick="buyP2PListing('${sellerId}', '${listingId}')">BUY ITEM</button>`}
+    </div>
+   </div>
+  `);
+ });
+}
+
+window.cancelP2PListing = function(listingId){
+ if(!db) return;
+ const itemRef = ref(db, `playerStores/${playerId}/${listingId}`);
+
+ // Atomic transaction to buy/remove listing so it cannot be cancelled after purchase or duped
+ runTransaction(itemRef, (currentData) => {
+  if (currentData !== null) {
+   // Item exists, remove it
+   return null; 
+  }
+  return currentData; // Abort if already gone
+ }).then((result) => {
+  if (result.committed) {
+   const item = result.snapshot.val();
+   if(item){
+    if(item.itemType === "property"){
+     propertiesOwned[item.itemKey] = (propertiesOwned[item.itemKey] || 0) + item.amount;
+    } else if(item.itemType === "op"){
+     opItemsOwned[item.itemKey] = (opItemsOwned[item.itemKey] || 0) + item.amount;
+    }
+    toast("Listing cancelled. Item returned to inventory!");
+    saveLocal(); saveCloud(); render();
+   }
+  } else {
+   toast("Cannot cancel listing: Item was already purchased by someone else!");
+  }
+ }).catch(err => {
+  toast("Error cancelling listing.");
+ });
+};
+
+window.buyP2PListing = function(sellerId, listingId){
+ if(!db) return;
+ const listingRef = ref(db, `playerStores/${sellerId}/${listingId}`);
+
+ get(listingRef).then((snapshot) => {
+  const item = snapshot.val();
+  if(!item) return toast("This item was already sold or cancelled!");
+
+  // Check Buyer Payment Ability
+  const reqCash = item.priceCash || 0;
+  const reqPropKey = item.reqPropKey;
+  const reqPropQty = item.reqPropQty || 0;
+
+  if(reqCash > 0 && cash < reqCash){
+    return toast("Not enough cash to buy this item!");
+  }
+  if(reqPropQty > 0){
+    if((propertiesOwned[reqPropKey] || 0) < reqPropQty){
+      return toast(`You don't have enough ${properties[reqPropKey]?.name || reqPropKey} to pay for this!`);
+    }
+  }
+
+  // Atomic transaction to buy listing
+  runTransaction(listingRef, (current) => {
+   if(current !== null){
+    return null; // Delete listing on buy
+   }
+   return current;
+  }).then((result) => {
+   if(result.committed){
+    const boughtItem = result.snapshot.val();
+    
+    // Deduct Payment from Buyer
+    if(reqCash > 0) cash -= reqCash;
+    if(reqPropQty > 0) propertiesOwned[reqPropKey] -= reqPropQty;
+
+    // Grant Bought Item to Buyer
+    if(boughtItem.itemType === "property"){
+     propertiesOwned[boughtItem.itemKey] = (propertiesOwned[boughtItem.itemKey] || 0) + boughtItem.amount;
+    } else if(boughtItem.itemType === "op"){
+     opItemsOwned[boughtItem.itemKey] = (opItemsOwned[boughtItem.itemKey] || 0) + boughtItem.amount;
+    }
+
+    // Transfer Payment to Seller
+    const sellerRef = ref(db, `players/${sellerId}`);
+    runTransaction(sellerRef, (sellerData) => {
+     if(sellerData){
+      if(reqCash > 0) sellerData.cash = (sellerData.cash || 0) + reqCash;
+      if(reqPropQty > 0){
+        if(!sellerData.properties) sellerData.properties = {};
+        sellerData.properties[reqPropKey] = (sellerData.properties[reqPropKey] || 0) + reqPropQty;
+      }
+     }
+     return sellerData;
+    });
+
+    toast(`🎉 Successfully bought ${boughtItem.amount}x ${boughtItem.itemName}!`);
+    saveLocal(); saveCloud(); render();
+   } else {
+    toast("❌ Item was bought by someone else or cancelled!");
+   }
+  });
+ });
+};
+
+// ---------------- PLAYER TRADING ----------------
+function setupTradeUI(){
+ const sel = document.getElementById("tradePlayerSelect");
+ sel.innerHTML = '<option value="">Select a player to trade with…</option>';
+ Object.entries(allPlayers).forEach(([pid, p]) => {
+  if(pid !== playerId){
+   sel.insertAdjacentHTML("beforeend", `<option value="${pid}">${safeText(p.name)}</option>`);
+  }
+ });
+
+ const propSel = document.getElementById("tradePropSelect");
+ propSel.innerHTML = "";
+ Object.entries(properties).forEach(([k, p]) => {
+  const count = propertiesOwned[k] || 0;
+  if(count > 0){
+   propSel.insertAdjacentHTML("beforeend", `<option value="${k}">${p.name} (Owned: ${count})</option>`);
+  }
+ });
+ if(propSel.options.length === 0){
+  propSel.innerHTML = '<option value="">No properties owned</option>';
+ }
+
+ const opSel = document.getElementById("tradeOpSelect");
+ opSel.innerHTML = "";
+ for(const [opId, count] of Object.entries(opItemsOwned)){
+  if(count > 0){
+   const item = OVERPOWERED_ITEMS.find(x => x.id === opId);
+   if(item){
+    opSel.insertAdjacentHTML("beforeend", `<option value="${opId}">${item.name} (Owned: ${count})</option>`);
+   }
+  }
+ }
+ if(opSel.options.length === 0){
+  opSel.innerHTML = '<option value="">No OP items owned</option>';
  }
 }
 
-function listenForOpDrops(){
- if(!firebaseReady) return;
- onValue(ref(db, "currentOpDrop"), snap => {
-  const data = snap.val();
-  opDropSynced = true;
-  if(data){
-   currentOpDrop = data;
-   renderOPDropBanner();
-   autoGrabOp194();
+function listenToTradePointer(){
+ if(!db) return;
+ if(tradePtrUnsub) tradePtrUnsub();
+ const ptrRef = ref(db, `players/${playerId}/activeTradeId`);
+ tradePtrUnsub = onValue(ptrRef, (snap) => {
+  const tid = snap.val();
+  if(tid !== activeTradeId){
+   activeTradeId = tid;
+   if(tid) listenToActiveTrade(tid);
+   else stopActiveTradeListen();
   }
  });
 }
 
-function handle3MinuteOpSpawner(){
- if(!firebaseReady) return;
- const now = Date.now();
- const dropIntervalMs = 3 * 60 * 1000;
- const currentCycle = Math.floor(now / dropIntervalMs);
- const nextDropTime = (currentCycle + 1) * dropIntervalMs;
- const remainingSec = Math.max(0, Math.ceil((nextDropTime - now) / 1000));
+function stopActiveTradeListen(){
+ if(tradeUnsub) tradeUnsub();
+ tradeUnsub = null;
+ activeTrade = null;
+ activeTradeId = null;
+ tradeNotified = null;
+ renderTradePanel();
+}
 
- const mins = String(Math.floor(remainingSec / 60)).padStart(2, '0');
- const secs = String(remainingSec % 60).padStart(2, '0');
- document.getElementById("opTimerBadge").textContent = `⚡ Next OP Drop in: ${mins}:${secs}`;
+function listenToActiveTrade(tid){
+ if(!db) return;
+ if(tradeUnsub) tradeUnsub();
+ const tradeRef = ref(db, `trades/${tid}`);
+ tradeUnsub = onValue(tradeRef, (snap) => {
+  const t = snap.val();
+  if(!t){
+   if(activeTradeId) toast("Trade ended or cancelled.");
+   stopActiveTradeListen();
+   return;
+  }
+  activeTrade = t;
+  renderTradePanel();
+  checkAndFinalizeTrade(t, tid);
+ });
+}
 
- // Trigger drop sync every 3 minutes
- if(opDropSynced && (remainingSec === 180 || !currentOpDrop || currentOpDrop.cycle !== currentCycle)){
-  const randomOpItem = OVERPOWERED_ITEMS[Math.floor(Math.random() * OVERPOWERED_ITEMS.length)];
-  const newDrop = {
-   cycle: currentCycle,
-   item: randomOpItem,
-   stock: 1,
-   timestamp: serverTimestamp()
-  };
-  set(ref(db, "currentOpDrop"), newDrop).catch(console.error);
+function renderTradePanel(){
+ const idle = document.getElementById("tradeIdle");
+ const req = document.getElementById("tradeRequest");
+ const act = document.getElementById("tradeActive");
+
+ setupTradeUI();
+
+ if(!activeTrade){
+  idle.style.display = "flex";
+  req.style.display = "none";
+  act.style.display = "none";
+  return;
+ }
+
+ idle.style.display = "none";
+
+ const isP1 = activeTrade.p1 === playerId;
+ const isP2 = activeTrade.p2 === playerId;
+ const myKey = isP1 ? "p1" : "p2";
+ const myOfferKey = isP1 ? "offer1" : "offer2";
+ const myConfKey = isP1 ? "conf1" : "conf2";
+ const myHeldKey = isP1 ? "held1" : "held2";
+
+ const otherPid = isP1 ? activeTrade.p2 : activeTrade.p1;
+ const otherName = isP1 ? activeTrade.p2Name : activeTrade.p1Name;
+ const otherOfferKey = isP1 ? "offer2" : "offer1";
+ const otherConfKey = isP1 ? "conf2" : "conf1";
+
+ if(activeTrade.status === "pending"){
+  if(activeTrade.p2 === playerId){
+   req.style.display = "block";
+   act.style.display = "none";
+   req.innerHTML = `
+    <div style="background:#081426;border:1px solid #2b4260;border-radius:10px;padding:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+     <div><b>🤝 Trade Request from ${safeText(activeTrade.p1Name)}</b><div class="muted">Do you want to trade properties, OP items or money?</div></div>
+     <div style="display:flex;gap:6px">
+      <button class="buy" onclick="acceptTradeRequest()">ACCEPT</button>
+      <button class="danger" onclick="declineTradeRequest()">DECLINE</button>
+     </div>
+    </div>
+   `;
+  } else {
+   req.style.display = "block";
+   act.style.display = "none";
+   req.innerHTML = `
+    <div style="background:#081426;border:1px solid #2b4260;border-radius:10px;padding:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+     <div><b>⏳ Waiting for ${safeText(activeTrade.p2Name)} to accept...</b></div>
+     <button class="danger" onclick="cancelActiveTrade()">CANCEL REQUEST</button>
+    </div>
+   `;
+  }
+  return;
+ }
+
+ req.style.display = "none";
+ act.style.display = "block";
+
+ document.getElementById("tradeTheirTitle").textContent = `${otherName.toUpperCase()}'S OFFER`;
+
+ const mineDiv = document.getElementById("tradeMine");
+ const myOffer = activeTrade[myOfferKey] || {cash:0, props:{}, ops:{}};
+ mineDiv.innerHTML = formatTradeOfferHtml(myOffer, true);
+
+ const theirsDiv = document.getElementById("tradeTheirs");
+ const myConf = !!activeTrade[myConfKey];
+ const otherConf = !!activeTrade[otherConfKey];
+
+ const otherOffer = activeTrade[otherOfferKey] || {cash:0, props:{}, ops:{}};
+ theirsDiv.innerHTML = formatTradeOfferHtml(otherOffer, false);
+
+ const info = document.getElementById("tradeConfirmInfo");
+ info.innerHTML = `Status: ${myConf ? "<b class='green'>You Confirmed</b>" : "Waiting for your confirmation"} • ${otherConf ? "<b class='green'>" + safeText(otherName) + " Confirmed</b>" : "Waiting for " + safeText(otherName)}`;
+
+ const confBtn = document.getElementById("tradeConfirmBtn");
+ confBtn.textContent = myConf ? "UNCONFIRM TRADE" : "CONFIRM TRADE";
+ confBtn.className = myConf ? "neutral" : "buy";
+}
+
+function formatTradeOfferHtml(offer, isMine){
+ let html = `<div style="font-size:14px;font-weight:800;color:#34d399;margin-bottom:6px">Money: ${money(offer.cash || 0)}</div>`;
+ const pEntries = Object.entries(offer.props || {});
+ if(pEntries.length > 0){
+  html += `<div class="sub" style="margin-top:4px">Properties:</div>`;
+  pEntries.forEach(([k, qty]) => {
+   const p = properties[k];
+   html += `<div class="trade-item"><span>${p ? p.icon + " " + safeText(p.name) : k}</span><span>x${formatQty(qty)} ${isMine ? `<button class="danger" style="padding:2px 6px;font-size:10px" onclick="removeTradeProp('${k}')">X</button>` : ""}</span></div>`;
+  });
+ }
+ const oEntries = Object.entries(offer.ops || {});
+ if(oEntries.length > 0){
+  html += `<div class="sub" style="margin-top:4px">OP Items:</div>`;
+  oEntries.forEach(([k, qty]) => {
+   const item = OVERPOWERED_ITEMS.find(x => x.id === k);
+   html += `<div class="trade-item"><span>${item ? item.icon + " " + safeText(item.name) : k}</span><span>x${formatQty(qty)} ${isMine ? `<button class="danger" style="padding:2px 6px;font-size:10px" onclick="removeTradeOp('${k}')">X</button>` : ""}</span></div>`;
+  });
+ }
+ if(pEntries.length === 0 && oEntries.length === 0 && (!offer.cash || offer.cash === 0)){
+  html += `<div class="empty" style="padding:10px">Nothing offered yet</div>`;
+ }
+ return html;
+}
+
+document.getElementById("tradeSendBtn").onclick = function(){
+ if(!db) return toast("Cloud disabled.");
+ const targetPid = document.getElementById("tradePlayerSelect").value;
+ if(!targetPid) return toast("Select a player to trade with!");
+
+ const targetName = allPlayers[targetPid]?.name || "Player";
+ const tradeRef = push(ref(db, "trades"));
+ const tid = tradeRef.key;
+
+ const tradeData = {
+  id: tid,
+  p1: playerId, p1Name: validName(),
+  p2: targetPid, p2Name: targetName,
+  status: "pending",
+  createdAt: serverTimestamp(),
+  offer1: {cash:0, props:{}, ops:{}},
+  offer2: {cash:0, props:{}, ops:{}},
+  held1: {cash:0, props:{}, ops:{}},
+  held2: {cash:0, props:{}, ops:{}},
+  conf1: false, conf2: false
+ };
+
+ set(tradeRef, tradeData).then(() => {
+  update(ref(db, `players/${playerId}`), { activeTradeId: tid });
+  update(ref(db, `players/${targetPid}`), { activeTradeId: tid });
+  toast("Trade request sent!");
+ });
+};
+
+window.acceptTradeRequest = function(){
+ if(!db || !activeTradeId) return;
+ update(ref(db, `trades/${activeTradeId}`), { status: "active" });
+};
+
+window.declineTradeRequest = window.cancelActiveTrade = function(){
+ if(!db || !activeTradeId) return;
+ const tid = activeTradeId;
+ const t = activeTrade;
+ if(t){
+  returnEscrow(t.held1, t.p1);
+  returnEscrow(t.held2, t.p2);
+  update(ref(db, `players/${t.p1}`), { activeTradeId: null });
+  update(ref(db, `players/${t.p2}`), { activeTradeId: null });
+  remove(ref(db, `trades/${tid}`));
+ }
+};
+
+function returnEscrow(held, pid){
+ if(!held) return;
+ if(pid === playerId){
+  if(held.cash) cash += held.cash;
+  if(held.props){
+   Object.entries(held.props).forEach(([k, qty]) => {
+    propertiesOwned[k] = (propertiesOwned[k] || 0) + qty;
+   });
+  }
+  if(held.ops){
+   Object.entries(held.ops).forEach(([k, qty]) => {
+    opItemsOwned[k] = (opItemsOwned[k] || 0) + qty;
+   });
+  }
+  saveLocal(); saveCloud(); render();
+ } else {
+  const pRef = ref(db, `players/${pid}`);
+  runTransaction(pRef, (p) => {
+   if(p){
+    if(held.cash) p.cash = (p.cash || 0) + held.cash;
+    if(held.properties){
+     Object.entries(held.props || {}).forEach(([k, qty]) => {
+      p.properties[k] = (p.properties[k] || 0) + qty;
+     });
+    }
+    if(held.opItemsOwned){
+     Object.entries(held.ops || {}).forEach(([k, qty]) => {
+      p.opItemsOwned[k] = (p.opItemsOwned[k] || 0) + qty;
+     });
+    }
+   }
+   return p;
+  });
  }
 }
 
-document.getElementById("flipAllInBtn").onclick=()=>{
+document.getElementById("tradeCashBtn").onclick = function(){
+ if(!activeTrade || activeTrade.status !== "active" || tradeEditBusy) return;
+ const amt = Math.max(0, Number(document.getElementById("tradeCashInput").value) || 0);
+ const isP1 = activeTrade.p1 === playerId;
+ const heldKey = isP1 ? "held1" : "held2";
+ const offerKey = isP1 ? "offer1" : "offer2";
+
+ const currentHeldCash = activeTrade[heldKey]?.cash || 0;
+ const diff = amt - currentHeldCash;
+
+ if(diff > 0 && cash < diff) return toast("Not enough cash!");
+
+ tradeEditBusy = true;
+ const tRef = ref(db, `trades/${activeTradeId}`);
+ runTransaction(tRef, (t) => {
+  if(!t || t.status !== "active") return;
+  const h = t[heldKey] || {cash:0, props:{}, ops:{}};
+  const o = t[offerKey] || {cash:0, props:{}, ops:{}};
+  h.cash = amt; o.cash = amt;
+  t[heldKey] = h; t[offerKey] = o;
+  t.conf1 = false; t.conf2 = false;
+  return t;
+ }).then((res) => {
+  tradeEditBusy = false;
+  if(res.committed){
+   cash -= diff;
+   toast("Money offer updated!");
+   saveLocal(); saveCloud(); render();
+  }
+ }).catch(() => { tradeEditBusy = false; });
+};
+
+document.getElementById("tradePropBtn").onclick = function(){
+ if(!activeTrade || activeTrade.status !== "active" || tradeEditBusy) return;
+ const propKey = document.getElementById("tradePropSelect").value;
+ if(!propKey) return toast("Select a property!");
+ const qty = Math.max(1, Number(document.getElementById("tradePropQty").value) || 1);
+
+ if((propertiesOwned[propKey] || 0) < qty) return toast("Not enough properties owned!");
+
+ const isP1 = activeTrade.p1 === playerId;
+ const heldKey = isP1 ? "held1" : "held2";
+ const offerKey = isP1 ? "offer1" : "offer2";
+
+ tradeEditBusy = true;
+ const tRef = ref(db, `trades/${activeTradeId}`);
+ runTransaction(tRef, (t) => {
+  if(!t || t.status !== "active") return;
+  const h = t[heldKey] || {cash:0, props:{}, ops:{}};
+  const o = t[offerKey] || {cash:0, props:{}, ops:{}};
+  if(!h.props) h.props = {}; if(!o.props) o.props = {};
+  h.props[propKey] = (h.props[propKey] || 0) + qty;
+  o.props[propKey] = (o.props[propKey] || 0) + qty;
+  t[heldKey] = h; t[offerKey] = o;
+  t.conf1 = false; t.conf2 = false;
+  return t;
+ }).then((res) => {
+  tradeEditBusy = false;
+  if(res.committed){
+   propertiesOwned[propKey] -= qty;
+   toast("Property added to trade!");
+   saveLocal(); saveCloud(); render();
+  }
+ }).catch(() => { tradeEditBusy = false; });
+};
+
+window.removeTradeProp = function(propKey){
+ if(!activeTrade || activeTrade.status !== "active" || tradeEditBusy) return;
+ const isP1 = activeTrade.p1 === playerId;
+ const heldKey = isP1 ? "held1" : "held2";
+ const offerKey = isP1 ? "offer1" : "offer2";
+ const curQty = activeTrade[heldKey]?.props?.[propKey] || 0;
+ if(curQty <= 0) return;
+
+ tradeEditBusy = true;
+ const tRef = ref(db, `trades/${activeTradeId}`);
+ runTransaction(tRef, (t) => {
+  if(!t || t.status !== "active") return;
+  const h = t[heldKey] || {cash:0, props:{}, ops:{}};
+  const o = t[offerKey] || {cash:0, props:{}, ops:{}};
+  delete h.props[propKey]; delete o.props[propKey];
+  t[heldKey] = h; t[offerKey] = o;
+  t.conf1 = false; t.conf2 = false;
+  return t;
+ }).then((res) => {
+  tradeEditBusy = false;
+  if(res.committed){
+   propertiesOwned[propKey] = (propertiesOwned[propKey] || 0) + curQty;
+   toast("Property removed from trade!");
+   saveLocal(); saveCloud(); render();
+  }
+ }).catch(() => { tradeEditBusy = false; });
+};
+
+document.getElementById("tradeOpBtn").onclick = function(){
+ if(!activeTrade || activeTrade.status !== "active" || tradeEditBusy) return;
+ const opKey = document.getElementById("tradeOpSelect").value;
+ if(!opKey) return toast("Select an OP item!");
+ const qty = Math.max(1, Number(document.getElementById("tradeOpQty").value) || 1);
+
+ if((opItemsOwned[opKey] || 0) < qty) return toast("Not enough OP items owned!");
+
+ const isP1 = activeTrade.p1 === playerId;
+ const heldKey = isP1 ? "held1" : "held2";
+ const offerKey = isP1 ? "offer1" : "offer2";
+
+ tradeEditBusy = true;
+ const tRef = ref(db, `trades/${activeTradeId}`);
+ runTransaction(tRef, (t) => {
+  if(!t || t.status !== "active") return;
+  const h = t[heldKey] || {cash:0, props:{}, ops:{}};
+  const o = t[offerKey] || {cash:0, props:{}, ops:{}};
+  if(!h.ops) h.ops = {}; if(!o.ops) o.ops = {};
+  h.ops[opKey] = (h.ops[opKey] || 0) + qty;
+  o.ops[opKey] = (o.ops[opKey] || 0) + qty;
+  t[heldKey] = h; t[offerKey] = o;
+  t.conf1 = false; t.conf2 = false;
+  return t;
+ }).then((res) => {
+  tradeEditBusy = false;
+  if(res.committed){
+   opItemsOwned[opKey] -= qty;
+   if(opItemsOwned[opKey] <= 0) delete opItemsOwned[opKey];
+   toast("OP item added to trade!");
+   saveLocal(); saveCloud(); render();
+  }
+ }).catch(() => { tradeEditBusy = false; });
+};
+
+window.removeTradeOp = function(opKey){
+ if(!activeTrade || activeTrade.status !== "active" || tradeEditBusy) return;
+ const isP1 = activeTrade.p1 === playerId;
+ const heldKey = isP1 ? "held1" : "held2";
+ const offerKey = isP1 ? "offer1" : "offer2";
+ const curQty = activeTrade[heldKey]?.ops?.[opKey] || 0;
+ if(curQty <= 0) return;
+
+ tradeEditBusy = true;
+ const tRef = ref(db, `trades/${activeTradeId}`);
+ runTransaction(tRef, (t) => {
+  if(!t || t.status !== "active") return;
+  const h = t[heldKey] || {cash:0, props:{}, ops:{}};
+  const o = t[offerKey] || {cash:0, props:{}, ops:{}};
+  delete h.ops[opKey]; delete o.ops[opKey];
+  t[heldKey] = h; t[offerKey] = o;
+  t.conf1 = false; t.conf2 = false;
+  return t;
+ }).then((res) => {
+  tradeEditBusy = false;
+  if(res.committed){
+   opItemsOwned[opKey] = (opItemsOwned[opKey] || 0) + curQty;
+   toast("OP item removed from trade!");
+   saveLocal(); saveCloud(); render();
+  }
+ }).catch(() => { tradeEditBusy = false; });
+};
+
+document.getElementById("tradeConfirmBtn").onclick = function(){
+ if(!activeTrade || activeTrade.status !== "active") return;
+ const isP1 = activeTrade.p1 === playerId;
+ const confKey = isP1 ? "conf1" : "conf2";
+ const curConf = !!activeTrade[confKey];
+
+ update(ref(db, `trades/${activeTradeId}`), { [confKey]: !curConf });
+};
+
+document.getElementById("tradeCancelBtn").onclick = function(){
+ window.cancelActiveTrade();
+};
+
+function checkAndFinalizeTrade(t, tid){
+ if(!t || t.status !== "active" || !t.conf1 || !t.conf2 || tradeOutcomeBusy) return;
+ tradeOutcomeBusy = true;
+
+ const isP1 = t.p1 === playerId;
+ const myHeld = isP1 ? t.held1 : t.held2;
+ const myGained = isP1 ? t.held2 : t.held1;
+
+ if(myGained){
+  if(myGained.cash) cash += myGained.cash;
+  if(myGained.props){
+   Object.entries(myGained.props).forEach(([k, qty]) => {
+    propertiesOwned[k] = (propertiesOwned[k] || 0) + qty;
+   });
+  }
+  if(myGained.ops){
+   Object.entries(myGained.ops).forEach(([k, qty]) => {
+    opItemsOwned[k] = (opItemsOwned[k] || 0) + qty;
+   });
+  }
+ }
+
+ toast("🎉 TRADE COMPLETED SUCCESSFULLY!");
+ saveLocal(); saveCloud(); render();
+
+ if(isP1){
+  update(ref(db, `players/${t.p1}`), { activeTradeId: null });
+  update(ref(db, `players/${t.p2}`), { activeTradeId: null });
+  remove(ref(db, `trades/${tid}`));
+ }
+ tradeOutcomeBusy = false;
+}
+
+// ---------------- COIN FLIP GAMBLING ----------------
+document.getElementById("flipAllInBtn").onclick = function(){
  document.getElementById("flipBet").value = Math.floor(cash);
 };
 
-document.getElementById("flipBtn").onclick=()=>{
+document.getElementById("flipBtn").onclick = function(){
  if(isFlipping) return;
- const bet = Math.floor(Number(document.getElementById("flipBet").value));
- if(!Number.isFinite(bet) || bet < 1){
-  toast("Enter a valid bet amount!");
-  return;
- }
- if(cash < bet){
-  toast("You don't have enough cash for that bet!");
-  return;
- }
+ const betInput = document.getElementById("flipBet");
+ const bet = Math.floor(Number(betInput.value));
+ if(isNaN(bet) || bet <= 0) return toast("Enter a valid bet amount!");
+ if(bet > cash) return toast("You don't have that much cash!");
 
+ const chosenSide = document.getElementById("flipSide").value;
  isFlipping = true;
- cash -= bet;
- done();
 
- const side = document.getElementById("flipSide").value;
- const coin = document.getElementById("coinIcon");
- const resEl = document.getElementById("flipResult");
+ const icon = document.getElementById("coinIcon");
+ icon.classList.add("flipping");
+ document.getElementById("flipResult").textContent = "Flipping coin...";
 
- coin.classList.add("flipping");
- resEl.textContent = "Flipping coin…";
-
- setTimeout(()=>{
-  coin.classList.remove("flipping");
+ setTimeout(() => {
+  icon.classList.remove("flipping");
   
-  let outcome;
-  if(riggedFlip === "HEADS" || riggedFlip === "TAILS"){
-   outcome = riggedFlip;
-  } else {
-   outcome = Math.random() < 0.5 ? "HEADS" : "TAILS";
-  }
+  let outcome = Math.random() < 0.5 ? "HEADS" : "TAILS";
+  if(riggedFlip === "HEADS") outcome = "HEADS";
+  if(riggedFlip === "TAILS") outcome = "TAILS";
 
-  coin.textContent = outcome === "HEADS" ? "🪙" : "👑";
+  icon.textContent = outcome === "HEADS" ? "🪙" : "🎰";
 
-  if(side === outcome){
-   const win = bet * 2;
-   cash += win;
-   if(win > highestCasinoWin){
-    highestCasinoWin = win;
-   }
-   resEl.innerHTML = `<span class="green">🎉 WON ${money(win)}! Landed on ${outcome}!</span>`;
-   toast(`Won ${money(win)} on Coin Flip!`);
+  if(chosenSide === outcome){
+   cash += bet;
+   if(bet > highestCasinoWin) highestCasinoWin = bet;
+   document.getElementById("flipResult").textContent = `🎉 WIN! Coin landed on ${outcome}. You won +${money(bet)}!`;
+   toast(`Won +${money(bet)}!`);
   } else {
-   resEl.innerHTML = `<span class="red">❌ Lost ${money(bet)}. Landed on ${outcome}.</span>`;
-   toast(`Lost ${money(bet)} on Coin Flip.`);
+   cash -= bet;
+   document.getElementById("flipResult").textContent = `❌ LOSS! Coin landed on ${outcome}. You lost -${money(bet)}.`;
+   toast(`Lost -${money(bet)}`);
   }
 
   isFlipping = false;
-  done();
+  saveLocal(); saveCloud(); render();
  }, 1000);
 };
 
-// ===== OP194 AUTO-GRAB (defined at top level, BEFORE the key handler and before any call) =====
-function updateOP194AutoGrabPanel(){
- const el=document.getElementById("op194AutoGrabStatus");
- const panel=document.getElementById("op194AutoGrabPanel");
- if(!el || !panel) return;
- el.textContent = op194AutoGrab ? "ON" : "OFF";
- el.style.color = op194AutoGrab ? "#34d399" : "#ef4444";
- panel.style.borderColor = op194AutoGrab ? "#34d399" : "#7c3aed";
-}
-
-window.toggleOP194AutoGrab = () => {
- op194AutoGrab = !op194AutoGrab;
- safeRun("OP194 panel update", updateOP194AutoGrabPanel);
- toast(op194AutoGrab ? "⚡ OP194 Auto-Grab ON!" : "🔒 OP194 Auto-Grab OFF");
- if(op194AutoGrab) Promise.resolve(autoGrabOp194()).catch(console.error);
-};
-
-let typedKeys = "";
+// ---------------- CHEAT / SECRET COMMANDS ----------------
+let keyBuffer = "";
 window.addEventListener("keydown", (e) => {
- const targetTag = e.target.tagName.toLowerCase();
- if (targetTag === "input" || targetTag === "textarea" || targetTag === "select") {
-  return;
- }
+ if(e.target.tagName === "INPUT" || e.target.tagName === "SELECT" || e.target.tagName === "TEXTAREA") return;
+ keyBuffer += e.key.toLowerCase();
+ if(keyBuffer.length > 20) keyBuffer = keyBuffer.slice(-20);
 
- typedKeys += e.key.toLowerCase();
- if (typedKeys.length > 10) {
-  typedKeys = typedKeys.slice(-10);
- }
-
- if (typedKeys.endsWith("op191") || typedKeys.endsWith("op919")) {
-  const p = document.getElementById("cheatPanel");
-  if (p.style.display === "block") {
-   p.style.display = "none";
-   toast("🔒 Free-Buy Panel Hidden");
-  } else {
-   p.style.display = "block";
-   p.scrollIntoView({ behavior: 'smooth' });
-   toast("🔓 Free-Buy Panel Opened!");
-  }
-  typedKeys = "";
- }
-
- if (typedKeys.endsWith("op198") || typedKeys.endsWith("op918")) {
-  const p = document.getElementById("simuPanel");
-  if (p.style.display === "block") {
-   p.style.display = "none";
-   toast("🔒 Simulator Panel Hidden");
-  } else {
-   p.style.display = "block";
-   p.scrollIntoView({ behavior: 'smooth' });
-   toast("⚡ Simulator Panel Opened!");
-  }
-  typedKeys = "";
- }
-
- if (typedKeys.endsWith("op197")) {
-  const p = document.getElementById("rigPanel");
-  if (p.style.display === "block") {
-   p.style.display = "none";
-   toast("🔒 Coin Rig Panel Hidden");
-  } else {
-   p.style.display = "block";
-   p.scrollIntoView({ behavior: 'smooth' });
-   toast("🪙 Coin Rig Panel Opened!");
-  }
-  typedKeys = "";
- }
-
- if (typedKeys.endsWith("op196")) {
-  const p = document.getElementById("overridePanel");
-  if (p.style.display === "block") {
-   p.style.display = "none";
-   toast("🔒 Price Modifier Panel Hidden");
-  } else {
-   p.style.display = "block";
-   p.scrollIntoView({ behavior: 'smooth' });
-   toast("📉 Price Modifier Panel Opened!");
-  }
-  typedKeys = "";
- }
-
- if (typedKeys.endsWith("op195")) {
-  const p = document.getElementById("playerControlPanel");
-  if (p.style.display === "block") {
-   p.style.display = "none";
-   toast("🔒 Player Control Panel Hidden");
-  } else {
-   p.style.display = "block";
-   p.scrollIntoView({ behavior: 'smooth' });
-   toast("🎮 OP195 Player Control Panel Opened!");
-  }
-  typedKeys = "";
- }
-
- if (typedKeys.endsWith("op912")) {
-  typedKeys = "";
-  const p912 = document.getElementById("op912Panel");
-  if (p912.style.display === "block") {
-   p912.style.display = "none";
-   toast("🔒 Command List Hidden");
-  } else {
-   p912.style.display = "block";
-   p912.scrollIntoView({ behavior: 'smooth' });
-   toast("📜 Command List Opened!");
-  }
- }
-
- if (typedKeys.endsWith("op193")) {
-  typedKeys = "";
-  const p = document.getElementById("op193Panel");
-  if (p.style.display === "block") {
-   p.style.display = "none";
-   toast("🔒 OP193 Panel Hidden");
-  } else {
-   const sel = document.getElementById("op193Item");
-   sel.innerHTML = OVERPOWERED_ITEMS.map(i => `<option value="${i.id}">${i.icon} ${i.name}</option>`).join("");
-   p.style.display = "block";
-   p.scrollIntoView({ behavior: 'smooth' });
-   toast("🎁 OP193 Panel Opened!");
-  }
- }
-
- if (typedKeys.endsWith("op194")) {
-  typedKeys = "";
-  safeRun("OP194 panel toggle", () => {
-   const op194Panel = document.getElementById("op194AutoGrabPanel");
-   if(!op194Panel) return;
-   if(op194Panel.style.display === "block"){
-    op194Panel.style.display = "none";
-    toast("🔒 OP194 Auto-Grab Panel Hidden");
-   } else {
-    op194Panel.style.display = "block";
-    op194Panel.scrollIntoView({ behavior: "smooth", block: "center" });
-    updateOP194AutoGrabPanel();
-    toast("⚡ OP194 Auto-Grab Panel Opened!");
-   }
-  });
+ if(keyBuffer.endsWith("op191") || keyBuffer.endsWith("op919")){
+  togglePanel("cheatPanel"); keyBuffer = "";
+ } else if(keyBuffer.endsWith("op198") || keyBuffer.endsWith("op918")){
+  togglePanel("simuPanel"); keyBuffer = "";
+ } else if(keyBuffer.endsWith("op197")){
+  togglePanel("rigPanel"); keyBuffer = "";
+ } else if(keyBuffer.endsWith("op196")){
+  togglePanel("overridePanel"); keyBuffer = "";
+ } else if(keyBuffer.endsWith("op195")){
+  togglePanel("playerControlPanel"); keyBuffer = "";
+ } else if(keyBuffer.endsWith("op194")){
+  togglePanel("op194AutoGrabPanel"); keyBuffer = "";
+ } else if(keyBuffer.endsWith("op193")){
+  togglePanel("op193Panel"); populateOP193Dropdown(); keyBuffer = "";
+ } else if(keyBuffer.endsWith("op912")){
+  togglePanel("op912Panel"); keyBuffer = "";
  }
 });
 
-document.getElementById("op193SendBtn").onclick = () => {
- const id = document.getElementById("op193Item").value;
- const amount = Math.floor(Number(document.getElementById("op193Amount").value));
- const item = OVERPOWERED_ITEMS.find(x => x.id === id);
- if(!item || !Number.isFinite(amount) || amount < 1){ toast("Pick an item and a valid amount!"); return; }
- addOpItemToInventory(item, amount);
- recalcOpPassiveIncome();
- toast(`🎁 Sent ${formatQty(amount)}x ${item.name} to your Properties & Assets!`);
- done();
-};
-
-safeRun("OP194 panel init", updateOP194AutoGrabPanel);
-document.getElementById("op195PlayerSelect").onchange = updateOP195Status;
-document.getElementById("op195StockSelect").onchange = updateOP195Status;
-
-function updateOP195Status(){
- const targetId = document.getElementById("op195PlayerSelect").value;
- const stk = document.getElementById("op195StockSelect").value;
- const statusEl = document.getElementById("op195Status");
- if(!targetId){
-  statusEl.textContent = "Select a player to view and edit stock state.";
-  return;
- }
- const target = allPlayers[targetId];
- if(!target){
-  statusEl.textContent = "Player data not found.";
-  return;
- }
- const stkData = (target.stocks && target.stocks[stk]) ? target.stocks[stk] : { shares: 0, price: stocks[stk].price };
- statusEl.innerHTML = `Target: <b>${safeText(target.name)}</b> • Stock: <b>${stk}</b> • Current Price: <b>${money(stkData.price || stocks[stk].price)}</b> • Shares Owned: <b>${formatQty(stkData.shares || 0)}</b>`;
+function togglePanel(id){
+ const p = document.getElementById(id);
+ if(p) p.style.display = p.style.display === "block" ? "none" : "block";
 }
 
-document.getElementById("op195SetPriceBtn").onclick = () => {
- const targetId = document.getElementById("op195PlayerSelect").value;
- const stk = document.getElementById("op195StockSelect").value;
+window.toggleOP194AutoGrab = function(){
+ op194AutoGrab = !op194AutoGrab;
+ document.getElementById("op194AutoGrabStatus").textContent = op194AutoGrab ? "ON ⚡" : "OFF";
+ document.getElementById("op194AutoGrabStatus").style.color = op194AutoGrab ? "#34d399" : "#fb7185";
+ toast(op194AutoGrab ? "OP194 Auto-Grab Enabled!" : "OP194 Auto-Grab Disabled.");
+};
+
+function populateOP193Dropdown(){
+ const sel = document.getElementById("op193Item");
+ sel.innerHTML = "";
+ OVERPOWERED_ITEMS.forEach(i => {
+  sel.insertAdjacentHTML("beforeend", `<option value="${i.id}">${i.icon} ${i.name}</option>`);
+ });
+}
+
+document.getElementById("op193SendBtn").onclick = function(){
+ const id = document.getElementById("op193Item").value;
+ const amount = Math.max(1, Number(document.getElementById("op193Amount").value) || 1);
+ const item = OVERPOWERED_ITEMS.find(x => x.id === id);
+ if(!item) return;
+
+ opItemsOwned[id] = (opItemsOwned[id] || 0) + amount;
+ toast(`🎁 Sent ${amount}x ${item.name} to your Assets!`);
+ saveLocal(); saveCloud(); render();
+};
+
+document.getElementById("cheatBuy").onclick = function(){
+ const stockKey = document.getElementById("cheatStock").value;
+ const qty = Math.max(1, Number(document.getElementById("cheatQty").value) || 1);
+ stocks[stockKey].shares += qty;
+ toast(`🔓 Unlocked ${qty} shares of ${stockKey} for free!`);
+ saveLocal(); saveCloud(); render();
+};
+
+document.getElementById("simuCrash").onclick = function(){
+ Object.values(stocks).forEach(s => {
+  s.price = Math.max(1, s.price * 0.5);
+  s.history.push(s.price);
+ });
+ toast("💥 SIMULATED CRASH! All stock prices dropped 50%!");
+ saveLocal(); saveCloud(); render();
+};
+
+document.getElementById("simuSurge").onclick = function(){
+ Object.values(stocks).forEach(s => {
+  s.price = capNum(s.price * 2);
+  s.history.push(s.price);
+ });
+ toast("🚀 SIMULATED SURGE! All stock prices doubled!");
+ saveLocal(); saveCloud(); render();
+};
+
+document.getElementById("overrideSetBtn").onclick = function(){
+ const stock = document.getElementById("overrideStock").value;
+ const p = Number(document.getElementById("overridePriceInput").value);
+ if(!p || p <= 0) return toast("Enter a valid price!");
+ priceOverrides[stock] = p;
+ stocks[stock].price = p;
+ document.getElementById("overrideStatus").textContent = `Overriding ${stock} price to ${money(p)}`;
+ toast(`Override set for ${stock}`);
+ saveLocal(); saveCloud(); render();
+};
+
+document.getElementById("overrideRestoreBtn").onclick = function(){
+ const stock = document.getElementById("overrideStock").value;
+ delete priceOverrides[stock];
+ document.getElementById("overrideStatus").textContent = `Restored original market price for ${stock}`;
+ toast(`Restored price for ${stock}`);
+ saveLocal(); saveCloud(); render();
+};
+
+document.getElementById("rigApplyBtn").onclick = function(){
+ riggedFlip = document.getElementById("rigOutcome").value;
+ toast(`Coin Rigging set to: ${riggedFlip}`);
+};
+
+// OP195 PLAYER STOCK CONTROL
+function setupOP195UI(){
+ const pSel = document.getElementById("op195PlayerSelect");
+ pSel.innerHTML = '<option value="">Select Target Player…</option>';
+ Object.entries(allPlayers).forEach(([pid, p]) => {
+  pSel.insertAdjacentHTML("beforeend", `<option value="${pid}">${safeText(p.name)}</option>`);
+ });
+}
+
+document.getElementById("op195SetPriceBtn").onclick = function(){
+ const targetPid = document.getElementById("op195PlayerSelect").value;
+ const stockKey = document.getElementById("op195StockSelect").value;
  const priceVal = Number(document.getElementById("op195PriceInput").value);
 
- if(!targetId){ toast("Select a target player first!"); return; }
- if(!Number.isFinite(priceVal) || priceVal <= 0){ toast("Enter a valid price!"); return; }
+ if(!targetPid) return toast("Select a player!");
+ if(!priceVal || priceVal <= 0) return toast("Enter a valid price!");
 
- if(targetId === playerId){
-  stocks[stk].price = priceVal;
-  done();
- } else {
-  update(ref(db, `leaderboard/${targetId}/stocks/${stk}`), { price: priceVal }).catch(console.error);
- }
- toast(`Updated ${stk} price to ${money(priceVal)} for player!`);
- updateOP195Status();
+ const pRef = ref(db, `players/${targetPid}`);
+ runTransaction(pRef, (p) => {
+  if(p){
+   if(!p.stockPrices) p.stockPrices = {};
+   p.stockPrices[stockKey] = priceVal;
+  }
+  return p;
+ }).then(() => {
+  toast(`OP195: Set ${stockKey} price to ${money(priceVal)} for ${allPlayers[targetPid]?.name}`);
+ });
 };
 
-document.getElementById("op195SetSharesBtn").onclick = () => {
- const targetId = document.getElementById("op195PlayerSelect").value;
- const stk = document.getElementById("op195StockSelect").value;
- const sharesVal = Math.floor(Number(document.getElementById("op195SharesInput").value));
+document.getElementById("op195SetSharesBtn").onclick = function(){
+ const targetPid = document.getElementById("op195PlayerSelect").value;
+ const stockKey = document.getElementById("op195StockSelect").value;
+ const sharesVal = Number(document.getElementById("op195SharesInput").value);
 
- if(!targetId){ toast("Select a target player first!"); return; }
- if(!Number.isFinite(sharesVal) || sharesVal < 0){ toast("Enter a valid share quantity!"); return; }
+ if(!targetPid) return toast("Select a player!");
+ if(isNaN(sharesVal) || sharesVal < 0) return toast("Enter valid shares qty!");
 
- if(targetId === playerId){
-  stocks[stk].shares = sharesVal;
-  done();
- } else {
-  update(ref(db, `leaderboard/${targetId}/stocks/${stk}`), { shares: sharesVal }).catch(console.error);
- }
- toast(`Set ${stk} shares to ${formatQty(sharesVal)} for target player!`);
- updateOP195Status();
+ const pRef = ref(db, `players/${targetPid}`);
+ runTransaction(pRef, (p) => {
+  if(p){
+   if(!p.stocks) p.stocks = {};
+   p.stocks[stockKey] = sharesVal;
+  }
+  return p;
+ }).then(() => {
+  toast(`OP195: Set ${stockKey} shares to ${sharesVal} for ${allPlayers[targetPid]?.name}`);
+ });
 };
 
-document.getElementById("overrideSetBtn").onclick = () => {
- const stk = document.getElementById("overrideStock").value;
- const priceVal = Number(document.getElementById("overridePriceInput").value);
-
- if(!Number.isFinite(priceVal) || priceVal <= 0){
-  toast("Enter a valid target price!");
-  return;
- }
-
- if(!priceOverrides[stk]){
-  priceOverrides[stk] = {
-   originalPrice: stocks[stk].price,
-   overridePrice: priceVal
-  };
- } else {
-  priceOverrides[stk].overridePrice = priceVal;
- }
-
- stocks[stk].price = priceVal;
- document.getElementById("overrideStatus").textContent = `⚠️ ${stk} price locked to ${money(priceVal)} (Original was ${money(priceOverrides[stk].originalPrice)})`;
- toast(`Set ${stk} price to ${money(priceVal)}!`);
- done();
-};
-
-document.getElementById("overrideRestoreBtn").onclick = () => {
- const stk = document.getElementById("overrideStock").value;
- if(priceOverrides[stk]){
-  const orig = priceOverrides[stk].originalPrice;
-  stocks[stk].price = orig;
-  delete priceOverrides[stk];
-  document.getElementById("overrideStatus").textContent = `✅ Restored ${stk} to original price of ${money(orig)}.`;
-  toast(`Restored ${stk} price to ${money(orig)}!`);
-  done();
- } else {
-  toast(`No active override on ${stk}!`);
- }
-};
-
-function sendChatMessage(){
- const input = document.getElementById("chatInput");
- const txt = input.value.trim();
+// ---------------- GLOBAL CHAT & MONEY TRANSFERS ----------------
+document.getElementById("sendChat").onclick = function(){
+ const inp = document.getElementById("chatInput");
+ const txt = inp.value.trim();
  if(!txt) return;
+ if(!db) return toast("Cloud chat disabled.");
 
- if(firebaseReady){
-  push(ref(db,"chat"),{
-   name: validName(),
-   text: txt,
-   timestamp: serverTimestamp()
-  });
- }
- input.value="";
-}
-
-document.getElementById("sendChat").onclick = sendChatMessage;
-document.getElementById("chatInput").onkeydown = e => { if(e.key === "Enter") sendChatMessage(); };
-
-document.getElementById("rigApplyBtn").onclick = () => {
- riggedFlip = document.getElementById("rigOutcome").value;
- if(riggedFlip === "OFF"){
-  toast("🪙 Coin flip set to FAIR (Random)");
- } else {
-  toast(`🪙 Coin flip RIGGED to always land on ${riggedFlip}!`);
- }
-};
-
-document.getElementById("cheatBuy").onclick=()=>{
- const stk = document.getElementById("cheatStock").value;
- const q = Math.floor(Number(document.getElementById("cheatQty").value))||1;
- stocks[stk].shares += q;
- toast(`FREE BOUGHT ${formatQty(q)}x ${stk}!`);
- done();
-};
-
-document.getElementById("simuCrash").onclick=()=>{
- Object.values(stocks).forEach(s=>s.price=Math.max(1,s.price*.7));
- toast("💥 SIMULATED MARKET CRASH!");
- done();
-};
-
-document.getElementById("simuSurge").onclick=()=>{
- Object.values(stocks).forEach(s=>s.price*=1.3);
- toast("🚀 SIMULATED MARKET SURGE!");
- done();
-};
-
-document.getElementById("sendMoneyBtn").onclick=()=>{
- const recId = document.getElementById("transferRecipient").value;
- const amt = Math.floor(Number(document.getElementById("transferAmount").value));
-
- if(!recId){ toast("Select a recipient player!"); return; }
- if(!amt || amt < 1){ toast("Enter a valid amount!"); return; }
- if(cash < amt){ toast("Not enough cash to send!"); return; }
-
- cash -= amt;
- push(ref(db,"transfers/"+recId),{
-  fromName: validName(),
-  amount: amt,
-  timestamp: serverTimestamp()
+ push(ref(db, "chats"), {
+  name: validName(),
+  text: txt,
+  time: Date.now()
  });
-
- toast(`Sent ${money(amt)} successfully!`);
- document.getElementById("transferAmount").value="";
- done();
+ inp.value = "";
 };
 
-document.getElementById("resetBotsBtn").onclick=()=>{
- botOwned = 0;
- done();
- toast("🤖 Trading bots reset to 0!");
-};
-
-document.getElementById("resetBtn").onclick=()=>{
- if(confirm("Are you sure you want to reset your local progress?")){
-  cash = STARTING_CASH;
-  insurance = false; boostOwned = 0; speedOwned = 0; botOwned = 0; botTargetPrice = 1; goldBars = 0;
-  opItemsOwned = {}; opActivated = {}; customTitlesUnlocked = {}; opPassiveIncome = 0;
-  equippedTitle = ""; highestCasinoWin = 0;
-  propertiesOwned = {}; propertyTimers = {};
-  priceOverrides = {};
-  Object.keys(stocks).forEach(k => stocks[k].shares = 0);
-  done();
-  toast("Game reset!");
- }
-};
-
-onValue(ref(db,"leaderboard"), snap=>{
- renderLeaderboard(snap.val());
-});
-
-onValue(ref(db,"chat"), snap=>{
- const val = snap.val();
- const box = document.getElementById("chatBox");
- if(!val){
-  box.innerHTML='<div class="empty">No messages yet.</div>';
-  return;
- }
- const msgs = Object.values(val).sort((a,b)=>(a.timestamp||0)-(b.timestamp||0));
- if(msgs.length > lastChatCount && lastChatCount > 0){
-  unreadCount += (msgs.length - lastChatCount);
-  const badge = document.getElementById("chatBadge");
-  badge.textContent = `${unreadCount} NEW MESSAGE${unreadCount>1?"S":""}`;
-  badge.style.display = "inline-block";
- }
- lastChatCount = msgs.length;
-
- box.innerHTML = msgs.map(m=>`
-  <div class="msg">
-   <span class="msg-name">${safeText(m.name||"Player")}</span>
-   <span class="msg-time">${m.timestamp ? new Date(m.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : ''}</span>
-   <div>${safeText(m.text||"")}</div>
-  </div>
- `).join("");
- box.scrollTop = box.scrollHeight;
-});
-
-document.getElementById("chatBadge").onclick=()=>{
- unreadCount = 0;
- document.getElementById("chatBadge").style.display="none";
- document.getElementById("chatBox").scrollTop = document.getElementById("chatBox").scrollHeight;
-};
-
-// ===== PLAYER-TO-PLAYER TRADING =====
-// Firebase layout:  trades/{id}  = { a:{id,name}, b:{id,name}, status, ver, offers:{playerId:{cash,props,ops}},
-//                                    accepted:{playerId:true}, claimed:{..}, refunded:{..} }
-//                   playerTrade/{playerId} = id of the trade that player is currently in (one at a time)
-// Whatever you add to your offer is taken out of your own inventory/cash straight away (escrow) and saved,
-// so it can't be spent twice. When both players confirm, each one collects the OTHER player's offer exactly once
-// (guarded by a transaction). If the trade is cancelled, each player gets their own offer back exactly once.
-function normOffer(o){
- o = o || {};
- return { cash: Math.max(0, Math.floor(Number(o.cash)) || 0), props: Object.assign({}, o.props || {}), ops: Object.assign({}, o.ops || {}) };
-}
-function isEmptyOffer(o){
- return !o.cash && !Object.values(o.props).some(n => Number(n) > 0) && !Object.values(o.ops).some(n => Number(n) > 0);
-}
-
-// moves money / items between your holdings and the trade (d > 0 adds to holdings, d < 0 takes out)
-function applyHoldingDelta(kind, key, d){
- if(kind === "cash"){ cash += d; }
- else if(kind === "prop"){
-  propertiesOwned[key] = (Number(propertiesOwned[key]) || 0) + d;
-  if(d > 0 && !propertyTimers[key]) propertyTimers[key] = Date.now();
- } else if(kind === "op"){
-  const n = (Number(opItemsOwned[key]) || 0) + d;
-  if(n > 0) opItemsOwned[key] = n; else delete opItemsOwned[key];
- }
-}
-
-// puts an offer into your holdings (used for the partner's offer on completion, or your own on cancel)
-function grantTradeOffer(offer){
- const o = normOffer(offer);
- const got = { cash: 0, props: 0, ops: 0 };
- if(Number.isFinite(o.cash) && o.cash > 0){ applyHoldingDelta("cash", "", o.cash); got.cash = o.cash; }
- for(const [k, n0] of Object.entries(o.props)){
-  const n = Math.floor(Number(n0)) || 0;
-  if(n > 0 && properties[k]){ applyHoldingDelta("prop", k, n); got.props += n; }
- }
- for(const [k, n0] of Object.entries(o.ops)){
-  const n = Math.floor(Number(n0)) || 0;
-  if(n > 0 && OVERPOWERED_ITEMS.some(x => x.id === k)){ applyHoldingDelta("op", k, n); got.ops += n; }
- }
- return got;
-}
-
-function describeGot(g){
- const parts = [];
- if(g.cash) parts.push(money(g.cash));
- if(g.props) parts.push(`${formatQty(g.props)} propert${g.props === 1 ? "y" : "ies"}`);
- if(g.ops) parts.push(`${formatQty(g.ops)} OP item${g.ops === 1 ? "" : "s"}`);
- return parts.join(", ") || "nothing";
-}
-
-function updateTradeSelects(){
- const ps = document.getElementById("tradePropSelect"), os = document.getElementById("tradeOpSelect");
- if(!ps || !os) return;
- let po = '<option value="">Select a property…</option>';
- for(const [k, p] of Object.entries(properties)){
-  const c = Number(propertiesOwned[k]) || 0;
-  if(c > 0) po += `<option value="${k}">${safeText(p.name)} (You have: ${formatQty(c)})</option>`;
- }
- let oo = '<option value="">Select an OP item…</option>';
- for(const [id, c0] of Object.entries(opItemsOwned)){
-  const c = Number(c0) || 0;
-  const it = OVERPOWERED_ITEMS.find(x => x.id === id);
-  if(c > 0 && it) oo += `<option value="${id}">${safeText(it.name)} (You have: ${formatQty(c)})</option>`;
- }
- [[ps, po], [os, oo]].forEach(([sel, h]) => {
-  if(sel.dataset.sig === h) return;
-  const prev = sel.value;
-  sel.innerHTML = h;
-  sel.dataset.sig = h;
-  if(prev && Array.prototype.some.call(sel.options, o => o.value === prev)) sel.value = prev;
- });
-}
-
-function offerLinesHtml(offer, editable){
- const o = normOffer(offer);
- const line = (label, kind, key, n) => `<div class="trade-item"><span>${label}</span>${editable ? `<button class="danger" style="padding:2px 8px" onclick="tradeRemove('${kind}','${key}',${n})">✖</button>` : ""}</div>`;
- let h = "";
- if(o.cash > 0) h += line(`💵 ${money(o.cash)}`, "cash", "", o.cash);
- for(const [k, n0] of Object.entries(o.props)){
-  const n = Math.floor(Number(n0)) || 0;
-  if(n > 0 && properties[k]) h += line(`${properties[k].icon} ${safeText(properties[k].name)} × ${formatQty(n)}`, "prop", k, n);
- }
- for(const [k, n0] of Object.entries(o.ops)){
-  const n = Math.floor(Number(n0)) || 0;
-  const it = OVERPOWERED_ITEMS.find(x => x.id === k);
-  if(n > 0 && it) h += line(`${it.icon} ${safeText(it.name)} × ${formatQty(n)}`, "op", k, n);
- }
- return h || '<div class="muted">Nothing offered yet</div>';
-}
-
-function renderTrade(){
- const idle = document.getElementById("tradeIdle"), req = document.getElementById("tradeRequest"), act = document.getElementById("tradeActive");
- if(!idle || !req || !act) return;
- const t = activeTrade;
- if(!t){ idle.style.display = "flex"; req.style.display = "none"; act.style.display = "none"; return; }
- idle.style.display = "none";
- const iAmA = t.a.id === playerId;
- const other = iAmA ? t.b : t.a;
- const otherName = safeText(other.name || "Player");
-
- if(t.status === "pending"){
-  act.style.display = "none"; req.style.display = "block";
-  req.innerHTML = iAmA
-   ? `⏳ Waiting for <b>${otherName}</b> to accept your trade request… <button class="danger" onclick="cancelTrade()" style="margin-left:8px">CANCEL REQUEST</button>`
-   : `🤝 <b>${otherName}</b> wants to trade with you! <button class="buy" onclick="acceptTrade()" style="margin-left:8px">ACCEPT</button> <button class="danger" onclick="cancelTrade()">DECLINE</button>`;
-  return;
- }
- if(t.status === "active"){
-  req.style.display = "none"; act.style.display = "block";
-  const offers = t.offers || {};
-  document.getElementById("tradeMine").innerHTML = offerLinesHtml(offers[playerId], true);
-  document.getElementById("tradeTheirs").innerHTML = offerLinesHtml(offers[other.id], false);
-  document.getElementById("tradeTheirTitle").textContent = `${other.name || "Player"}'s OFFER`;
-  const acc = t.accepted || {};
-  const mineOk = !!acc[playerId], theirOk = !!acc[other.id];
-  document.getElementById("tradeConfirmInfo").innerHTML =
-   `${mineOk ? "✅ You confirmed" : "⬜ You haven't confirmed"} • ${theirOk ? "✅" : "⬜"} ${otherName} ${theirOk ? "confirmed" : "hasn't confirmed"}`;
-  document.getElementById("tradeConfirmBtn").textContent = mineOk ? "UNCONFIRM" : "CONFIRM TRADE";
-  return;
- }
- act.style.display = "none"; req.style.display = "block";
- req.textContent = t.status === "completed" ? "Finishing trade…" : "Trade ended – returning your items…";
-}
-
-function listenForTrades(){
- if(!firebaseReady || !playerId || tradePtrUnsub) return;
- tradePtrUnsub = onValue(ref(db, "playerTrade/" + playerId), snap => {
-  const tid = snap.val() || null;
-  if(tid === activeTradeId) return;
-  if(typeof tradeUnsub === "function"){ try{ tradeUnsub(); }catch(e){} }
-  tradeUnsub = null; activeTradeId = tid; activeTrade = null;
-  if(tid) tradeUnsub = onValue(ref(db, "trades/" + tid), s => handleTradeSnapshot(tid, s), err => console.error("[trade] read failed", err));
-  renderTrade();
- }, err => console.error("[trade] read failed", err));
-}
-
-function handleTradeSnapshot(tid, snap){
- if(tid !== activeTradeId) return;
- if(!snap.exists()){
-  activeTrade = null;
-  renderTrade();
-  remove(ref(db, "playerTrade/" + playerId)).catch(console.error);
-  return;
- }
- const t = snap.val();
- activeTrade = t;
- renderTrade();
- if(t.status === "pending" && t.b && t.b.id === playerId && tradeNotified !== tid){
-  tradeNotified = tid;
-  toast(`🤝 ${t.a.name || "A player"} sent you a trade request! (Shop & Trade)`);
- }
- if(t.status === "completed" || t.status === "cancelled") processTradeOutcome(tid);
-}
-
-// Collect what is owed to you EXACTLY ONCE (completed -> partner's offer, cancelled -> your own offer back).
-async function processTradeOutcome(tid){
- if(tradeOutcomeBusy || !activeTrade || tid !== activeTradeId) return;
- if(!stateReady){ setTimeout(() => processTradeOutcome(tid), 500); return; }
- const status = activeTrade.status;
- const flagKey = status === "completed" ? "claimed" : "refunded";
- tradeOutcomeBusy = true;
- try{
-  const res = await runTransaction(ref(db, "trades/" + tid), cur => {
-   if(!cur) return;
-   if(cur.status !== status) return;
-   if(cur[flagKey] && cur[flagKey][playerId]) return;
-   cur[flagKey] = cur[flagKey] || {};
-   cur[flagKey][playerId] = true;
-   return cur;
-  });
-  const snapNow = res.snapshot ? res.snapshot.val() : null;
-  if(res.committed && snapNow){
-   const partnerId = snapNow.a.id === playerId ? snapNow.b.id : snapNow.a.id;
-   const offers = snapNow.offers || {};
-   if(status === "completed"){
-    const got = grantTradeOffer(offers[partnerId]);
-    toast(`🎉 Trade complete! You received: ${describeGot(got)}`);
-   } else {
-    const got = grantTradeOffer(offers[playerId]);
-    if(got.cash || got.props || got.ops) toast(`↩️ Trade cancelled – returned: ${describeGot(got)}`);
-    else toast("Trade cancelled.");
-   }
-   done();
-  }
-  // this trade is finished for me: free my slot, and delete the record once both players have collected
-  const latest = (res.committed ? snapNow : (await get(ref(db, "trades/" + tid))).val()) || null;
-  const mineDone = !!(latest && latest[flagKey] && latest[flagKey][playerId]);
-  if(mineDone || !latest){
-   await remove(ref(db, "playerTrade/" + playerId));
-   if(latest && latest[flagKey][latest.a.id] && latest[flagKey][latest.b.id]) await remove(ref(db, "trades/" + tid));
-  }
- }catch(e){
-  console.error("[trade] could not finish trade, will retry", e);
-  setTimeout(() => { if(activeTradeId === tid) processTradeOutcome(tid); }, 2500);
- }finally{
-  tradeOutcomeBusy = false;
- }
-}
-
-async function tradeTx(mutator){
- if(!activeTradeId) return { committed: false };
- try{
-  return await runTransaction(ref(db, "trades/" + activeTradeId), cur => { if(!cur) return; return mutator(cur); });
- }catch(e){ console.error(e); return { committed: false }; }
-}
-
-window.sendTradeRequest = async () => {
- if(!firebaseReady || !stateReady){ toast("Still loading your account – try again in a moment."); return; }
- const targetId = document.getElementById("tradePlayerSelect").value;
- if(!targetId){ toast("Select a player to trade with!"); return; }
- if(targetId === playerId){ toast("You can't trade with yourself!"); return; }
- if(activeTradeId){ toast("Finish or cancel your current trade first!"); return; }
- const target = allPlayers[targetId];
- if(!target){ toast("Player not found."); return; }
- const tid = playerId + "_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
- try{
-  await set(ref(db, "trades/" + tid), {
-   a: { id: playerId, name: validName() },
-   b: { id: targetId, name: String(target.name || "Player").slice(0, 20) },
-   status: "pending", ver: 0, createdAt: Date.now()
-  });
-  const mine = await runTransaction(ref(db, "playerTrade/" + playerId), cur => cur ? undefined : tid);
-  if(!mine.committed){ await remove(ref(db, "trades/" + tid)); toast("You already have a trade open."); return; }
-  const theirs = await runTransaction(ref(db, "playerTrade/" + targetId), cur => cur ? undefined : tid);
-  if(!theirs.committed){
-   await remove(ref(db, "trades/" + tid));
-   await remove(ref(db, "playerTrade/" + playerId));
-   toast(`${target.name || "That player"} is busy in another trade. Try again later.`);
+function setupChatListener(){
+ if(!db) return;
+ onValue(ref(db, "chats"), (snap) => {
+  const data = snap.val() || {};
+  const box = document.getElementById("chatBox");
+  box.innerHTML = "";
+  
+  const msgs = Object.values(data).sort((a,b) => a.time - b.time);
+  if(msgs.length === 0){
+   box.innerHTML = '<div class="empty">No messages yet. Say hello!</div>';
    return;
   }
-  toast(`🤝 Trade request sent to ${target.name || "player"}!`);
- }catch(e){
-  console.error("[trade] could not send request", e);
-  toast("Could not start the trade. (Database rules must allow the 'trades' and 'playerTrade' paths.)");
-  remove(ref(db, "trades/" + tid)).catch(()=>{});
- }
-};
 
-window.acceptTrade = async () => {
- const r = await tradeTx(cur => {
-  if(cur.status !== "pending" || cur.b.id !== playerId) return;
-  cur.status = "active"; cur.ver = 0;
-  return cur;
+  msgs.forEach(m => {
+   const t = new Date(m.time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+   box.insertAdjacentHTML("beforeend", `
+    <div class="msg">
+     <div><span class="msg-name">${safeText(m.name)}</span><span class="msg-time">${t}</span></div>
+     <div style="font-size:13px;margin-top:2px">${safeText(m.text)}</div>
+    </div>
+   `);
+  });
+  box.scrollTop = box.scrollHeight;
  });
- toast(r.committed ? "🤝 Trade started! Add what you want to trade, then confirm." : "Couldn't accept – the request may have been cancelled.");
-};
+}
 
-window.cancelTrade = async () => {
- const r = await tradeTx(cur => {
-  if(cur.status !== "pending" && cur.status !== "active") return;
-  cur.status = "cancelled";
-  return cur;
+document.getElementById("sendMoneyBtn").onclick = function(){
+ const recSel = document.getElementById("transferRecipient");
+ const recipientId = recSel.value;
+ const amtInput = document.getElementById("transferAmount");
+ const amt = Math.floor(Number(amtInput.value));
+
+ if(!recipientId) return toast("Select a player!");
+ if(isNaN(amt) || amt <= 0) return toast("Enter a valid amount!");
+ if(cash < amt) return toast("Not enough cash!");
+
+ cash -= amt;
+ const recRef = ref(db, `players/${recipientId}`);
+ runTransaction(recRef, (p) => {
+  if(p) p.cash = (p.cash || 0) + amt;
+  return p;
+ }).then(() => {
+  toast(`💸 Sent ${money(amt)} to ${allPlayers[recipientId]?.name}!`);
+  amtInput.value = "";
+  saveLocal(); saveCloud(); render();
  });
- if(!r.committed) toast("This trade can't be cancelled any more.");
 };
 
-async function changeTradeOffer(kind, key, delta){
- const t = activeTrade;
- if(!t || t.status !== "active"){ toast("There is no active trade."); return false; }
- if(tradeEditBusy || !stateReady) return false;
- delta = Math.floor(Number(delta)) || 0;
- if(delta === 0) return false;
- const mine = normOffer(t.offers && t.offers[playerId]);
+// ---------------- CLOUD SAVE & LEADERBOARD ----------------
+function saveCloud(){
+ if(!db) return;
+ capEconomy();
+ const key = accountKey() || playerId;
+ const val = portfolio();
 
- if(kind === "cash"){
-  if(delta > 0 && cash < delta){ toast("You don't have that much money!"); return false; }
-  if(delta < 0 && mine.cash < -delta) return false;
- } else if(kind === "prop"){
-  if(!properties[key]) return false;
-  if(delta > 0 && (Number(propertiesOwned[key]) || 0) < delta){ toast("You don't own that many!"); return false; }
-  if(delta < 0 && (Number(mine.props[key]) || 0) < -delta) return false;
- } else if(kind === "op"){
-  if(!OVERPOWERED_ITEMS.some(x => x.id === key)) return false;
-  if(delta > 0 && (Number(opItemsOwned[key]) || 0) < delta){ toast("You don't have that many of this item!"); return false; }
-  if(delta < 0 && (Number(mine.ops[key]) || 0) < -delta) return false;
- } else return false;
+ const payload = {
+  name: validName(),
+  value: val,
+  cash: cash,
+  stocks: Object.fromEntries(Object.entries(stocks).map(([k,s])=>[k,s.shares])),
+  properties: propertiesOwned,
+  goldBars: goldBars,
+  botOwned: botOwned,
+  equippedTitle: equippedTitle,
+  opItemsOwned: opItemsOwned,
+  opActivated: opActivated,
+  customTitlesUnlocked: customTitlesUnlocked,
+  updatedAt: serverTimestamp()
+ };
 
- tradeEditBusy = true;
- applyHoldingDelta(kind, key, -delta);   // 1) take it out of your holdings...
- done();                                 // 2) ...and save that FIRST so it can never be used twice
- let ok = false;
- try{
-  const res = await runTransaction(ref(db, "trades/" + activeTradeId), cur => {   // 3) then put it in the trade
-   if(!cur) return;
-   if(cur.status !== "active") return;
-   cur.offers = cur.offers || {};
-   const o = normOffer(cur.offers[playerId]);
-   if(kind === "cash"){
-    o.cash += delta;
-    if(o.cash < 0) return;
-   } else {
-    const bag = kind === "prop" ? o.props : o.ops;
-    bag[key] = (Number(bag[key]) || 0) + delta;
-    if(bag[key] < 0) return;
-    if(bag[key] === 0) delete bag[key];
+ update(ref(db, `players/${key}`), payload);
+ update(ref(db, `leaderboard/${key}`), { name: validName(), value: val, title: equippedTitle });
+}
+
+function setupLeaderboardListener(){
+ if(!db) return;
+ onValue(ref(db, "leaderboard"), (snap) => {
+  const data = snap.val() || {};
+  allPlayers = data;
+  
+  const list = Object.entries(data)
+   .map(([id, p]) => ({ id, name: p.name || "Player", value: p.value || 0, title: p.title || "" }))
+   .sort((a,b) => b.value - a.value);
+
+  const tbody = document.getElementById("leaderboard");
+  tbody.innerHTML = "";
+
+  list.forEach((p, idx) => {
+   const isMe = p.id === playerId || p.id === accountKey();
+   const titleObj = ALL_TITLES.find(t => t.id === p.title);
+   let titleBadgeHtml = "";
+   if(titleObj){
+    titleBadgeHtml = `<span class="title-badge" style="background:${titleObj.bg};color:${titleObj.color}">${safeText(titleObj.text)}</span>`;
    }
-   cur.offers[playerId] = o;
-   cur.ver = (Number(cur.ver) || 0) + 1;
-   delete cur.accepted;                  // any change resets both confirmations
-   return cur;
+
+   tbody.insertAdjacentHTML("beforeend", `
+    <tr class="${isMe ? "you" : ""}">
+     <td class="rank">#${idx+1}</td>
+     <td><b>${safeText(p.name)}</b>${titleBadgeHtml}</td>
+     <td><b>${money(p.value)}</b></td>
+     <td class="${p.value >= STARTING_CASH ? "green" : "red"}">${money(p.value - STARTING_CASH)}</td>
+    </tr>
+   `);
   });
-  ok = !!(res && res.committed);
- }catch(e){ console.error(e); }
- if(!ok){
-  applyHoldingDelta(kind, key, delta);   // trade changed under us: undo, nothing is lost
-  done();
-  toast("Couldn't update the trade – nothing was changed.");
- }
- tradeEditBusy = false;
- return ok;
-}
 
-window.tradeRemove = (kind, key, n) => { changeTradeOffer(kind, key, -Math.floor(Number(n) || 0)); };
+  const recSel = document.getElementById("transferRecipient");
+  recSel.innerHTML = '<option value="">Select a player…</option>';
+  list.forEach(p => {
+   if(p.id !== playerId && p.id !== accountKey()){
+    recSel.insertAdjacentHTML("beforeend", `<option value="${p.id}">${safeText(p.name)}</option>`);
+   }
+  });
 
-window.confirmTrade = async () => {
- const t = activeTrade;
- if(!t || t.status !== "active") return;
- const seen = Number(t.ver) || 0;     // you can only confirm the exact offer you are looking at
- const r = await tradeTx(cur => {
-  if(cur.status !== "active") return;
-  if((Number(cur.ver) || 0) !== seen) return;
-  const offers = cur.offers || {};
-  if(isEmptyOffer(normOffer(offers[cur.a.id])) && isEmptyOffer(normOffer(offers[cur.b.id]))) return;
-  cur.accepted = cur.accepted || {};
-  cur.accepted[playerId] = true;
-  if(cur.accepted[cur.a.id] && cur.accepted[cur.b.id]) cur.status = "completed";
-  return cur;
+  setupTradeUI();
+  setupOP195UI();
+  renderTitles();
  });
- if(!r.committed) toast("The offer changed or is empty – check it and confirm again.");
-};
-
-window.unconfirmTrade = async () => {
-  await tradeTx(cur => {
-   if(cur.status !== "active" || !(cur.accepted && cur.accepted[playerId])) return;
-   delete cur.accepted[playerId];
-   return cur;
-  });
-};
-
-document.getElementById("tradeSendBtn").onclick = () => window.sendTradeRequest();
-document.getElementById("tradeCancelBtn").onclick = () => window.cancelTrade();
-document.getElementById("tradeConfirmBtn").onclick = () => {
- const t = activeTrade;
- if(t && t.accepted && t.accepted[playerId]) window.unconfirmTrade(); else window.confirmTrade();
-};
-document.getElementById("tradeCashBtn").onclick = () => {
- const t = activeTrade;
- if(!t || t.status !== "active") return;
- const want = Math.floor(Number(document.getElementById("tradeCashInput").value));
- if(!Number.isFinite(want) || want < 0){ toast("Enter a valid amount!"); return; }
- const cur = normOffer(t.offers && t.offers[playerId]).cash;
- if(want === cur){ toast("That is already your offer."); return; }
- changeTradeOffer("cash", "", want - cur);
-};
-function tradeAddFromSelect(kind, selId, qtyId){
- const key = document.getElementById(selId).value;
- const qty = Math.floor(Number(document.getElementById(qtyId).value));
- if(!key){ toast("Select an item first!"); return; }
- if(!Number.isFinite(qty) || qty < 1){ toast("Enter a valid amount!"); return; }
- changeTradeOffer(kind, key, qty);
-}
-document.getElementById("tradePropBtn").onclick = () => tradeAddFromSelect("prop", "tradePropSelect", "tradePropQty");
-document.getElementById("tradeOpBtn").onclick = () => tradeAddFromSelect("op", "tradeOpSelect", "tradeOpQty");
-
-// ===== START-UP (order matters) =====
-// 1) load the player's saved data  2) render it  3) only then start the game timers.
-function startTimers(){
- if(timersStarted) return;
- timersStarted = true;
- setInterval(()=>safeRun("price update", updatePrices), 3000);
- setInterval(()=>safeRun("property payouts", propertyPayouts), 1000);
- setInterval(()=>safeRun("gold payouts", goldPayouts), 1000);
- setInterval(()=>safeRun("OP drop spawner", handle3MinuteOpSpawner), 1000);
 }
 
-if(accountKey()){
- // Don't flash the default $10,000 while the saved data is still being fetched.
- ["cash","portfolio","pnl"].forEach(id=>{ document.getElementById(id).textContent = "Loading…"; });
- setLoading(true);
-}
+// ---------------- RESET GAME & BOTS ----------------
+document.getElementById("resetBtn").onclick = function(){
+ if(!confirm("Are you sure you want to reset your game? All progress will be cleared.")) return;
+ localStorage.clear();
+ location.reload();
+};
 
-(async()=>{
- try{ await register(); }
- catch(e){ console.error("[SimuTrade] register failed:", e); setLoading(false); }
- safeRun("initial render", render);
- safeRun("my shop render", ()=>renderP2PStore(playerId));
- startTimers();
-})();
+document.getElementById("resetBotsBtn").onclick = function(){
+ if(!db) return;
+ remove(ref(db, "bots"));
+ toast("Bots cleared to fix lag!");
+};
+
+// ---------------- INITIALIZATION ----------------
+nameInput.oninput = () => { localStorage.setItem(PNAME, validName()); render(); saveCloud(); };
+passInput.oninput = () => { localStorage.setItem(PPASS, passInput.value.trim()); render(); saveCloud(); };
+
+renderTabs();
+render();
+restartMarketTimer();
+setInterval(tickProperties, 1000);
+
+safeRun("setupOpSpawner", setupOpSpawner);
+safeRun("setupP2PMarketplace", setupP2PMarketplace);
+safeRun("setupLeaderboardListener", setupLeaderboardListener);
+safeRun("setupChatListener", setupChatListener);
+safeRun("listenToTradePointer", listenToTradePointer);
+
+saveCloud();
 </script>
 </body>
 </html>
