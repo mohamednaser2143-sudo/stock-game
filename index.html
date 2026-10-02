@@ -642,6 +642,7 @@ function accountKey(){
 
 function money(n){
  const num = Number(n);
+ if(num === Infinity) return "$MAX";
  if(!Number.isFinite(num)) return "$0.00";
  const abs = Math.abs(num);
  const sign = num < 0 ? "-" : "";
@@ -658,6 +659,7 @@ function money(n){
 
 function formatQty(n){
  const num = Number(n);
+ if(num === Infinity) return "MAX";
  if(!Number.isFinite(num)) return "0";
  if(num >= 1e12) return num.toExponential(2);
  return num.toLocaleString();
@@ -666,8 +668,31 @@ function formatQty(n){
 function safeText(v){const e=document.createElement("span");e.textContent=String(v??"");return e.innerHTML}
 function validName(){return(nameInput.value.trim()||"Player").slice(0,20)}
 
+// ---- OVERFLOW GUARD ----
+// JavaScript numbers break at ~1.79e308 (they become Infinity/NaN and the game shows $0.00).
+// Every game value is held at ECON_CAP so it can never overflow, and totals are held at PORTFOLIO_CAP.
+const ECON_CAP = 1e307, PORTFOLIO_CAP = 1.7e308;
+function capNum(v){
+ v = Number(v);
+ if(v !== v) return ECON_CAP;                 // NaN (caused by Infinity maths) -> max
+ if(v > ECON_CAP) return ECON_CAP;            // includes Infinity
+ if(v < -ECON_CAP) return -ECON_CAP;
+ return v;
+}
+function capEconomy(){
+ cash = capNum(cash);
+ goldBars = capNum(goldBars); botOwned = capNum(botOwned);
+ boostOwned = capNum(boostOwned); speedOwned = capNum(speedOwned);
+ opPassiveIncome = capNum(opPassiveIncome); highestCasinoWin = capNum(highestCasinoWin);
+ for(const s of Object.values(stocks)){ s.shares = capNum(s.shares); s.price = capNum(s.price); }
+ for(const k of Object.keys(propertiesOwned)) propertiesOwned[k] = capNum(propertiesOwned[k]);
+ for(const k of Object.keys(opItemsOwned)) opItemsOwned[k] = capNum(opItemsOwned[k]);
+ for(const k of Object.keys(opActivated)) opActivated[k] = capNum(opActivated[k]);
+}
+
 function portfolio(){
- return cash + Object.values(stocks).reduce((a,s)=>a + (s.price * s.shares), 0);
+ const v = cash + Object.values(stocks).reduce((a,s)=>a + (s.price * s.shares), 0);
+ return (v !== v || v > PORTFOLIO_CAP) ? PORTFOLIO_CAP : v;
 }
 
 function pnl(){return portfolio()-STARTING_CASH}
@@ -682,6 +707,7 @@ function saveLocal(){
 function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.style.display="block";clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.style.display="none",2600)}
 
 function render(){
+ capEconomy();
  const b=document.getElementById("market");b.innerHTML="";
  for(const[t,s]of Object.entries(stocks)){const c=s.change,q=Math.floor(cash/s.price);b.insertAdjacentHTML("beforeend",`<tr><td><b>${safeText(t)}</b><br><span class="sub">${safeText(s.name)}</span></td><td><div><b>${money(s.price)}</b></div><div class="spark-wrap"><canvas class="spark" id="chart-${t}" width="170" height="48"></canvas></div></td><td class="${c>=0?"green":"red"}"><span class="arrow">${c>=0?"▲":"▼"}</span>${c>=0?"+":""}${c.toFixed(2)}%</td><td>${formatQty(s.shares)}</td><td><div class="actions"><button class="buy" onclick="buy('${t}')" ${q<1?"disabled":""}>BUY</button><button class="buy" onclick="buyAll('${t}')" ${q<1?"disabled":""}>BUY ALL</button><button class="sell" onclick="sell('${t}')" ${s.shares<1?"disabled":""}>SELL</button><button class="sell" onclick="sellAll('${t}')" ${s.shares<1?"disabled":""}>SELL ALL</button></div></td></tr>`)}
  for(const t of Object.keys(stocks))drawSmall(t);
