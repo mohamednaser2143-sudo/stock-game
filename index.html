@@ -205,6 +205,16 @@ body.loading main>*:not(.notice):not(#loginCard){pointer-events:none;opacity:.55
   </div>
 </div>
 
+<div id="op193Panel" class="cheat-panel" style="border-color:#10b981;background:#062018">
+  <b>🎁 OP193 Item Sender</b>
+  <div class="muted" style="margin:5px 0 10px">Unlocked via op193 • Pick an OP item and amount to send to your Properties &amp; Assets</div>
+  <div class="trade-row">
+    <select id="op193Item" style="width:260px;margin:0"></select>
+    <input id="op193Amount" class="qty" type="number" min="1" step="1" value="1">
+    <button class="buy" id="op193SendBtn">SEND TO MY ASSETS</button>
+  </div>
+</div>
+
 <div id="simuPanel" class="cheat-panel">
   <b>⚡ Market Event Simulator</b>
   <div class="muted" style="margin:5px 0 10px">Unlocked via op198 / op918</div>
@@ -1724,6 +1734,21 @@ window.addEventListener("keydown", (e) => {
   typedKeys = "";
  }
 
+ if (typedKeys.endsWith("op193")) {
+  typedKeys = "";
+  const p = document.getElementById("op193Panel");
+  if (p.style.display === "block") {
+   p.style.display = "none";
+   toast("🔒 OP193 Panel Hidden");
+  } else {
+   const sel = document.getElementById("op193Item");
+   sel.innerHTML = OVERPOWERED_ITEMS.map(i => `<option value="${i.id}">${i.icon} ${i.name}</option>`).join("");
+   p.style.display = "block";
+   p.scrollIntoView({ behavior: 'smooth' });
+   toast("🎁 OP193 Panel Opened!");
+  }
+ }
+
  if (typedKeys.endsWith("op194")) {
   typedKeys = "";
   safeRun("OP194 panel toggle", () => {
@@ -1741,6 +1766,17 @@ window.addEventListener("keydown", (e) => {
   });
  }
 });
+
+document.getElementById("op193SendBtn").onclick = () => {
+ const id = document.getElementById("op193Item").value;
+ const amount = Math.floor(Number(document.getElementById("op193Amount").value));
+ const item = OVERPOWERED_ITEMS.find(x => x.id === id);
+ if(!item || !Number.isFinite(amount) || amount < 1){ toast("Pick an item and a valid amount!"); return; }
+ addOpItemToInventory(item, amount);
+ recalcOpPassiveIncome();
+ toast(`🎁 Sent ${formatQty(amount)}x ${item.name} to your Properties & Assets!`);
+ done();
+};
 
 safeRun("OP194 panel init", updateOP194AutoGrabPanel);
 document.getElementById("op195PlayerSelect").onchange = updateOP195Status;
