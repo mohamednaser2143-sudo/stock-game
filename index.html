@@ -24,6 +24,11 @@
 .p2p-card{background:#050d1a;border:1px solid #1e2d42;border-radius:8px;padding:10px;display:flex;flex-direction:column;justify-content:space-between}
 
 body.loading main>*:not(.notice):not(#loginCard){pointer-events:none;opacity:.55}
+.trade-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.trade-col{background:#050d1a;border:1px solid #1e2d42;border-radius:8px;padding:10px}
+.trade-row{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.trade-item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #1e2d42;font-size:13px}
+@media(max-width:700px){.trade-cols{grid-template-columns:1fr}}
 @keyframes spin{0%{transform:rotateY(0deg)}100%{transform:rotateY(360deg)}}
 @keyframes pulse{0%{opacity:1}50%{opacity:.5}100%{opacity:1}}
 @media(max-width:950px){.grid,.selected-main{grid-template-columns:1fr}.shop-grid,.property-grid{grid-template-columns:1fr 1fr}}@media(max-width:700px){.top{grid-template-columns:1fr}.name-row{grid-template-columns:1fr}header{padding:15px 17px}main{padding:14px}.shop-grid,.property-grid,.title-grid{grid-template-columns:1fr}.trade-row,.send-money-box,.flip-box{align-items:stretch;flex-direction:column}.trade-row>*, .send-money-box>*, .flip-box>*{width:100%!important}}
@@ -92,6 +97,54 @@ body.loading main>*:not(.notice):not(#loginCard){pointer-events:none;opacity:.55
     <div style="margin-top:12px">
       <div id="p2pStoreTitle" class="muted" style="font-weight:700">Viewing: Your Listings</div>
       <div class="p2p-grid" id="p2pGrid"><div class="empty" style="grid-column:1/-1">No items listed.</div></div>
+    </div>
+  </div>
+
+  <!-- PLAYER-TO-PLAYER TRADING -->
+  <div class="p2p-box" id="tradeBox">
+    <div class="section-title">
+      <h3 style="margin:0">🤝 Player Trading</h3>
+      <span class="muted">Trade properties, OP items and money with another player</span>
+    </div>
+
+    <div id="tradeIdle" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">
+      <select id="tradePlayerSelect" style="flex:1;margin:0"><option value="">Select a player to trade with…</option></select>
+      <button class="gold" id="tradeSendBtn">SEND TRADE REQUEST</button>
+    </div>
+
+    <div id="tradeRequest" style="display:none;margin-top:10px"></div>
+
+    <div id="tradeActive" style="display:none">
+      <div class="trade-cols">
+        <div class="trade-col">
+          <div class="sub" style="margin-bottom:6px">YOUR OFFER</div>
+          <div id="tradeMine"></div>
+          <div class="trade-row">
+            <input id="tradeCashInput" type="number" min="0" step="1" placeholder="Money to give ($)" style="flex:1;margin:0">
+            <button class="gold" id="tradeCashBtn">SET MONEY</button>
+          </div>
+          <div class="trade-row">
+            <select id="tradePropSelect" style="flex:1;margin:0"></select>
+            <input id="tradePropQty" type="number" min="1" step="1" value="1" style="width:70px;margin:0">
+            <button class="gold" id="tradePropBtn">ADD</button>
+          </div>
+          <div class="trade-row">
+            <select id="tradeOpSelect" style="flex:1;margin:0"></select>
+            <input id="tradeOpQty" type="number" min="1" step="1" value="1" style="width:70px;margin:0">
+            <button class="gold" id="tradeOpBtn">ADD</button>
+          </div>
+        </div>
+        <div class="trade-col">
+          <div class="sub" style="margin-bottom:6px" id="tradeTheirTitle">THEIR OFFER</div>
+          <div id="tradeTheirs"></div>
+        </div>
+      </div>
+      <div id="tradeConfirmInfo" class="muted" style="margin-top:10px"></div>
+      <div class="trade-row">
+        <button class="buy" id="tradeConfirmBtn">CONFIRM TRADE</button>
+        <button class="danger" id="tradeCancelBtn">CANCEL TRADE</button>
+      </div>
+      <div class="muted" style="margin-top:6px;font-size:11px">Items and money you add are held safely in the trade. If either player changes their offer, both confirmations reset. Cancelling gives everything back.</div>
     </div>
   </div>
 </div>
@@ -435,6 +488,8 @@ let pass=localStorage.getItem(PPASS)||"";
 let firebaseReady=!!db,stateReady=false,loadedKey=null,registerSeq=0,listenersStarted=false,timersStarted=false,opDropSynced=false,retryTimer,debounceTimer,lastUploadedValue=null,selected="AAPL",insurance=false,boostOwned=0,speedOwned=0,botOwned=0,botTargetPrice=1,goldBars=0,propertiesOwned={},propertyTimers={},allPlayers={};
 let opItemsOwned = {};      // OP items in your inventory (NOT used yet: sell them or activate them)
 let opActivated = {};       // OP income generators you have already activated (these produce the passive income)
+let activeTradeId = null, activeTrade = null, tradeUnsub = null, tradePtrUnsub = null, tradeNotified = null;
+let tradeEditBusy = false, tradeOutcomeBusy = false;
 let opItemsLegacy = {};     // untouched copy of old pre-inventory OP counts (kept for safety, not used by the game)
 let opPassiveIncome = 0;
 let lastChatCount = 0, unreadCount = 0, isFlipping = false;
@@ -573,7 +628,7 @@ function render(){
  for(const[t,s]of Object.entries(stocks)){const c=s.change,q=Math.floor(cash/s.price);b.insertAdjacentHTML("beforeend",`<tr><td><b>${safeText(t)}</b><br><span class="sub">${safeText(s.name)}</span></td><td><div><b>${money(s.price)}</b></div><div class="spark-wrap"><canvas class="spark" id="chart-${t}" width="170" height="48"></canvas></div></td><td class="${c>=0?"green":"red"}"><span class="arrow">${c>=0?"▲":"▼"}</span>${c>=0?"+":""}${c.toFixed(2)}%</td><td>${formatQty(s.shares)}</td><td><div class="actions"><button class="buy" onclick="buy('${t}')" ${q<1?"disabled":""}>BUY</button><button class="buy" onclick="buyAll('${t}')" ${q<1?"disabled":""}>BUY ALL</button><button class="sell" onclick="sell('${t}')" ${s.shares<1?"disabled":""}>SELL</button><button class="sell" onclick="sellAll('${t}')" ${s.shares<1?"disabled":""}>SELL ALL</button></div></td></tr>`)}
  for(const t of Object.keys(stocks))drawSmall(t);
  document.getElementById("cash").textContent=money(cash);document.getElementById("portfolio").textContent=money(portfolio());const p=pnl(),pe=document.getElementById("pnl");pe.textContent=(p>=0?"+":"-")+money(Math.abs(p));pe.className="big "+(p>=0?"green":"red");
- renderSelected();renderShop();renderProperties();renderTitles();updateP2PListDropdown();saveLocal();
+ renderSelected();renderShop();renderProperties();renderTitles();updateP2PListDropdown();safeRun("trade selects",updateTradeSelects);saveLocal();
 }
 function drawSmall(t){const s=stocks[t],c=document.getElementById("chart-"+t);if(!c)return;const x=c.getContext("2d"),w=c.width,h=c.height,v=s.history,min=Math.min(...v),max=Math.max(...v),r=max-min||1;x.clearRect(0,0,w,h);x.beginPath();v.forEach((n,i)=>{const px=v.length===1?w/2:i/(v.length-1)*(w-4)+2,py=h-4-(n-min)/r*(h-8);i?x.lineTo(px,py):x.moveTo(px,py)});x.strokeStyle=s.change>=0?"#10b981":"#ef4444";x.lineWidth=2;x.stroke()}
 function drawBig(){const c=document.getElementById("bigChart"),s=stocks[selected],x=c.getContext("2d"),w=c.width,h=c.height,v=s.history,min=Math.min(...v),max=Math.max(...v),r=max-min||1;x.clearRect(0,0,w,h);x.strokeStyle="#243957";x.lineWidth=1;for(let i=1;i<5;i++){x.beginPath();x.moveTo(0,i*h/5);x.lineTo(w,i*h/5);x.stroke()}x.beginPath();v.forEach((n,i)=>{const px=v.length===1?w/2:i/(v.length-1)*(w-8)+4,py=h-8-(n-min)/r*(h-16);i?x.lineTo(px,py):x.moveTo(px,py)});x.strokeStyle=s.change>=0?"#10b981":"#ef4444";x.lineWidth=3;x.stroke()}
@@ -1244,6 +1299,7 @@ function startListeners(){
  safeRun("transfer listener", listenForTransfers);
  safeRun("stock override listener", listenForRemoteStockOverrides);
  safeRun("OP drop listener", listenForOpDrops);
+ safeRun("trade listener", listenForTrades);
 }
 
 async function register(){
@@ -1392,6 +1448,14 @@ function renderLeaderboard(data){
  const curP2P = p2pSel.value;
  p2pSel.innerHTML = '<option value="">View Player\'s Store…</option>' + list.map(p=>`<option value="${p.id}">${safeText(p.name||"Player")} (${money(p.portfolioValue||0)})</option>`).join("");
  p2pSel.value = curP2P;
+
+ // TRADE PLAYER SELECTOR (everyone except you)
+ const tradeSel = document.getElementById("tradePlayerSelect");
+ if(tradeSel){
+  const curTrade = tradeSel.value;
+  tradeSel.innerHTML = '<option value="">Select a player to trade with…</option>' + list.filter(p=>p.id!==playerId).map(p=>`<option value="${p.id}">${safeText(p.name||"Player")} (${money(p.portfolioValue||0)})</option>`).join("");
+  tradeSel.value = curTrade;
+ }
 
  updateOP195PlayerDropdown(list);
 }
@@ -1895,6 +1959,371 @@ document.getElementById("chatBadge").onclick=()=>{
  document.getElementById("chatBadge").style.display="none";
  document.getElementById("chatBox").scrollTop = document.getElementById("chatBox").scrollHeight;
 };
+
+// ===== PLAYER-TO-PLAYER TRADING =====
+// Firebase layout:  trades/{id}  = { a:{id,name}, b:{id,name}, status, ver, offers:{playerId:{cash,props,ops}},
+//                                    accepted:{playerId:true}, claimed:{..}, refunded:{..} }
+//                   playerTrade/{playerId} = id of the trade that player is currently in (one at a time)
+// Whatever you add to your offer is taken out of your own inventory/cash straight away (escrow) and saved,
+// so it can't be spent twice. When both players confirm, each one collects the OTHER player's offer exactly once
+// (guarded by a transaction). If the trade is cancelled, each player gets their own offer back exactly once.
+function normOffer(o){
+ o = o || {};
+ return { cash: Math.max(0, Math.floor(Number(o.cash)) || 0), props: Object.assign({}, o.props || {}), ops: Object.assign({}, o.ops || {}) };
+}
+function isEmptyOffer(o){
+ return !o.cash && !Object.values(o.props).some(n => Number(n) > 0) && !Object.values(o.ops).some(n => Number(n) > 0);
+}
+
+// moves money / items between your holdings and the trade (d > 0 adds to holdings, d < 0 takes out)
+function applyHoldingDelta(kind, key, d){
+ if(kind === "cash"){ cash += d; }
+ else if(kind === "prop"){
+  propertiesOwned[key] = (Number(propertiesOwned[key]) || 0) + d;
+  if(d > 0 && !propertyTimers[key]) propertyTimers[key] = Date.now();
+ } else if(kind === "op"){
+  const n = (Number(opItemsOwned[key]) || 0) + d;
+  if(n > 0) opItemsOwned[key] = n; else delete opItemsOwned[key];
+ }
+}
+
+// puts an offer into your holdings (used for the partner's offer on completion, or your own on cancel)
+function grantTradeOffer(offer){
+ const o = normOffer(offer);
+ const got = { cash: 0, props: 0, ops: 0 };
+ if(Number.isFinite(o.cash) && o.cash > 0){ applyHoldingDelta("cash", "", o.cash); got.cash = o.cash; }
+ for(const [k, n0] of Object.entries(o.props)){
+  const n = Math.floor(Number(n0)) || 0;
+  if(n > 0 && properties[k]){ applyHoldingDelta("prop", k, n); got.props += n; }
+ }
+ for(const [k, n0] of Object.entries(o.ops)){
+  const n = Math.floor(Number(n0)) || 0;
+  if(n > 0 && OVERPOWERED_ITEMS.some(x => x.id === k)){ applyHoldingDelta("op", k, n); got.ops += n; }
+ }
+ return got;
+}
+
+function describeGot(g){
+ const parts = [];
+ if(g.cash) parts.push(money(g.cash));
+ if(g.props) parts.push(`${formatQty(g.props)} propert${g.props === 1 ? "y" : "ies"}`);
+ if(g.ops) parts.push(`${formatQty(g.ops)} OP item${g.ops === 1 ? "" : "s"}`);
+ return parts.join(", ") || "nothing";
+}
+
+function updateTradeSelects(){
+ const ps = document.getElementById("tradePropSelect"), os = document.getElementById("tradeOpSelect");
+ if(!ps || !os) return;
+ let po = '<option value="">Select a property…</option>';
+ for(const [k, p] of Object.entries(properties)){
+  const c = Number(propertiesOwned[k]) || 0;
+  if(c > 0) po += `<option value="${k}">${safeText(p.name)} (You have: ${formatQty(c)})</option>`;
+ }
+ let oo = '<option value="">Select an OP item…</option>';
+ for(const [id, c0] of Object.entries(opItemsOwned)){
+  const c = Number(c0) || 0;
+  const it = OVERPOWERED_ITEMS.find(x => x.id === id);
+  if(c > 0 && it) oo += `<option value="${id}">${safeText(it.name)} (You have: ${formatQty(c)})</option>`;
+ }
+ [[ps, po], [os, oo]].forEach(([sel, h]) => {
+  if(sel.dataset.sig === h) return;
+  const prev = sel.value;
+  sel.innerHTML = h;
+  sel.dataset.sig = h;
+  if(prev && Array.prototype.some.call(sel.options, o => o.value === prev)) sel.value = prev;
+ });
+}
+
+function offerLinesHtml(offer, editable){
+ const o = normOffer(offer);
+ const line = (label, kind, key, n) => `<div class="trade-item"><span>${label}</span>${editable ? `<button class="danger" style="padding:2px 8px" onclick="tradeRemove('${kind}','${key}',${n})">✖</button>` : ""}</div>`;
+ let h = "";
+ if(o.cash > 0) h += line(`💵 ${money(o.cash)}`, "cash", "", o.cash);
+ for(const [k, n0] of Object.entries(o.props)){
+  const n = Math.floor(Number(n0)) || 0;
+  if(n > 0 && properties[k]) h += line(`${properties[k].icon} ${safeText(properties[k].name)} × ${formatQty(n)}`, "prop", k, n);
+ }
+ for(const [k, n0] of Object.entries(o.ops)){
+  const n = Math.floor(Number(n0)) || 0;
+  const it = OVERPOWERED_ITEMS.find(x => x.id === k);
+  if(n > 0 && it) h += line(`${it.icon} ${safeText(it.name)} × ${formatQty(n)}`, "op", k, n);
+ }
+ return h || '<div class="muted">Nothing offered yet</div>';
+}
+
+function renderTrade(){
+ const idle = document.getElementById("tradeIdle"), req = document.getElementById("tradeRequest"), act = document.getElementById("tradeActive");
+ if(!idle || !req || !act) return;
+ const t = activeTrade;
+ if(!t){ idle.style.display = "flex"; req.style.display = "none"; act.style.display = "none"; return; }
+ idle.style.display = "none";
+ const iAmA = t.a.id === playerId;
+ const other = iAmA ? t.b : t.a;
+ const otherName = safeText(other.name || "Player");
+
+ if(t.status === "pending"){
+  act.style.display = "none"; req.style.display = "block";
+  req.innerHTML = iAmA
+   ? `⏳ Waiting for <b>${otherName}</b> to accept your trade request… <button class="danger" onclick="cancelTrade()" style="margin-left:8px">CANCEL REQUEST</button>`
+   : `🤝 <b>${otherName}</b> wants to trade with you! <button class="buy" onclick="acceptTrade()" style="margin-left:8px">ACCEPT</button> <button class="danger" onclick="cancelTrade()">DECLINE</button>`;
+  return;
+ }
+ if(t.status === "active"){
+  req.style.display = "none"; act.style.display = "block";
+  const offers = t.offers || {};
+  document.getElementById("tradeMine").innerHTML = offerLinesHtml(offers[playerId], true);
+  document.getElementById("tradeTheirs").innerHTML = offerLinesHtml(offers[other.id], false);
+  document.getElementById("tradeTheirTitle").textContent = `${other.name || "Player"}'s OFFER`;
+  const acc = t.accepted || {};
+  const mineOk = !!acc[playerId], theirOk = !!acc[other.id];
+  document.getElementById("tradeConfirmInfo").innerHTML =
+   `${mineOk ? "✅ You confirmed" : "⬜ You haven't confirmed"} • ${theirOk ? "✅" : "⬜"} ${otherName} ${theirOk ? "confirmed" : "hasn't confirmed"}`;
+  document.getElementById("tradeConfirmBtn").textContent = mineOk ? "UNCONFIRM" : "CONFIRM TRADE";
+  return;
+ }
+ act.style.display = "none"; req.style.display = "block";
+ req.textContent = t.status === "completed" ? "Finishing trade…" : "Trade ended – returning your items…";
+}
+
+function listenForTrades(){
+ if(!firebaseReady || !playerId || tradePtrUnsub) return;
+ tradePtrUnsub = onValue(ref(db, "playerTrade/" + playerId), snap => {
+  const tid = snap.val() || null;
+  if(tid === activeTradeId) return;
+  if(typeof tradeUnsub === "function"){ try{ tradeUnsub(); }catch(e){} }
+  tradeUnsub = null; activeTradeId = tid; activeTrade = null;
+  if(tid) tradeUnsub = onValue(ref(db, "trades/" + tid), s => handleTradeSnapshot(tid, s), err => console.error("[trade] read failed", err));
+  renderTrade();
+ }, err => console.error("[trade] read failed", err));
+}
+
+function handleTradeSnapshot(tid, snap){
+ if(tid !== activeTradeId) return;
+ if(!snap.exists()){
+  activeTrade = null;
+  renderTrade();
+  remove(ref(db, "playerTrade/" + playerId)).catch(console.error);
+  return;
+ }
+ const t = snap.val();
+ activeTrade = t;
+ renderTrade();
+ if(t.status === "pending" && t.b && t.b.id === playerId && tradeNotified !== tid){
+  tradeNotified = tid;
+  toast(`🤝 ${t.a.name || "A player"} sent you a trade request! (Shop & Trade)`);
+ }
+ if(t.status === "completed" || t.status === "cancelled") processTradeOutcome(tid);
+}
+
+// Collect what is owed to you EXACTLY ONCE (completed -> partner's offer, cancelled -> your own offer back).
+async function processTradeOutcome(tid){
+ if(tradeOutcomeBusy || !activeTrade || tid !== activeTradeId) return;
+ if(!stateReady){ setTimeout(() => processTradeOutcome(tid), 500); return; }
+ const status = activeTrade.status;
+ const flagKey = status === "completed" ? "claimed" : "refunded";
+ tradeOutcomeBusy = true;
+ try{
+  const res = await runTransaction(ref(db, "trades/" + tid), cur => {
+   if(!cur) return;
+   if(cur.status !== status) return;
+   if(cur[flagKey] && cur[flagKey][playerId]) return;
+   cur[flagKey] = cur[flagKey] || {};
+   cur[flagKey][playerId] = true;
+   return cur;
+  });
+  const snapNow = res.snapshot ? res.snapshot.val() : null;
+  if(res.committed && snapNow){
+   const partnerId = snapNow.a.id === playerId ? snapNow.b.id : snapNow.a.id;
+   const offers = snapNow.offers || {};
+   if(status === "completed"){
+    const got = grantTradeOffer(offers[partnerId]);
+    toast(`🎉 Trade complete! You received: ${describeGot(got)}`);
+   } else {
+    const got = grantTradeOffer(offers[playerId]);
+    if(got.cash || got.props || got.ops) toast(`↩️ Trade cancelled – returned: ${describeGot(got)}`);
+    else toast("Trade cancelled.");
+   }
+   done();
+  }
+  // this trade is finished for me: free my slot, and delete the record once both players have collected
+  const latest = (res.committed ? snapNow : (await get(ref(db, "trades/" + tid))).val()) || null;
+  const mineDone = !!(latest && latest[flagKey] && latest[flagKey][playerId]);
+  if(mineDone || !latest){
+   await remove(ref(db, "playerTrade/" + playerId));
+   if(latest && latest[flagKey][latest.a.id] && latest[flagKey][latest.b.id]) await remove(ref(db, "trades/" + tid));
+  }
+ }catch(e){
+  console.error("[trade] could not finish trade, will retry", e);
+  setTimeout(() => { if(activeTradeId === tid) processTradeOutcome(tid); }, 2500);
+ }finally{
+  tradeOutcomeBusy = false;
+ }
+}
+
+async function tradeTx(mutator){
+ if(!activeTradeId) return { committed: false };
+ try{
+  return await runTransaction(ref(db, "trades/" + activeTradeId), cur => { if(!cur) return; return mutator(cur); });
+ }catch(e){ console.error(e); return { committed: false }; }
+}
+
+window.sendTradeRequest = async () => {
+ if(!firebaseReady || !stateReady){ toast("Still loading your account – try again in a moment."); return; }
+ const targetId = document.getElementById("tradePlayerSelect").value;
+ if(!targetId){ toast("Select a player to trade with!"); return; }
+ if(targetId === playerId){ toast("You can't trade with yourself!"); return; }
+ if(activeTradeId){ toast("Finish or cancel your current trade first!"); return; }
+ const target = allPlayers[targetId];
+ if(!target){ toast("Player not found."); return; }
+ const tid = playerId + "_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+ try{
+  await set(ref(db, "trades/" + tid), {
+   a: { id: playerId, name: validName() },
+   b: { id: targetId, name: String(target.name || "Player").slice(0, 20) },
+   status: "pending", ver: 0, createdAt: Date.now()
+  });
+  const mine = await runTransaction(ref(db, "playerTrade/" + playerId), cur => cur ? undefined : tid);
+  if(!mine.committed){ await remove(ref(db, "trades/" + tid)); toast("You already have a trade open."); return; }
+  const theirs = await runTransaction(ref(db, "playerTrade/" + targetId), cur => cur ? undefined : tid);
+  if(!theirs.committed){
+   await remove(ref(db, "trades/" + tid));
+   await remove(ref(db, "playerTrade/" + playerId));
+   toast(`${target.name || "That player"} is busy in another trade. Try again later.`);
+   return;
+  }
+  toast(`🤝 Trade request sent to ${target.name || "player"}!`);
+ }catch(e){
+  console.error("[trade] could not send request", e);
+  toast("Could not start the trade. (Database rules must allow the 'trades' and 'playerTrade' paths.)");
+  remove(ref(db, "trades/" + tid)).catch(()=>{});
+ }
+};
+
+window.acceptTrade = async () => {
+ const r = await tradeTx(cur => {
+  if(cur.status !== "pending" || cur.b.id !== playerId) return;
+  cur.status = "active"; cur.ver = 0;
+  return cur;
+ });
+ toast(r.committed ? "🤝 Trade started! Add what you want to trade, then confirm." : "Couldn't accept – the request may have been cancelled.");
+};
+
+window.cancelTrade = async () => {
+ const r = await tradeTx(cur => {
+  if(cur.status !== "pending" && cur.status !== "active") return;
+  cur.status = "cancelled";
+  return cur;
+ });
+ if(!r.committed) toast("This trade can't be cancelled any more.");
+};
+
+async function changeTradeOffer(kind, key, delta){
+ const t = activeTrade;
+ if(!t || t.status !== "active"){ toast("There is no active trade."); return false; }
+ if(tradeEditBusy || !stateReady) return false;
+ delta = Math.floor(Number(delta)) || 0;
+ if(delta === 0) return false;
+ const mine = normOffer(t.offers && t.offers[playerId]);
+
+ if(kind === "cash"){
+  if(delta > 0 && cash < delta){ toast("You don't have that much money!"); return false; }
+  if(delta < 0 && mine.cash < -delta) return false;
+ } else if(kind === "prop"){
+  if(!properties[key]) return false;
+  if(delta > 0 && (Number(propertiesOwned[key]) || 0) < delta){ toast("You don't own that many!"); return false; }
+  if(delta < 0 && (Number(mine.props[key]) || 0) < -delta) return false;
+ } else if(kind === "op"){
+  if(!OVERPOWERED_ITEMS.some(x => x.id === key)) return false;
+  if(delta > 0 && (Number(opItemsOwned[key]) || 0) < delta){ toast("You don't have that many of this item!"); return false; }
+  if(delta < 0 && (Number(mine.ops[key]) || 0) < -delta) return false;
+ } else return false;
+
+ tradeEditBusy = true;
+ applyHoldingDelta(kind, key, -delta);   // 1) take it out of your holdings...
+ done();                                 // 2) ...and save that FIRST so it can never be used twice
+ let ok = false;
+ try{
+  const res = await runTransaction(ref(db, "trades/" + activeTradeId), cur => {   // 3) then put it in the trade
+   if(!cur) return;
+   if(cur.status !== "active") return;
+   cur.offers = cur.offers || {};
+   const o = normOffer(cur.offers[playerId]);
+   if(kind === "cash"){
+    o.cash += delta;
+    if(o.cash < 0) return;
+   } else {
+    const bag = kind === "prop" ? o.props : o.ops;
+    bag[key] = (Number(bag[key]) || 0) + delta;
+    if(bag[key] < 0) return;
+    if(bag[key] === 0) delete bag[key];
+   }
+   cur.offers[playerId] = o;
+   cur.ver = (Number(cur.ver) || 0) + 1;
+   delete cur.accepted;                  // any change resets both confirmations
+   return cur;
+  });
+  ok = !!(res && res.committed);
+ }catch(e){ console.error(e); }
+ if(!ok){
+  applyHoldingDelta(kind, key, delta);   // trade changed under us: undo, nothing is lost
+  done();
+  toast("Couldn't update the trade – nothing was changed.");
+ }
+ tradeEditBusy = false;
+ return ok;
+}
+
+window.tradeRemove = (kind, key, n) => { changeTradeOffer(kind, key, -Math.floor(Number(n) || 0)); };
+
+window.confirmTrade = async () => {
+ const t = activeTrade;
+ if(!t || t.status !== "active") return;
+ const seen = Number(t.ver) || 0;     // you can only confirm the exact offer you are looking at
+ const r = await tradeTx(cur => {
+  if(cur.status !== "active") return;
+  if((Number(cur.ver) || 0) !== seen) return;
+  const offers = cur.offers || {};
+  if(isEmptyOffer(normOffer(offers[cur.a.id])) && isEmptyOffer(normOffer(offers[cur.b.id]))) return;
+  cur.accepted = cur.accepted || {};
+  cur.accepted[playerId] = true;
+  if(cur.accepted[cur.a.id] && cur.accepted[cur.b.id]) cur.status = "completed";
+  return cur;
+ });
+ if(!r.committed) toast("The offer changed or is empty – check it and confirm again.");
+};
+
+window.unconfirmTrade = async () => {
+  await tradeTx(cur => {
+   if(cur.status !== "active" || !(cur.accepted && cur.accepted[playerId])) return;
+   delete cur.accepted[playerId];
+   return cur;
+  });
+};
+
+document.getElementById("tradeSendBtn").onclick = () => window.sendTradeRequest();
+document.getElementById("tradeCancelBtn").onclick = () => window.cancelTrade();
+document.getElementById("tradeConfirmBtn").onclick = () => {
+ const t = activeTrade;
+ if(t && t.accepted && t.accepted[playerId]) window.unconfirmTrade(); else window.confirmTrade();
+};
+document.getElementById("tradeCashBtn").onclick = () => {
+ const t = activeTrade;
+ if(!t || t.status !== "active") return;
+ const want = Math.floor(Number(document.getElementById("tradeCashInput").value));
+ if(!Number.isFinite(want) || want < 0){ toast("Enter a valid amount!"); return; }
+ const cur = normOffer(t.offers && t.offers[playerId]).cash;
+ if(want === cur){ toast("That is already your offer."); return; }
+ changeTradeOffer("cash", "", want - cur);
+};
+function tradeAddFromSelect(kind, selId, qtyId){
+ const key = document.getElementById(selId).value;
+ const qty = Math.floor(Number(document.getElementById(qtyId).value));
+ if(!key){ toast("Select an item first!"); return; }
+ if(!Number.isFinite(qty) || qty < 1){ toast("Enter a valid amount!"); return; }
+ changeTradeOffer(kind, key, qty);
+}
+document.getElementById("tradePropBtn").onclick = () => tradeAddFromSelect("prop", "tradePropSelect", "tradePropQty");
+document.getElementById("tradeOpBtn").onclick = () => tradeAddFromSelect("op", "tradeOpSelect", "tradeOpQty");
 
 // ===== START-UP (order matters) =====
 // 1) load the player's saved data  2) render it  3) only then start the game timers.
