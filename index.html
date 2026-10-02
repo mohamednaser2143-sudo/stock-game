@@ -1456,7 +1456,7 @@ window.cancelP2PListing = async (listKey) => {
   const result=await runTransaction(itemRef,current=>{
    if(!current || current.status==="sold") return; // abort: already bought
    if(current.sellerId && current.sellerId!==playerId) return;
-   return {...current,status:"cancelled",cancelledAt:serverTimestamp()};
+   return {...current,status:"cancelled",cancelledAt:Date.now()};
   });
 
   if(!result.committed){
@@ -1512,7 +1512,7 @@ window.buyP2PListing = async (sellerId,listKey) => {
    // Older listings may not have a status field. The marketplace treats
    // missing status as ACTIVE, so the purchase transaction must do the same.
    if(!current || (current.status||"active")!=="active") return;
-   return {...current,status:"sold",buyerId:playerId,buyerName:validName(),soldAt:serverTimestamp()};
+   return {...current,status:"sold",buyerId:playerId,buyerName:validName(),soldAt:Date.now()};
   });
 
   if(!claim.committed){
