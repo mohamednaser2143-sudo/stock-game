@@ -472,7 +472,7 @@ function withTimeout(promise, ms){
 }
 function setLoading(on){ document.body.classList.toggle("loading", !!on); }
 
-try{const saved=JSON.parse(localStorage.getItem(STATE+"Data")||"{}");if(saved.stocks)Object.keys(stocks).forEach(k=>{stocks[k].shares=Number(saved.stocks[k]?.shares)||0});insurance=!!saved.insurance;boostOwned=Number(saved.boostOwned)||0;speedOwned=Number(saved.speedOwned)||0;botOwned=Number(saved.botOwned)||0;botTargetPrice=Number(saved.botTargetPrice)||1;goldBars=Number(saved.goldBars)||0;opItemsOwned=saved.opItemsOwned||{};opActivated=saved.opActivated||{};opItemsLegacy=saved.opItemsLegacy||{};if(!saved.opV2&&Object.keys(opItemsOwned).length){const m=migrateLegacyOpItems(opItemsOwned);opItemsOwned=m.inventory;opActivated=m.active;opItemsLegacy=m.legacy;}customTitlesUnlocked=saved.customTitlesUnlocked||{};recalcOpPassiveIncome();}catch(e){}
+try{const saved=JSON.parse(localStorage.getItem(STATE+"Data")||"{}");if(saved.stocks)Object.keys(stocks).forEach(k=>{stocks[k].shares=Number(saved.stocks[k]?.shares)||0});insurance=!!saved.insurance;boostOwned=Number(saved.boostOwned)||0;speedOwned=Number(saved.speedOwned)||0;botOwned=Number(saved.botOwned)||0;botTargetPrice=Number(saved.botTargetPrice)||1;goldBars=Number(saved.goldBars)||0;opItemsOwned=saved.opItemsOwned||{};opActivated=saved.opActivated||{};opItemsLegacy=saved.opItemsLegacy||{};if(!saved.opV3){const m=normalizeOpData({inv:opItemsOwned,act:opActivated,legacy:opItemsLegacy,v2:!!saved.opV2});opItemsOwned=m.inv;opActivated=m.act;opItemsLegacy=m.legacy;}customTitlesUnlocked=saved.customTitlesUnlocked||{};recalcOpPassiveIncome();}catch(e){}
 try{propertiesOwned=JSON.parse(localStorage.getItem(PROPS)||"{}")}catch(e){propertiesOwned={}}
 try{propertyTimers=JSON.parse(localStorage.getItem("simuPropTimers")||"{}")}catch(e){propertyTimers={}}
 if(!playerId){playerId=crypto.randomUUID?crypto.randomUUID().replaceAll("-",""):"p_"+Date.now()+Math.random().toString(36).slice(2);localStorage.setItem(PID,playerId)}
@@ -480,17 +480,34 @@ if(!playerId){playerId=crypto.randomUUID?crypto.randomUUID().replaceAll("-",""):
 const nameInput=document.getElementById("name");nameInput.value=name;
 const passInput=document.getElementById("pass");passInput.value=pass;
 
-// Old saves counted every OP item as "owned and already applied". Convert once:
-// income generators were already producing income -> they become ACTIVATED (income keeps flowing);
-// one-shot items (cash, shares, gold, ...) were already used -> they must not become re-usable.
-function migrateLegacyOpItems(inv){
- const active = {};
- for(const [id,c] of Object.entries(inv || {})){
-  const item = OVERPOWERED_ITEMS.find(x => x.id === id);
-  const n = Number(c) || 0;
-  if(n > 0 && item && item.effect && item.effect.type === "income") active[id] = n;
+// Old saves counted every OP item as "owned and already applied". One-time conversion:
+//  - pre-inventory saves: income generators go back to the INVENTORY (unused, sellable);
+//    one-shot items (cash, shares, gold...) were already consumed and are not re-usable.
+//  - saves converted by the first inventory update: income generators that were auto-marked
+//    "active" are moved back to the inventory using the preserved legacy counts.
+// The untouched original counts are always kept in opItemsLegacy.
+function normalizeOpData(d){
+ let inv = Object.assign({}, d.inv || {}), act = Object.assign({}, d.act || {}), legacy = Object.assign({}, d.legacy || {});
+ const isIncome = id => { const it = OVERPOWERED_ITEMS.find(x => x.id === id); return !!(it && it.effect && it.effect.type === "income"); };
+ if(!d.v2){
+  if(Object.keys(inv).length){
+   legacy = Object.assign({}, inv);
+   const ninv = {};
+   for(const [id,c] of Object.entries(inv)){ const n = Number(c) || 0; if(n > 0 && isIncome(id)) ninv[id] = n; }
+   inv = ninv;
+  }
+ } else {
+  for(const [id,c] of Object.entries(legacy)){
+   if(!isIncome(id)) continue;
+   const n = Math.min(Number(c) || 0, Number(act[id]) || 0);
+   if(n > 0){
+    act[id] = (Number(act[id]) || 0) - n;
+    if(act[id] <= 0) delete act[id];
+    inv[id] = (Number(inv[id]) || 0) + n;
+   }
+  }
  }
- return { inventory:{}, active, legacy:Object.assign({}, inv || {}) };
+ return { inv, act, legacy };
 }
 
 function recalcOpPassiveIncome(){
@@ -543,7 +560,7 @@ function portfolio(){
 function pnl(){return portfolio()-STARTING_CASH}
 function saveLocal(){
  localStorage.setItem(STATE+"Cash",String(cash));
- localStorage.setItem(STATE+"Data",JSON.stringify({stocks:Object.fromEntries(Object.entries(stocks).map(([k,s])=>[k,{shares:s.shares}])),insurance,boostOwned,speedOwned,botOwned,botTargetPrice,goldBars,opItemsOwned,opActivated,opItemsLegacy,opV2:true,customTitlesUnlocked}));
+ localStorage.setItem(STATE+"Data",JSON.stringify({stocks:Object.fromEntries(Object.entries(stocks).map(([k,s])=>[k,{shares:s.shares}])),insurance,boostOwned,speedOwned,botOwned,botTargetPrice,goldBars,opItemsOwned,opActivated,opItemsLegacy,opV2:true,opV3:true,customTitlesUnlocked}));
  localStorage.setItem(PROPS,JSON.stringify(propertiesOwned));
  localStorage.setItem("simuPropTimers",JSON.stringify(propertyTimers));
  localStorage.setItem("simuEquippedTitle",equippedTitle);
@@ -1183,7 +1200,7 @@ function upload(force=false){
     cash,
     stocks: Object.fromEntries(Object.entries(stocks).map(([k,s])=>[k,{shares:s.shares, price:s.price}])),
     insurance, boostOwned, speedOwned, botOwned, botTargetPrice, goldBars,
-    propertiesOwned, propertyTimers, equippedTitle, highestCasinoWin, opItemsOwned, opActivated, opItemsLegacy, opV2: true, customTitlesUnlocked,
+    propertiesOwned, propertyTimers, equippedTitle, highestCasinoWin, opItemsOwned, opActivated, opItemsLegacy, opV2: true, opV3: true, customTitlesUnlocked,
     name: validName(),
     updatedAt: serverTimestamp()
    }).catch(console.error);
@@ -1202,9 +1219,9 @@ function applyAccountData(data){
  opItemsOwned = data.opItemsOwned || {};
  opActivated = data.opActivated || {};
  opItemsLegacy = data.opItemsLegacy || {};
- if(!data.opV2 && Object.keys(opItemsOwned).length){
-  const m = migrateLegacyOpItems(opItemsOwned);
-  opItemsOwned = m.inventory; opActivated = m.active; opItemsLegacy = m.legacy;
+ if(!data.opV3){
+  const m = normalizeOpData({ inv:opItemsOwned, act:opActivated, legacy:opItemsLegacy, v2:!!data.opV2 });
+  opItemsOwned = m.inv; opActivated = m.act; opItemsLegacy = m.legacy;
  }
  customTitlesUnlocked = data.customTitlesUnlocked || {};
  recalcOpPassiveIncome();
