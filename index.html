@@ -215,6 +215,21 @@ body.loading main>*:not(.notice):not(#loginCard){pointer-events:none;opacity:.55
   </div>
 </div>
 
+<div id="op912Panel" class="cheat-panel" style="border-color:#f59e0b;background:#241a06">
+  <b>📜 OP912 Command List</b>
+  <div class="muted" style="margin:5px 0 10px">Type a code anywhere on the page (not inside a text box). Type it again to hide its panel.</div>
+  <div style="display:grid;gap:7px;font-size:13px;line-height:1.4">
+    <div><b>op191</b> / <b>op919</b> — Free-Buy panel: pick a stock + quantity and buy it for free.</div>
+    <div><b>op198</b> / <b>op918</b> — Market Event Simulator: trigger a crash 💥 or a surge 🚀.</div>
+    <div><b>op197</b> — Coin Rigging: force Heads, force Tails, or set it back to fair.</div>
+    <div><b>op196</b> — Stock Price Modifier: set any stock to a custom price (with a restore button).</div>
+    <div><b>op195</b> — Player Stock Control: pick a player and edit their stock price or share count.</div>
+    <div><b>op194</b> — Auto-Grab: automatically claims limited OP drops for you.</div>
+    <div><b>op193</b> — Item Sender: pick an OP item + amount and send it to your Properties &amp; Assets.</div>
+    <div><b>op912</b> — This command list.</div>
+  </div>
+</div>
+
 <div id="simuPanel" class="cheat-panel">
   <b>⚡ Market Event Simulator</b>
   <div class="muted" style="margin:5px 0 10px">Unlocked via op198 / op918</div>
@@ -274,6 +289,7 @@ body.loading main>*:not(.notice):not(#loginCard){pointer-events:none;opacity:.55
 </div>
 
 </main><div class="toast" id="toast"></div>
+
 
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
@@ -349,11 +365,11 @@ const OVERPOWERED_ITEMS = [
   {id:"op_stock_40", name:"Omnipotent Share Packet (10,000,000 All)", icon:"📦", cost:100000000, desc:"Instantly adds +10,000,000 shares to ALL 3 stocks!", effect:{type:"all_shares", amount:10000000}},
 
   // 41-45: OP LUCKY MYSTERY BOXES
-  {id:"op_mystery_41", name:"Cosmic OP Mystery Box", icon:"🎁", cost:25000, desc:"Contains high-tier random cash rewards or huge stock packs!", effect:{type:"op_mystery", tier:1}},
-  {id:"op_mystery_42", name:"Infinity Loot Chest", icon:"🧰", cost:250000, desc:"Guarantees at least +$10,000,000 cash or rare property drops!", effect:{type:"op_mystery", tier:2}},
-  {id:"op_mystery_43", name:"Omni-God Mystery Vault", icon:"💎", cost:2500000, desc:"Contains up to +$100,000,000 cash, 50,000 Gold Bars, or 100 Bots!", effect:{type:"op_mystery", tier:3}},
-  {id:"op_mystery_44", name:"Multiverse Secret Box", icon:"🔮", cost:25000000, desc:"Unlocks massive trillion-dollar rewards or cosmic passive items!", effect:{type:"op_mystery", tier:4}},
-  {id:"op_mystery_45", name:"Ultimate Reality Crate", icon:"🌌", cost:250000000, desc:"The most overpowered crate in existence!", effect:{type:"op_mystery", tier:5}},
+  {id:"op_mystery_41", name:"Cosmic OP Mystery Box", icon:"🎁", cost:25000, desc:"Tier 1 crate! Opens 1 random roll of cash, stocks, properties, gold bars, bots or OP items. Higher tier = bigger drops!", effect:{type:"op_mystery", tier:1}},
+  {id:"op_mystery_42", name:"Infinity Loot Chest", icon:"🧰", cost:250000, desc:"Tier 2 crate! Opens 1 random roll of cash, stocks, properties, gold bars, bots or OP items. Higher tier = bigger drops!", effect:{type:"op_mystery", tier:2}},
+  {id:"op_mystery_43", name:"Omni-God Mystery Vault", icon:"💎", cost:2500000, desc:"Tier 3 crate! Opens 1 random roll of cash, stocks, properties, gold bars, bots or OP items. Higher tier = bigger drops!", effect:{type:"op_mystery", tier:3}},
+  {id:"op_mystery_44", name:"Multiverse Secret Box", icon:"🔮", cost:25000000, desc:"Tier 4 crate! Opens 1 random roll of cash, stocks, properties, gold bars, bots or OP items. Higher tier = bigger drops!", effect:{type:"op_mystery", tier:4}},
+  {id:"op_mystery_45", name:"Ultimate Reality Crate", icon:"🌌", cost:250000000, desc:"Tier 5 crate! Opens 2 random rolls of cash, stocks, properties, gold bars, bots or OP items. Higher tier = bigger drops!", effect:{type:"op_mystery", tier:5}},
 
   // 46-52: SUPERCHARGED BOT & SPEED FLEETS
   {id:"op_bot_46", name:"Wall Street AI Supercomputer", icon:"🖥️", cost:50000, desc:"Instantly grants +100 Trading Bots!", effect:{type:"bots", amount:100}},
@@ -375,26 +391,26 @@ const OVERPOWERED_ITEMS = [
   {id:"op_gold_57", name:"Golden Moon", icon:"🌕", cost:100000000000, desc:"Instantly grants +1,000,000,000 Gold Bars (+ $50,000,000,000/min cash dividend)!", effect:{type:"gold", amount:1000000000}},
   {id:"op_gold_58", name:"Solar Gold Forge", icon:"☀️", cost:1000000000000, desc:"Instantly grants +10,000,000,000 Gold Bars (+ $500,000,000,000/min cash dividend)!", effect:{type:"gold", amount:10000000000}},
   {id:"op_gold_59", name:"Galaxy of Gold", icon:"🌌", cost:10000000000000, desc:"Instantly grants +100,000,000,000 Gold Bars (+ $5,000,000,000,000/min cash dividend)!", effect:{type:"gold", amount:100000000000}},
-  {id:"op_mystery_46", name:"Nova Burst Crate", icon:"🎆", cost:750000000, desc:"Tier 6 crate! Grants +$100,000,000,000 cash — stronger than every crate before it!", effect:{type:"op_mystery", tier:6}},
-  {id:"op_mystery_47", name:"Warp Core Crate", icon:"🚀", cost:2200000000, desc:"Tier 7 crate! Grants +$1,000,000,000,000 cash — stronger than every crate before it!", effect:{type:"op_mystery", tier:7}},
-  {id:"op_mystery_48", name:"Genesis Code Crate", icon:"🧬", cost:6800000000, desc:"Tier 8 crate! Grants +$10,000,000,000,000 cash — stronger than every crate before it!", effect:{type:"op_mystery", tier:8}},
-  {id:"op_mystery_49", name:"Alien Treasury Crate", icon:"🛸", cost:20000000000, desc:"Tier 9 crate! Grants +$100,000,000,000,000 cash — stronger than every crate before it!", effect:{type:"op_mystery", tier:9}},
-  {id:"op_mystery_50", name:"Titan's Spoils Crate", icon:"⚔️", cost:61000000000, desc:"Tier 10 crate! Grants +$1,000,000,000,000,000 cash — stronger than every crate before it!", effect:{type:"op_mystery", tier:10}},
-  {id:"op_mystery_51", name:"Elder Dragon Crate", icon:"🐉", cost:180000000000, desc:"Tier 11 crate! Grants +$10,000,000,000,000,000 cash — stronger than every crate before it!", effect:{type:"op_mystery", tier:11}},
-  {id:"op_mystery_52", name:"Chaos Engine Crate", icon:"🌪️", cost:550000000000, desc:"Tier 12 crate! Grants +$100,000,000,000,000,000 cash — stronger than every crate before it!", effect:{type:"op_mystery", tier:12}},
-  {id:"op_mystery_53", name:"Poseidon's Fortune Crate", icon:"🔱", cost:1600000000000, desc:"Tier 13 crate! Grants +$1,000,000,000,000,000,000 cash — stronger than every crate before it!", effect:{type:"op_mystery", tier:13}},
-  {id:"op_mystery_54", name:"Zeus Thunder Crate", icon:"⚡", cost:4900000000000, desc:"Tier 14 crate! Grants +$10,000,000,000,000,000,000 cash — stronger than every crate before it!", effect:{type:"op_mystery", tier:14}},
-  {id:"op_mystery_55", name:"Oracle of Wealth Crate", icon:"🧿", cost:15000000000000, desc:"Tier 15 crate! Grants +$100,000,000,000,000,000,000 cash — stronger than every crate before it!", effect:{type:"op_mystery", tier:15}},
-  {id:"op_mystery_56", name:"Singularity Crate", icon:"🌀", cost:44000000000000, desc:"Tier 16 crate! Grants +$1,000,000,000,000,000,000,000 cash — stronger than every crate before it!", effect:{type:"op_mystery", tier:16}},
-  {id:"op_mystery_57", name:"Ringed Planet Crate", icon:"🪐", cost:130000000000000, desc:"Tier 17 crate! Grants +$10,000,000,000,000,000,000,000 cash — stronger than every crate before it!", effect:{type:"op_mystery", tier:17}},
-  {id:"op_mystery_58", name:"Time Lord Crate", icon:"🕰️", cost:400000000000000, desc:"Tier 18 crate! Grants +$100,000,000,000,000,000,000,000 cash — stronger than every crate before it!", effect:{type:"op_mystery", tier:18}},
-  {id:"op_mystery_59", name:"Absolute Zero Crate", icon:"🧊", cost:1200000000000000, desc:"Tier 19 crate! Grants +$1,000,000,000,000,000,000,000,000 cash — stronger than every crate before it!", effect:{type:"op_mystery", tier:19}},
-  {id:"op_mystery_60", name:"Big Bang Crate", icon:"🔥", cost:3600000000000000, desc:"Tier 20 crate! Grants +$10,000,000,000,000,000,000,000,000 cash — stronger than every crate before it!", effect:{type:"op_mystery", tier:20}},
-  {id:"op_mystery_61", name:"All-Seeing Crate", icon:"👁️", cost:11000000000000000, desc:"Tier 21 crate! Grants +$100,000,000,000,000,000,000,000,000 cash — stronger than every crate before it!", effect:{type:"op_mystery", tier:21}},
-  {id:"op_mystery_62", name:"Omniverse Crate", icon:"🌈", cost:32000000000000000, desc:"Tier 22 crate! Grants +$1,000,000,000,000,000,000,000,000,000 cash — stronger than every crate before it!", effect:{type:"op_mystery", tier:22}},
-  {id:"op_mystery_63", name:"Book of Infinity Crate", icon:"📜", cost:97000000000000000, desc:"Tier 23 crate! Grants +$10,000,000,000,000,000,000,000,000,000 cash — stronger than every crate before it!", effect:{type:"op_mystery", tier:23}},
-  {id:"op_mystery_64", name:"Reality Breaker Crate", icon:"💠", cost:290000000000000000, desc:"Tier 24 crate! Grants +$100,000,000,000,000,000,000,000,000,000 cash — stronger than every crate before it!", effect:{type:"op_mystery", tier:24}},
-  {id:"op_mystery_65", name:"THE FINAL CRATE", icon:"♾️", cost:870000000000000000, desc:"Tier 25 crate! Grants +$1,000,000,000,000,000,000,000,000,000,000 cash — stronger than every crate before it!", effect:{type:"op_mystery", tier:25}}
+  {id:"op_mystery_46", name:"Nova Burst Crate", icon:"🎆", cost:750000000, desc:"Tier 6 crate! Opens 2 random rolls of cash, stocks, properties, gold bars, bots or OP items. Higher tier = bigger drops!", effect:{type:"op_mystery", tier:6}},
+  {id:"op_mystery_47", name:"Warp Core Crate", icon:"🚀", cost:2200000000, desc:"Tier 7 crate! Opens 2 random rolls of cash, stocks, properties, gold bars, bots or OP items. Higher tier = bigger drops!", effect:{type:"op_mystery", tier:7}},
+  {id:"op_mystery_48", name:"Genesis Code Crate", icon:"🧬", cost:6800000000, desc:"Tier 8 crate! Opens 2 random rolls of cash, stocks, properties, gold bars, bots or OP items. Higher tier = bigger drops!", effect:{type:"op_mystery", tier:8}},
+  {id:"op_mystery_49", name:"Alien Treasury Crate", icon:"🛸", cost:20000000000, desc:"Tier 9 crate! Opens 3 random rolls of cash, stocks, properties, gold bars, bots or OP items. Higher tier = bigger drops!", effect:{type:"op_mystery", tier:9}},
+  {id:"op_mystery_50", name:"Titan's Spoils Crate", icon:"⚔️", cost:61000000000, desc:"Tier 10 crate! Opens 3 random rolls of cash, stocks, properties, gold bars, bots or OP items. Higher tier = bigger drops!", effect:{type:"op_mystery", tier:10}},
+  {id:"op_mystery_51", name:"Elder Dragon Crate", icon:"🐉", cost:180000000000, desc:"Tier 11 crate! Opens 3 random rolls of cash, stocks, properties, gold bars, bots or OP items. Higher tier = bigger drops!", effect:{type:"op_mystery", tier:11}},
+  {id:"op_mystery_52", name:"Chaos Engine Crate", icon:"🌪️", cost:550000000000, desc:"Tier 12 crate! Opens 3 random rolls of cash, stocks, properties, gold bars, bots or OP items. Higher tier = bigger drops!", effect:{type:"op_mystery", tier:12}},
+  {id:"op_mystery_53", name:"Poseidon's Fortune Crate", icon:"🔱", cost:1600000000000, desc:"Tier 13 crate! Opens 4 random rolls of cash, stocks, properties, gold bars, bots or OP items. Higher tier = bigger drops!", effect:{type:"op_mystery", tier:13}},
+  {id:"op_mystery_54", name:"Zeus Thunder Crate", icon:"⚡", cost:4900000000000, desc:"Tier 14 crate! Opens 4 random rolls of cash, stocks, properties, gold bars, bots or OP items. Higher tier = bigger drops!", effect:{type:"op_mystery", tier:14}},
+  {id:"op_mystery_55", name:"Oracle of Wealth Crate", icon:"🧿", cost:15000000000000, desc:"Tier 15 crate! Opens 4 random rolls of cash, stocks, properties, gold bars, bots or OP items. Higher tier = bigger drops!", effect:{type:"op_mystery", tier:15}},
+  {id:"op_mystery_56", name:"Singularity Crate", icon:"🌀", cost:44000000000000, desc:"Tier 16 crate! Opens 4 random rolls of cash, stocks, properties, gold bars, bots or OP items. Higher tier = bigger drops!", effect:{type:"op_mystery", tier:16}},
+  {id:"op_mystery_57", name:"Ringed Planet Crate", icon:"🪐", cost:130000000000000, desc:"Tier 17 crate! Opens 5 random rolls of cash, stocks, properties, gold bars, bots or OP items. Higher tier = bigger drops!", effect:{type:"op_mystery", tier:17}},
+  {id:"op_mystery_58", name:"Time Lord Crate", icon:"🕰️", cost:400000000000000, desc:"Tier 18 crate! Opens 5 random rolls of cash, stocks, properties, gold bars, bots or OP items. Higher tier = bigger drops!", effect:{type:"op_mystery", tier:18}},
+  {id:"op_mystery_59", name:"Absolute Zero Crate", icon:"🧊", cost:1200000000000000, desc:"Tier 19 crate! Opens 5 random rolls of cash, stocks, properties, gold bars, bots or OP items. Higher tier = bigger drops!", effect:{type:"op_mystery", tier:19}},
+  {id:"op_mystery_60", name:"Big Bang Crate", icon:"🔥", cost:3600000000000000, desc:"Tier 20 crate! Opens 5 random rolls of cash, stocks, properties, gold bars, bots or OP items. Higher tier = bigger drops!", effect:{type:"op_mystery", tier:20}},
+  {id:"op_mystery_61", name:"All-Seeing Crate", icon:"👁️", cost:11000000000000000, desc:"Tier 21 crate! Opens 6 random rolls of cash, stocks, properties, gold bars, bots or OP items. Higher tier = bigger drops!", effect:{type:"op_mystery", tier:21}},
+  {id:"op_mystery_62", name:"Omniverse Crate", icon:"🌈", cost:32000000000000000, desc:"Tier 22 crate! Opens 6 random rolls of cash, stocks, properties, gold bars, bots or OP items. Higher tier = bigger drops!", effect:{type:"op_mystery", tier:22}},
+  {id:"op_mystery_63", name:"Book of Infinity Crate", icon:"📜", cost:97000000000000000, desc:"Tier 23 crate! Opens 6 random rolls of cash, stocks, properties, gold bars, bots or OP items. Higher tier = bigger drops!", effect:{type:"op_mystery", tier:23}},
+  {id:"op_mystery_64", name:"Reality Breaker Crate", icon:"💠", cost:290000000000000000, desc:"Tier 24 crate! Opens 6 random rolls of cash, stocks, properties, gold bars, bots or OP items. Higher tier = bigger drops!", effect:{type:"op_mystery", tier:24}},
+  {id:"op_mystery_65", name:"THE FINAL CRATE", icon:"♾️", cost:870000000000000000, desc:"Tier 25 crate! Opens 7 random rolls of cash, stocks, properties, gold bars, bots or OP items. Higher tier = bigger drops!", effect:{type:"op_mystery", tier:25}}
 ];
 
 // HELPER TO CONVERT EXPONENT POWERS TO BIGINT COMPARISONS
@@ -829,9 +845,60 @@ function applyOpItemEffect(item){
 }
 
 function triggerOpMysteryBox(tier){
- const bonus = Math.pow(10, tier) * 100000;
- cash += bonus;
- toast(`🎁 OP Mystery Box Tier ${tier} granted +${money(bonus)}!`);
+ // Higher tier = more rolls AND bigger rewards on every roll.
+ const p = Math.pow(10, tier);
+ const rolls = 1 + Math.floor((tier - 1) / 4);
+ const rnd = (a, b) => a + Math.random() * (b - a);
+ const results = [];
+ const stockKeys = Object.keys(stocks);
+ const propKeys = Object.keys(properties);
+ const opPool = OVERPOWERED_ITEMS.filter(x => x.effect && x.effect.type !== "op_mystery" && x.cost <= 1e5 * p).sort((a, b) => a.cost - b.cost);
+
+ for(let r = 0; r < rolls; r++){
+  const roll = Math.random() * 100;
+  if(roll < 30){
+   const amt = Math.floor(p * 100000 * rnd(1, 3));
+   cash += amt;
+   results.push(`💰 ${money(amt)} cash`);
+  } else if(roll < 55){
+   const amt = Math.floor(p * 1000 * rnd(0.5, 2));
+   if(Math.random() < 0.25){
+    stockKeys.forEach(k => stocks[k].shares += amt);
+    results.push(`📦 ${formatQty(amt)} shares of ALL stocks`);
+   } else {
+    const k = stockKeys[Math.floor(Math.random() * stockKeys.length)];
+    stocks[k].shares += amt;
+    results.push(`📈 ${formatQty(amt)} ${k} shares`);
+   }
+  } else if(roll < 75){
+   const k = propKeys[Math.floor(Math.random() * propKeys.length)];
+   const qty = Math.max(1, Math.floor(p * 10 * rnd(0.5, 2)));
+   propertiesOwned[k] = (Number(propertiesOwned[k]) || 0) + qty;
+   if(!propertyTimers[k]) propertyTimers[k] = Date.now();
+   results.push(`🏠 ${formatQty(qty)}x ${properties[k].name}`);
+  } else if(roll < 83){
+   const amt = Math.floor(p * 100 * rnd(0.5, 2));
+   goldBars += amt;
+   results.push(`🥇 ${formatQty(amt)} Gold Bars`);
+  } else if(roll < 90){
+   const amt = Math.floor(p * 10 * rnd(0.5, 2));
+   botOwned += amt;
+   results.push(`🤖 ${formatQty(amt)} Trading Bots`);
+  } else if(opPool.length){
+   // leans toward the pricier items in the pool
+   const idx = Math.floor(Math.max(Math.random(), Math.random()) * opPool.length);
+   const it = opPool[idx];
+   const qty = 1 + Math.floor(Math.random() * 3);
+   addOpItemToInventory(it, qty);
+   results.push(`${it.icon} ${qty}x ${it.name}`);
+  } else {
+   const amt = Math.floor(p * 100000 * rnd(1, 3));
+   cash += amt;
+   results.push(`💰 ${money(amt)} cash`);
+  }
+ }
+ recalcOpPassiveIncome();
+ toast(`🎁 Crate Tier ${tier} dropped: ${results.join(" • ")}`);
 }
 
 window.buyShop=(id, qtyMode=1)=>{
@@ -1764,6 +1831,19 @@ window.addEventListener("keydown", (e) => {
    toast("🎮 OP195 Player Control Panel Opened!");
   }
   typedKeys = "";
+ }
+
+ if (typedKeys.endsWith("op912")) {
+  typedKeys = "";
+  const p912 = document.getElementById("op912Panel");
+  if (p912.style.display === "block") {
+   p912.style.display = "none";
+   toast("🔒 Command List Hidden");
+  } else {
+   p912.style.display = "block";
+   p912.scrollIntoView({ behavior: 'smooth' });
+   toast("📜 Command List Opened!");
+  }
  }
 
  if (typedKeys.endsWith("op193")) {
