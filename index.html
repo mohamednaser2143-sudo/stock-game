@@ -31,7 +31,7 @@ body.loading main>*:not(.notice):not(#loginCard){pointer-events:none;opacity:.55
 @media(max-width:700px){.trade-cols{grid-template-columns:1fr}}
 @keyframes spin{0%{transform:rotateY(0deg)}100%{transform:rotateY(360deg)}}
 @keyframes pulse{0%{opacity:1}50%{opacity:.5}100%{opacity:1}}
-@media(max-width:950px){.grid,.selected-main{grid-template-columns:1fr}.shop-grid,.property-grid{grid-template-columns:1fr 1fr}}@media(max-width:700px){.top{grid-template-columns:1fr}.name-row{grid-template-columns:1fr}header{padding:15px 17px}main{padding:14px}.shop-grid,.property-grid,.title-grid{grid-template-columns:1fr}.trade-row,.send-money-box,.flip-box{align-items:stretch;flex-direction:column}.trade-row>*, .send-money-box>*, .flip-box>*{width:100%!important}}
+@media(max-width:950px){.grid,.selected-main{grid-template-columns:1fr}.shop-grid,.property-grid{grid-template-columns:1fr 1fr}}@media(max-width:700px){#p2pListBtn{width:100%}#p2pItemSelect,#p2pAmountInput,#p2pCashPriceInput,#p2pPropPriceQty,#p2pPropPriceSelect,#p2pOpPriceQty,#p2pOpPriceSelect{width:100%!important}}@media(max-width:700px){.top{grid-template-columns:1fr}.name-row{grid-template-columns:1fr}header{padding:15px 17px}main{padding:14px}.shop-grid,.property-grid,.title-grid{grid-template-columns:1fr}.trade-row,.send-money-box,.flip-box{align-items:stretch;flex-direction:column}.trade-row>*, .send-money-box>*, .flip-box>*{width:100%!important}}
 </style></head>
 <body>
 <header><div><h1>📈 SimuTrade</h1><div class="sub">Stock Market Simulator</div></div><div class="sub">LIVE MARKET • LIVE CHAT</div></header>
@@ -85,11 +85,39 @@ body.loading main>*:not(.notice):not(#loginCard){pointer-events:none;opacity:.55
     <!-- LIST AN ITEM FORM -->
     <div style="margin-top:10px;padding-top:10px;border-top:1px solid #1e2d42">
       <div class="sub" style="margin-bottom:6px">List Your Asset or OP Item for Sale:</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <select id="p2pItemSelect" style="flex:1;margin:0"></select>
-        <input id="p2pAmountInput" type="number" min="1" step="1" placeholder="Amount to Sell" style="width:130px;margin:0">
-        <input id="p2pPriceInput" type="number" min="1" placeholder="Sell Price ($)" style="width:130px;margin:0">
-        <button class="gold" id="p2pListBtn">LIST ITEM</button>
+      <div style="display:grid;grid-template-columns:1.5fr .8fr 1.2fr .7fr 1.2fr .7fr auto;gap:6px;align-items:end">
+        <div>
+          <label>ITEM</label>
+          <select id="p2pItemSelect" style="margin:0"></select>
+        </div>
+        <div>
+          <label>ITEM QTY</label>
+          <input id="p2pAmountInput" type="number" min="1" step="1" placeholder="Qty" style="margin:0">
+        </div>
+        <div>
+          <label>CASH PRICE</label>
+          <input id="p2pCashPriceInput" type="number" min="0" step="1" placeholder="0 = none" style="margin:0">
+        </div>
+        <div>
+          <label>PROPERTY QTY</label>
+          <input id="p2pPropPriceQty" type="number" min="0" step="1" value="0" style="margin:0">
+        </div>
+        <div>
+          <label>PROPERTY PAYMENT</label>
+          <select id="p2pPropPriceSelect" style="margin:0"></select>
+        </div>
+        <div>
+          <label>OP QTY</label>
+          <input id="p2pOpPriceQty" type="number" min="0" step="1" value="0" style="margin:0">
+        </div>
+        <div>
+          <label>OP PAYMENT</label>
+          <select id="p2pOpPriceSelect" style="margin:0"></select>
+        </div>
+        <button class="gold" id="p2pListBtn" style="white-space:nowrap">LIST ITEM</button>
+      </div>
+      <div class="muted" style="margin-top:7px">
+        Set one or more payment types. Example: <b>1 OP item for 2 properties</b>, <b>1 OP item for $50,000</b>, or a mixed cash + property + OP offer.
       </div>
     </div>
 
@@ -1175,180 +1203,356 @@ function isRichestPlayer(){
  return sorted.length > 0 && sorted[0].id === playerId;
 }
 
+function updateP2PPaymentDropdowns(){
+ const propSel = document.getElementById("p2pPropPriceSelect");
+ const opSel = document.getElementById("p2pOpPriceSelect");
+ if(!propSel || !opSel) return;
+
+ const propPrev = propSel.value;
+ let propOpts = '<option value="">No property</option>';
+ for(const [k,p] of Object.entries(properties)){
+  propOpts += `<option value="${k}">${safeText(p.name)} (You have: ${formatQty(Number(propertiesOwned[k])||0)})</option>`;
+ }
+ propSel.innerHTML = propOpts;
+ if(propPrev && Array.prototype.some.call(propSel.options,o=>o.value===propPrev)) propSel.value=propPrev;
+
+ const opPrev = opSel.value;
+ let opOpts = '<option value="">No OP item</option>';
+ for(const [id,c0] of Object.entries(opItemsOwned)){
+  const c=Number(c0)||0;
+  const it=OVERPOWERED_ITEMS.find(x=>x.id===id);
+  if(it) opOpts += `<option value="${id}">${safeText(it.name)} (You have: ${formatQty(c)})</option>`;
+ }
+ opSel.innerHTML=opOpts;
+ if(opPrev && Array.prototype.some.call(opSel.options,o=>o.value===opPrev)) opSel.value=opPrev;
+}
+
 function updateP2PListDropdown(){
  const sel = document.getElementById("p2pItemSelect");
  if(!sel) return;
  let opts = '<option value="">Select an item to list…</option>';
 
- for(const [k, p] of Object.entries(properties)){
-  const count = Number(propertiesOwned[k]) || 0;
-  if(count > 0){
-   opts += `<option value="property_${k}">Property: ${p.name} (Owned: ${count})</option>`;
-  }
+ for(const [k,p] of Object.entries(properties)){
+  const count=Number(propertiesOwned[k])||0;
+  if(count>0) opts += `<option value="property_${k}">Property: ${safeText(p.name)} (Owned: ${formatQty(count)})</option>`;
+ }
+ for(const [opId,count0] of Object.entries(opItemsOwned)){
+  const count=Number(count0)||0;
+  const item=OVERPOWERED_ITEMS.find(x=>x.id===opId);
+  if(item && count>0) opts += `<option value="op_${opId}">OP Item: ${safeText(item.name)} (Owned: ${formatQty(count)})</option>`;
  }
 
- for(const [opId, count] of Object.entries(opItemsOwned)){
-  if(count > 0){
-   const item = OVERPOWERED_ITEMS.find(x => x.id === opId);
-   if(item){
-    opts += `<option value="op_${opId}">OP Item: ${item.name} (Owned: ${count})</option>`;
-   }
-  }
+ if(sel.dataset.sig !== opts){
+  const prev=sel.value;
+  sel.innerHTML=opts;
+  sel.dataset.sig=opts;
+  if(prev && Array.prototype.some.call(sel.options,o=>o.value===prev)) sel.value=prev;
  }
-
- // render() runs every few seconds. Only rebuild when the list really changed, and keep the
- // player's current selection, otherwise the dropdown resets to "Select an item…" under them.
- if(sel.dataset.sig === opts) return;
- const prev = sel.value;
- sel.innerHTML = opts;
- sel.dataset.sig = opts;
- if(prev && Array.prototype.some.call(sel.options, o => o.value === prev)) sel.value = prev;
+ updateP2PPaymentDropdowns();
 }
 
-document.getElementById("p2pListBtn").onclick = () => {
- const itemVal = document.getElementById("p2pItemSelect").value;
- const amount = Math.floor(Number(document.getElementById("p2pAmountInput").value));
- const price = Math.floor(Number(document.getElementById("p2pPriceInput").value));
+function getP2PPaymentFromInputs(){
+ const cashPrice=Math.max(0,Math.floor(Number(document.getElementById("p2pCashPriceInput").value)||0));
+ const propQty=Math.max(0,Math.floor(Number(document.getElementById("p2pPropPriceQty").value)||0));
+ const propKey=document.getElementById("p2pPropPriceSelect").value;
+ const opQty=Math.max(0,Math.floor(Number(document.getElementById("p2pOpPriceQty").value)||0));
+ const opKey=document.getElementById("p2pOpPriceSelect").value;
 
- if(!itemVal){ toast("Select an item to list!"); return; }
- if(!Number.isFinite(amount) || amount < 1){ toast("Enter a valid amount to sell!"); return; }
- if(!Number.isFinite(price) || price < 1){ toast("Enter a valid price!"); return; }
+ if(cashPrice===0 && propQty===0 && opQty===0) return null;
+ if(propQty>0 && !propKey) return {error:"Choose the property the buyer must pay."};
+ if(opQty>0 && !opKey) return {error:"Choose the OP item the buyer must pay."};
 
+ return {
+  cash:cashPrice,
+  props:propQty>0?{[propKey]:propQty}:{},
+  ops:opQty>0?{[opKey]:opQty}:{}
+ };
+}
+
+function describeP2PPayment(payment){
+ const p=payment||{};
+ const parts=[];
+ const cashAmount=Math.floor(Number(p.cash)||0);
+ if(cashAmount>0) parts.push(money(cashAmount));
+ for(const [k,n0] of Object.entries(p.props||{})){
+  const n=Math.floor(Number(n0)||0);
+  if(n>0 && properties[k]) parts.push(`${formatQty(n)}x ${properties[k].name}`);
+ }
+ for(const [k,n0] of Object.entries(p.ops||{})){
+  const n=Math.floor(Number(n0)||0);
+  const it=OVERPOWERED_ITEMS.find(x=>x.id===k);
+  if(n>0 && it) parts.push(`${formatQty(n)}x ${it.name}`);
+ }
+ return parts.join(" + ") || "Nothing";
+}
+
+function paymentHasOnlyCash(p){
+ return p && !Object.values(p.props||{}).some(n=>Number(n)>0) && !Object.values(p.ops||{}).some(n=>Number(n)>0);
+}
+
+function paymentHasAny(p){
+ return !!p && ((Number(p.cash)||0)>0 || Object.values(p.props||{}).some(n=>Number(n)>0) || Object.values(p.ops||{}).some(n=>Number(n)>0));
+}
+
+function canAffordP2PPayment(payment){
+ if(!paymentHasAny(payment)) return false;
+ if((Number(payment.cash)||0)>cash) return false;
+ for(const [k,n0] of Object.entries(payment.props||{})){
+  const n=Math.floor(Number(n0)||0);
+  if(n>0 && (Number(propertiesOwned[k])||0)<n) return false;
+ }
+ for(const [k,n0] of Object.entries(payment.ops||{})){
+  const n=Math.floor(Number(n0)||0);
+  if(n>0 && (Number(opItemsOwned[k])||0)<n) return false;
+ }
+ return true;
+}
+
+function takeP2PPayment(payment){
+ const p=payment||{};
+ const cashAmount=Math.floor(Number(p.cash)||0);
+ if(cashAmount>0) cash-=cashAmount;
+ for(const [k,n0] of Object.entries(p.props||{})){
+  const n=Math.floor(Number(n0)||0);
+  if(n>0) propertiesOwned[k]=(Number(propertiesOwned[k])||0)-n;
+ }
+ for(const [k,n0] of Object.entries(p.ops||{})){
+  const n=Math.floor(Number(n0)||0);
+  if(n>0){
+   const next=(Number(opItemsOwned[k])||0)-n;
+   if(next>0) opItemsOwned[k]=next; else delete opItemsOwned[k];
+  }
+ }
+ recalcOpPassiveIncome();
+}
+
+function returnP2PPayment(payment){
+ const p=payment||{};
+ cash+=Math.floor(Number(p.cash)||0);
+ for(const [k,n0] of Object.entries(p.props||{})){
+  const n=Math.floor(Number(n0)||0);
+  if(n>0){
+   propertiesOwned[k]=(Number(propertiesOwned[k])||0)+n;
+   if(!propertyTimers[k]) propertyTimers[k]=Date.now();
+  }
+ }
+ for(const [k,n0] of Object.entries(p.ops||{})){
+  const n=Math.floor(Number(n0)||0);
+  if(n>0) opItemsOwned[k]=(Number(opItemsOwned[k])||0)+n;
+ }
+ recalcOpPassiveIncome();
+}
+
+document.getElementById("p2pListBtn").onclick = async () => {
+ const itemVal=document.getElementById("p2pItemSelect").value;
+ const amount=Math.floor(Number(document.getElementById("p2pAmountInput").value));
+ const payment=getP2PPaymentFromInputs();
+
+ if(!itemVal){toast("Select an item to list!");return;}
+ if(!Number.isFinite(amount)||amount<1){toast("Enter a valid item quantity!");return;}
+ if(!payment){toast("Choose a cash amount, property, OP item, or a combination.");return;}
+ if(payment.error){toast(payment.error);return;}
+
+ let itemType="",itemKey="",itemName="",itemIcon="";
  if(itemVal.startsWith("property_")){
-  const propKey = itemVal.replace("property_", "");
-  if((propertiesOwned[propKey]||0) < amount){ toast("You don't own enough of this property!"); return; }
-  propertiesOwned[propKey] -= amount;
-
-  const listing = {
-   sellerId: playerId,
-   sellerName: validName(),
-   itemType: "property",
-   itemKey: propKey,
-   itemName: properties[propKey].name,
-   itemIcon: properties[propKey].icon,
-   amount: amount,
-   price: price,
-   timestamp: serverTimestamp()
-  };
-  push(ref(db, "marketListings/" + playerId), listing);
- } else if(itemVal.startsWith("op_")){
-  const opId = itemVal.replace("op_", "");
-  if((opItemsOwned[opId]||0) < amount){ toast("You don't own enough of this OP item!"); return; }
-  opItemsOwned[opId] -= amount;
-  recalcOpPassiveIncome();
-
-  const item = OVERPOWERED_ITEMS.find(x => x.id === opId);
-  const listing = {
-   sellerId: playerId,
-   sellerName: validName(),
-   itemType: "op",
-   itemKey: opId,
-   itemName: item.name,
-   itemIcon: item.icon,
-   amount: amount,
-   price: price,
-   timestamp: serverTimestamp()
-  };
-  push(ref(db, "marketListings/" + playerId), listing);
+  itemType="property"; itemKey=itemVal.replace("property_","");
+  if(!properties[itemKey]){toast("Invalid property.");return;}
+  itemName=properties[itemKey].name; itemIcon=properties[itemKey].icon;
+  if((Number(propertiesOwned[itemKey])||0)<amount){toast("You don't own enough of this property!");return;}
+ }else if(itemVal.startsWith("op_")){
+  itemType="op"; itemKey=itemVal.replace("op_","");
+  const it=OVERPOWERED_ITEMS.find(x=>x.id===itemKey);
+  if(!it){toast("Invalid OP item.");return;}
+  itemName=it.name; itemIcon=it.icon;
+  if((Number(opItemsOwned[itemKey])||0)<amount){toast("You don't own enough of this OP item!");return;}
+ }else{
+  toast("Invalid listing item.");return;
  }
 
- toast(`Listed ${formatQty(amount)} item${amount>1?"s":""} in your store!`);
- document.getElementById("p2pAmountInput").value = "";
- document.getElementById("p2pPriceInput").value = "";
- done();
+ // The item is escrowed immediately. The listing can only be cancelled while it is ACTIVE.
+ if(itemType==="property"){
+  propertiesOwned[itemKey]=(Number(propertiesOwned[itemKey])||0)-amount;
+ }else{
+  const next=(Number(opItemsOwned[itemKey])||0)-amount;
+  if(next>0) opItemsOwned[itemKey]=next; else delete opItemsOwned[itemKey];
+  recalcOpPassiveIncome();
+ }
+
+ const listing={
+  sellerId:playerId,sellerName:validName(),
+  itemType,itemKey,itemName,itemIcon,amount,
+  payment,
+  // Keep the old cash field for compatibility with older listings.
+  price:Math.floor(Number(payment.cash)||0),
+  status:"active",
+  timestamp:serverTimestamp()
+ };
+
+ try{
+  await push(ref(db,"marketListings/"+playerId),listing);
+  toast(`Listed ${formatQty(amount)}x ${itemName} for ${describeP2PPayment(payment)}!`);
+  document.getElementById("p2pAmountInput").value="";
+  document.getElementById("p2pCashPriceInput").value="";
+  document.getElementById("p2pPropPriceQty").value="0";
+  document.getElementById("p2pOpPriceQty").value="0";
+  done();
+ }catch(e){
+  // If Firebase rejects the listing, restore the escrowed item instead of losing it.
+  if(itemType==="property") propertiesOwned[itemKey]=(Number(propertiesOwned[itemKey])||0)+amount;
+  else opItemsOwned[itemKey]=(Number(opItemsOwned[itemKey])||0)+amount;
+  recalcOpPassiveIncome();
+  toast("Could not create listing. Your item was returned.");
+  console.error(e);
+ }
 };
 
 function renderP2PStore(targetId){
- currentSelectedP2PPlayer = targetId || playerId;
- const isSelf = currentSelectedP2PPlayer === playerId;
- const storeTitle = document.getElementById("p2pStoreTitle");
- const grid = document.getElementById("p2pGrid");
+ currentSelectedP2PPlayer=targetId||playerId;
+ const isSelf=currentSelectedP2PPlayer===playerId;
+ const storeTitle=document.getElementById("p2pStoreTitle");
+ const grid=document.getElementById("p2pGrid");
+ const targetPlayerObj=allPlayers[currentSelectedP2PPlayer];
+ storeTitle.textContent=isSelf?"Viewing: Your Listings":`Viewing Store of: ${targetPlayerObj?targetPlayerObj.name:"Player"}`;
 
- const targetPlayerObj = allPlayers[currentSelectedP2PPlayer];
- storeTitle.textContent = isSelf ? "Viewing: Your Listings" : `Viewing Store of: ${targetPlayerObj ? targetPlayerObj.name : "Player"}`;
-
- onValue(ref(db, "marketListings/" + currentSelectedP2PPlayer), snap => {
-  const data = snap.val();
+ onValue(ref(db,"marketListings/"+currentSelectedP2PPlayer),snap=>{
+  const data=snap.val();
   if(!data){
-   grid.innerHTML = '<div class="empty" style="grid-column:1/-1">No items listed in this store.</div>';
+   grid.innerHTML='<div class="empty" style="grid-column:1/-1">No items listed in this store.</div>';
    return;
   }
 
-  grid.innerHTML = Object.entries(data).map(([listKey, item]) => {
-   const amount = Math.max(1, Math.floor(Number(item.amount) || 1));
-   const canBuy = cash >= item.price;
+  const activeEntries=Object.entries(data).filter(([,item])=>item && (item.status||"active")==="active");
+  if(!activeEntries.length){
+   grid.innerHTML='<div class="empty" style="grid-column:1/-1">No items listed in this store.</div>';
+   return;
+  }
+
+  grid.innerHTML=activeEntries.map(([listKey,item])=>{
+   const amount=Math.max(1,Math.floor(Number(item.amount)||1));
+   const payment=item.payment || {cash:Number(item.price)||0,props:{},ops:{}};
+   const canBuy=canAffordP2PPayment(payment);
+   const paymentText=describeP2PPayment(payment);
    return `<div class="p2p-card">
     <div>
-     <div style="font-size:26px">${item.itemIcon}</div>
-     <b style="font-size:14px">${safeText(item.itemName)}</b>
+     <div style="font-size:26px">${item.itemIcon||"📦"}</div>
+     <b style="font-size:14px">${safeText(item.itemName||"Item")}</b>
      <div class="muted" style="margin-top:4px">Amount: ${formatQty(amount)}</div>
-     <div class="green" style="font-size:15px;font-weight:900;margin-top:4px">${money(item.price)}</div>
+     <div style="color:#fbbf24;font-size:13px;font-weight:900;margin-top:5px">WANTED: ${safeText(paymentText)}</div>
     </div>
     <div style="margin-top:8px">
-     ${isSelf 
-       ? `<button class="danger" onclick="cancelP2PListing('${listKey}', '${item.itemType}', '${item.itemKey}', ${amount})" style="width:100%">CANCEL LISTING</button>`
-       : `<button class="buy" onclick="buyP2PListing('${currentSelectedP2PPlayer}', '${listKey}', ${item.price}, '${item.itemType}', '${item.itemKey}', ${amount})" style="width:100%" ${!canBuy?"disabled":""}>BUY ITEM</button>`
+     ${isSelf
+       ? `<button class="danger" onclick="cancelP2PListing('${listKey}')" style="width:100%">CANCEL LISTING</button>`
+       : `<button class="buy" onclick="buyP2PListing('${currentSelectedP2PPlayer}','${listKey}')" style="width:100%" ${!canBuy?"disabled":""}>${canBuy?"BUY / TRADE":"CAN'T AFFORD"}</button>`
      }
     </div>
    </div>`;
   }).join("");
- }, {onlyOnce: true});
+ },{onlyOnce:true});
 }
 
-window.cancelP2PListing = (listKey, itemType, itemKey, amount=1) => {
- remove(ref(db, "marketListings/" + playerId + "/" + listKey));
- amount = Math.max(1, Math.floor(Number(amount) || 1));
- if(itemType === "property"){
-  propertiesOwned[itemKey] = (propertiesOwned[itemKey]||0) + amount;
- } else if(itemType === "op"){
-  opItemsOwned[itemKey] = (opItemsOwned[itemKey]||0) + amount;
-  recalcOpPassiveIncome();
+window.cancelP2PListing = async (listKey) => {
+ const itemRef=ref(db,"marketListings/"+playerId+"/"+listKey);
+ try{
+  const result=await runTransaction(itemRef,current=>{
+   if(!current || current.status==="sold") return; // abort: already bought
+   if(current.sellerId && current.sellerId!==playerId) return;
+   return {...current,status:"cancelled",cancelledAt:serverTimestamp()};
+  });
+
+  if(!result.committed){
+   toast("This listing was already bought. It cannot be cancelled.");
+   renderP2PStore(playerId);
+   return;
+  }
+
+  const listing=result.snapshot.val();
+  const amount=Math.max(1,Math.floor(Number(listing.amount)||1));
+  if(listing.itemType==="property"){
+   propertiesOwned[listing.itemKey]=(Number(propertiesOwned[listing.itemKey])||0)+amount;
+   if(!propertyTimers[listing.itemKey]) propertyTimers[listing.itemKey]=Date.now();
+  }else if(listing.itemType==="op"){
+   opItemsOwned[listing.itemKey]=(Number(opItemsOwned[listing.itemKey])||0)+amount;
+   recalcOpPassiveIncome();
+  }
+  toast("Cancelled listing and returned your item!");
+  done();
+  renderP2PStore(playerId);
+ }catch(e){
+  console.error(e);
+  toast("Could not cancel the listing.");
  }
- toast("Cancelled listing and returned item!");
- done();
- renderP2PStore(playerId);
 };
 
-window.buyP2PListing = async (sellerId, listKey, price, itemType, itemKey, amount=1) => {
- if(cash < price){ toast("Not enough cash!"); return; }
-
- const itemRef = ref(db, `marketListings/${sellerId}/${listKey}`);
- try {
-  const snap = await get(itemRef);
-  if(!snap.exists()){
+window.buyP2PListing = async (sellerId,listKey) => {
+ const itemRef=ref(db,`marketListings/${sellerId}/${listKey}`);
+ let paymentTaken=false;
+ let payment=null;
+ try{
+  const snap=await get(itemRef);
+  if(!snap.exists() || snap.val().status==="cancelled" || snap.val().status==="sold"){
    toast("Item was already sold or removed!");
+   renderP2PStore(sellerId); return;
+  }
+
+  const listing=snap.val();
+  const amount=Math.max(1,Math.floor(Number(listing.amount)||1));
+  payment=listing.payment || {cash:Number(listing.price)||0,props:{},ops:{}};
+
+  if(!canAffordP2PPayment(payment)){
+   toast("You don't have the required cash/property/OP items.");
+   return;
+  }
+  if(sellerId===playerId){toast("You can't buy your own listing.");return;}
+
+  takeP2PPayment(payment);
+  paymentTaken=true;
+  done();
+
+  const claim=await runTransaction(itemRef,current=>{
+   if(!current || current.status!=="active") return;
+   return {...current,status:"sold",buyerId:playerId,buyerName:validName(),soldAt:serverTimestamp()};
+  });
+
+  if(!claim.committed){
+   returnP2PPayment(payment);
+   paymentTaken=false;
+   done();
+   toast("Someone bought that listing first. Your payment was returned.");
    renderP2PStore(sellerId);
    return;
   }
 
-  const listing = snap.val();
-  amount = Math.max(1, Math.floor(Number(listing.amount) || Number(amount) || 1));
-  price = Number(listing.price) || Number(price) || 0;
-  if(cash < price){ toast("Not enough cash!"); return; }
+  paymentTaken=false;
 
-  cash -= price;
-  await remove(itemRef);
-
-  push(ref(db, "transfers/" + sellerId), {
-   fromName: validName(),
-   amount: price,
-   timestamp: serverTimestamp()
-  });
-
-  if(itemType === "property"){
-   propertiesOwned[itemKey] = (propertiesOwned[itemKey]||0) + amount;
-  } else if(itemType === "op"){
-   const opItemObj = OVERPOWERED_ITEMS.find(x => x.id === itemKey);
-   if(opItemObj){
-    addOpItemToInventory(opItemObj, amount);   // goes to the buyer's inventory, activate from My Properties
-   }
+  // The listing is now SOLD in Firebase. The seller's cancellation transaction
+  // can no longer succeed, so the escrowed item cannot be duplicated.
+  if(listing.itemType==="property"){
+   propertiesOwned[listing.itemKey]=(Number(propertiesOwned[listing.itemKey])||0)+amount;
+   if(!propertyTimers[listing.itemKey]) propertyTimers[listing.itemKey]=Date.now();
+  }else if(listing.itemType==="op"){
+   const opItemObj=OVERPOWERED_ITEMS.find(x=>x.id===listing.itemKey);
+   if(opItemObj) addOpItemToInventory(opItemObj,amount);
   }
 
-  toast(`🎉 Bought ${formatQty(amount)}x ${listing.itemName} for ${money(price)}!`);
+  push(ref(db,"marketTransfers/"+sellerId),{
+   buyerId:playerId,
+   buyerName:validName(),
+   listingId:listKey,
+   payment,
+   timestamp:serverTimestamp()
+  });
+
+  toast(`🎉 You got ${formatQty(amount)}x ${listing.itemName} for ${describeP2PPayment(payment)}!`);
   done();
   renderP2PStore(sellerId);
- } catch(e){
+ }catch(e){
   console.error(e);
+  if(paymentTaken && payment){
+   returnP2PPayment(payment);
+   paymentTaken=false;
+   done();
+  }
+  toast("Purchase failed. Your payment was returned.");
  }
 };
 
@@ -1432,6 +1636,7 @@ function startListeners(){
  if(listenersStarted) return;
  listenersStarted = true;
  safeRun("transfer listener", listenForTransfers);
+ safeRun("market payment listener", listenForMarketTransfers);
  safeRun("stock override listener", listenForRemoteStockOverrides);
  safeRun("OP drop listener", listenForOpDrops);
  safeRun("trade listener", listenForTrades);
@@ -1617,6 +1822,24 @@ function listenForTransfers(){
    };
    applyTransfer();
   }
+ });
+}
+
+function listenForMarketTransfers(){
+ if(!firebaseReady||!playerId)return;
+ onChildAdded(ref(db,"marketTransfers/"+playerId),snap=>{
+  const val=snap.val();
+  if(!val || !val.payment) return;
+  const applyMarketTransfer=()=>{
+   if(!stateReady){setTimeout(applyMarketTransfer,500);return;}
+   try{
+    returnP2PPayment(val.payment);
+    toast(`💰 Received ${describeP2PPayment(val.payment)} from ${val.buyerName||"another player"}!`);
+    done();
+    remove(ref(db,"marketTransfers/"+playerId+"/"+snap.key));
+   }catch(e){console.error("Market payment processing failed:",e);}
+  };
+  applyMarketTransfer();
  });
 }
 
